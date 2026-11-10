@@ -8,10 +8,10 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Fonts -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -21,11 +21,16 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #0f172a;
+      background-color: #0b0f19;
       color: #f1f5f9;
       touch-action: manipulation;
+      overflow-x: hidden;
+      width: 100vw;
     }
     .font-mono-tech {
       font-family: 'JetBrains Mono', monospace;
@@ -35,22 +40,22 @@
     }
     .dro-green {
       color: #10b981;
-      text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
     }
     .dro-amber {
       color: #f59e0b;
-      text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+      text-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
     }
     .dro-cyan {
       color: #06b6d4;
-      text-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+      text-shadow: 0 0 10px rgba(6, 182, 212, 0.45);
     }
     .custom-scroll::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
+      width: 4px;
+      height: 4px;
     }
     .custom-scroll::-webkit-scrollbar-track {
-      background: #0f172a;
+      background: #0b0f19;
     }
     .custom-scroll::-webkit-scrollbar-thumb {
       background: #334155;
@@ -66,42 +71,39 @@
   </style>
 </head>
 
-<body class="min-h-screen w-full flex flex-col bg-slate-900 text-slate-100 overflow-x-hidden">
+<body class="min-h-screen w-full flex flex-col bg-slate-950 text-slate-100">
 
-  <!-- Top Navigation Header -->
-  <header class="h-14 bg-slate-950 border-b border-slate-800 px-3 sm:px-4 flex items-center justify-between shrink-0 z-30">
-    <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-md bg-cyan-600 flex items-center justify-center font-industrial font-bold text-white shadow-sm text-xs">
+  <!-- Top Header Navigation -->
+  <header class="h-14 bg-slate-900 border-b border-slate-800 px-3 flex items-center justify-between shrink-0 z-30 w-full">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded bg-cyan-600 flex items-center justify-center font-industrial font-bold text-white text-xs shadow-sm">
         CNC
       </div>
-      <div>
-        <div class="flex items-center gap-1.5 leading-none">
-          <span class="text-xs sm:text-sm font-bold font-industrial tracking-wider text-slate-100">V-MILL 3000</span>
-          <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono-tech font-semibold">ONLINE</span>
+      <div class="leading-tight">
+        <div class="flex items-center gap-1.5">
+          <span class="text-xs sm:text-sm font-bold font-industrial tracking-wide text-slate-100">V-MILL 3000</span>
+          <span class="text-[9px] px-1 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono-tech font-bold">ONLINE</span>
         </div>
-        <p class="text-[10px] text-slate-400 font-mono-tech mt-0.5 hidden sm:block">3-Axis CNC Training Simulator</p>
+        <p class="text-[10px] text-slate-400 font-mono-tech hidden sm:block">3-Axis Vertical Mill Simulator</p>
       </div>
     </div>
 
-    <!-- Header Actions -->
-    <div class="flex items-center gap-1.5 sm:gap-2">
-      <!-- Beginner Guide Button -->
-      <button id="btnOpenHelp" class="h-8 px-2.5 rounded bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 border border-cyan-700/60 flex items-center gap-1.5 text-xs font-medium transition active:scale-95 shadow-sm">
-        <i data-lucide="help-circle" class="w-4 h-4 text-cyan-400"></i>
-        <span class="font-mono-tech hidden sm:inline">GUIDE</span>
+    <!-- Header Actions (No horizontal overflow) -->
+    <div class="flex items-center gap-1.5 font-mono-tech text-xs">
+      <button id="btnOpenHelp" class="h-8 px-2.5 rounded bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-700/60 flex items-center gap-1 text-[11px] transition active:scale-95 shadow-sm">
+        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-cyan-400"></i>
+        <span>GUIDE</span>
       </button>
 
-      <button id="btnAudioToggle" class="h-8 px-2 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center gap-1.5 text-xs transition active:scale-95" title="Toggle Workshop Audio">
-        <i data-lucide="volume-2" class="w-4 h-4 text-emerald-400" id="audioIcon"></i>
-        <span id="audioStatusText" class="font-mono-tech text-[10px] hidden md:inline">AUDIO: ON</span>
+      <button id="btnAudioToggle" class="h-8 px-2 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center gap-1 text-[11px] transition active:scale-95" title="Toggle Sound">
+        <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400" id="audioIcon"></i>
       </button>
 
-      <button id="btnResetStock" class="h-8 px-2 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center gap-1.5 text-xs transition active:scale-95" title="Face Workpiece Fresh">
-        <i data-lucide="refresh-cw" class="w-4 h-4 text-cyan-400"></i>
-        <span class="font-mono-tech text-[10px] hidden md:inline">RESET</span>
+      <button id="btnResetStock" class="h-8 px-2 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center gap-1 text-[11px] transition active:scale-95" title="Reset Stock">
+        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-cyan-400"></i>
       </button>
 
-      <button id="btnEStop" class="h-8 px-3 rounded bg-red-600 hover:bg-red-500 text-white font-industrial font-bold border border-red-400 shadow flex items-center gap-1 text-xs active:scale-95 transition">
+      <button id="btnEStop" class="h-8 px-2.5 rounded bg-red-600 hover:bg-red-500 text-white font-industrial font-bold border border-red-400 flex items-center gap-1 text-[11px] active:scale-95 transition shadow-sm">
         <i data-lucide="octagon-alert" class="w-3.5 h-3.5"></i>
         <span>E-STOP</span>
       </button>
@@ -109,110 +111,111 @@
   </header>
 
   <!-- Alarm Banner -->
-  <div id="alarmBanner" class="hidden bg-red-950 border-b border-red-500 text-red-200 px-4 py-2 text-xs font-mono-tech font-bold alarm-active items-center justify-between z-20">
+  <div id="alarmBanner" class="hidden bg-red-950 border-b border-red-500 text-red-200 px-3 py-2 text-xs font-mono-tech font-bold alarm-active items-center justify-between z-20 w-full">
     <div class="flex items-center gap-2">
       <i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0"></i>
-      <span id="alarmText">COLLISION DETECTED</span>
+      <span id="alarmText" class="truncate">COLLISION DETECTED</span>
     </div>
-    <button id="btnDismissAlarm" class="text-[10px] bg-red-800 hover:bg-red-700 px-2 py-1 rounded text-white border border-red-400 font-sans">DISMISS</button>
+    <button id="btnDismissAlarm" class="text-[10px] bg-red-800 hover:bg-red-700 px-2 py-0.5 rounded text-white border border-red-400 font-sans shrink-0">ACK</button>
   </div>
 
-  <!-- Main Responsive Container -->
-  <div class="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden">
+  <!-- Main View Area (Responsive Split: Stack on Mobile, Dual-Pane on Desktop) -->
+  <div class="flex-1 flex flex-col md:flex-row w-full overflow-x-hidden">
 
-    <!-- Left / Top: 3D Viewport with Studio Lighting -->
-    <div class="w-full md:flex-1 h-[320px] sm:h-[400px] md:h-auto relative bg-slate-950 shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-slate-800">
+    <!-- 3D Viewport Section -->
+    <div class="w-full md:flex-1 h-[290px] sm:h-[360px] md:h-auto relative bg-slate-950 shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-slate-800">
       
-      <!-- 3D Canvas Container -->
+      <!-- 3D Canvas Mounting Container -->
       <div id="viewport3D" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
 
-      <!-- Camera Presets -->
-      <div class="absolute top-2.5 left-2.5 flex items-center gap-1 bg-slate-900/90 backdrop-blur px-2 py-1 rounded-md border border-slate-700 text-[10px] font-mono-tech shadow z-10">
-        <span class="text-slate-400 font-semibold hidden sm:inline mr-1">VIEW:</span>
-        <button id="camIso" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">ISO</button>
-        <button id="camTop" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">TOP</button>
-        <button id="camFront" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">FRONT</button>
-        <button id="camSide" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">SIDE</button>
+      <!-- Camera View Angle Pills -->
+      <div class="absolute top-2 left-2 flex items-center gap-1 bg-slate-900/90 backdrop-blur px-1.5 py-1 rounded border border-slate-700 text-[10px] font-mono-tech shadow z-10">
+        <button id="camIso" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">ISO</button>
+        <button id="camTop" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">TOP</button>
+        <button id="camFront" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">FRONT</button>
+        <button id="camSide" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">SIDE</button>
       </div>
 
-      <!-- Spindle & Feed HUD -->
-      <div class="absolute top-2.5 right-2.5 bg-slate-900/90 backdrop-blur px-3 py-1 rounded-md border border-slate-700 text-[10px] font-mono-tech flex items-center gap-3 shadow z-10">
+      <!-- Live Machine State HUD -->
+      <div class="absolute top-2 right-2 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded border border-slate-700 text-[10px] font-mono-tech flex items-center gap-2.5 shadow z-10">
         <div>
           <span class="text-slate-400 block text-[9px] leading-tight">SPINDLE</span>
           <span id="hudSpindleRpm" class="text-slate-300 font-bold">0 RPM</span>
         </div>
-        <div class="h-5 w-px bg-slate-700"></div>
+        <div class="h-4 w-px bg-slate-700"></div>
         <div>
-          <span class="text-slate-400 block text-[9px] leading-tight">FEEDRATE</span>
+          <span class="text-slate-400 block text-[9px] leading-tight">FEED</span>
           <span id="hudFeedrate" class="text-cyan-400 font-bold dro-cyan">F600</span>
         </div>
       </div>
 
-      <!-- Workpiece & Tool Details -->
-      <div class="absolute bottom-2.5 left-2.5 bg-slate-900/90 backdrop-blur border border-slate-700/80 px-2.5 py-1 rounded-md text-[10px] font-mono-tech text-slate-300 flex items-center gap-2 z-10">
-        <span>Stock: <strong class="text-slate-100">120×80×20 mm</strong></span>
+      <!-- Bottom Workpiece & Tool Details -->
+      <div class="absolute bottom-2 left-2 bg-slate-900/90 backdrop-blur border border-slate-700 px-2 py-0.5 rounded text-[10px] font-mono-tech text-slate-300 flex items-center gap-2 z-10">
+        <span>Stock: <strong class="text-slate-100">120×80×20</strong></span>
         <span>•</span>
-        <span>Tool: <strong class="text-cyan-300">Ø6mm Flat Mill</strong></span>
+        <span>Tool: <strong class="text-cyan-300">Ø6mm Flat</strong></span>
       </div>
     </div>
 
-    <!-- Right / Bottom: Control Console -->
-    <div class="w-full md:w-[420px] lg:w-[460px] bg-slate-900 flex flex-col shrink-0 custom-scroll md:overflow-y-auto">
+    <!-- Machine Control & Information Console (Strictly Full Width on Mobile, 420px on Desktop) -->
+    <div class="w-full md:w-[420px] bg-slate-900 flex flex-col shrink-0 custom-scroll overflow-y-auto">
       
-      <!-- DRO (Digital Readout) -->
-      <section class="p-3 bg-slate-950 border-b border-slate-800">
+      <!-- DRO (Digital Readout) Panel -->
+      <section class="p-3 bg-slate-950 border-b border-slate-800 w-full">
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-1.5">
             <i data-lucide="gauge" class="w-3.5 h-3.5 text-cyan-400"></i>
             <span class="text-[11px] font-industrial tracking-wider font-bold text-slate-300">POSITION (WORK G54)</span>
           </div>
-          <span class="text-[9px] font-mono-tech text-cyan-400 bg-cyan-950/70 px-1.5 py-0.5 rounded border border-cyan-800">METRIC mm</span>
+          <span class="text-[9px] font-mono-tech text-cyan-400 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-800">METRIC mm</span>
         </div>
 
-        <!-- DRO 3-Axis Grid (Prevents Text Wrapping) -->
-        <div class="grid grid-cols-3 gap-2 font-mono-tech">
+        <!-- 3 Axis Readouts -->
+        <div class="grid grid-cols-3 gap-1.5 font-mono-tech w-full">
           <!-- X Axis -->
-          <div class="bg-slate-900/90 border border-slate-800 p-2 rounded-md flex flex-col justify-between">
-            <div class="flex justify-between items-center text-[10px] text-emerald-400 mb-1">
+          <div class="bg-slate-900 border border-slate-800 p-2 rounded flex flex-col justify-between">
+            <div class="flex justify-between items-center text-[10px] text-emerald-400 mb-0.5">
               <span class="font-bold">X</span>
-              <button id="btnZeroX" class="bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-[9px] text-slate-300">ZERO</button>
+              <button id="btnZeroX" class="bg-slate-800 hover:bg-slate-700 px-1 py-0.2 rounded text-[9px] text-slate-300">ZERO</button>
             </div>
             <div id="droX" class="text-base sm:text-lg font-bold dro-green tracking-tight whitespace-nowrap overflow-hidden text-center">+000.000</div>
           </div>
 
           <!-- Y Axis -->
-          <div class="bg-slate-900/90 border border-slate-800 p-2 rounded-md flex flex-col justify-between">
-            <div class="flex justify-between items-center text-[10px] text-emerald-400 mb-1">
+          <div class="bg-slate-900 border border-slate-800 p-2 rounded flex flex-col justify-between">
+            <div class="flex justify-between items-center text-[10px] text-emerald-400 mb-0.5">
               <span class="font-bold">Y</span>
-              <button id="btnZeroY" class="bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-[9px] text-slate-300">ZERO</button>
+              <button id="btnZeroY" class="bg-slate-800 hover:bg-slate-700 px-1 py-0.2 rounded text-[9px] text-slate-300">ZERO</button>
             </div>
             <div id="droY" class="text-base sm:text-lg font-bold dro-green tracking-tight whitespace-nowrap overflow-hidden text-center">+000.000</div>
           </div>
 
           <!-- Z Axis -->
-          <div class="bg-slate-900/90 border border-slate-800 p-2 rounded-md flex flex-col justify-between">
-            <div class="flex justify-between items-center text-[10px] text-amber-400 mb-1">
+          <div class="bg-slate-900 border border-slate-800 p-2 rounded flex flex-col justify-between">
+            <div class="flex justify-between items-center text-[10px] text-amber-400 mb-0.5">
               <span class="font-bold">Z</span>
-              <button id="btnZeroZ" class="bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-[9px] text-slate-300">ZERO</button>
+              <button id="btnZeroZ" class="bg-slate-800 hover:bg-slate-700 px-1 py-0.2 rounded text-[9px] text-slate-300">ZERO</button>
             </div>
             <div id="droZ" class="text-base sm:text-lg font-bold dro-amber tracking-tight whitespace-nowrap overflow-hidden text-center">+025.000</div>
           </div>
         </div>
 
-        <!-- Touch-Off / Quick Zero -->
-        <div class="mt-2.5 grid grid-cols-2 gap-2">
-          <button id="btnTouchOffCorner" class="h-8 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-[11px] font-mono-tech text-cyan-300 flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
-            <i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Set Part Zero (X0 Y0 Z0)
+        <!-- Quick Reference Touch-Off Buttons -->
+        <div class="mt-2 grid grid-cols-2 gap-2 w-full">
+          <button id="btnTouchOffCorner" class="h-8 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-[10px] sm:text-[11px] font-mono-tech text-cyan-300 flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
+            <i data-lucide="crosshair" class="w-3.5 h-3.5 shrink-0"></i>
+            <span class="truncate">Set Part Zero (X0 Y0 Z0)</span>
           </button>
-          <button id="btnTouchOffTop" class="h-8 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-[11px] font-mono-tech text-amber-300 flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
-            <i data-lucide="arrow-down-to-line" class="w-3.5 h-3.5"></i> Touch Face (Z0)
+          <button id="btnTouchOffTop" class="h-8 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-[10px] sm:text-[11px] font-mono-tech text-amber-300 flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
+            <i data-lucide="arrow-down-to-line" class="w-3.5 h-3.5 shrink-0"></i>
+            <span class="truncate">Touch Face (Z0)</span>
           </button>
         </div>
       </section>
 
-      <!-- Tabs Navigation (Now includes dedicated TOOLS tab) -->
-      <div class="flex border-b border-slate-800 bg-slate-950 font-industrial text-xs tracking-wider font-bold">
-        <button id="tabBtnPendant" class="flex-1 py-2.5 text-cyan-400 border-b-2 border-cyan-400 bg-slate-900/70 transition">PENDANT</button>
+      <!-- Navigation Tabs (Pendant / G-Code / Tools / Lessons) -->
+      <div class="flex border-b border-slate-800 bg-slate-950 font-industrial text-xs tracking-wider font-bold w-full shrink-0">
+        <button id="tabBtnPendant" class="flex-1 py-2.5 text-cyan-400 border-b-2 border-cyan-400 bg-slate-900/80 transition">PENDANT</button>
         <button id="tabBtnGcode" class="flex-1 py-2.5 text-slate-400 hover:text-slate-200 transition">G-CODE</button>
         <button id="tabBtnTools" class="flex-1 py-2.5 text-slate-400 hover:text-slate-200 transition">TOOLS</button>
         <button id="tabBtnAcademy" class="flex-1 py-2.5 text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1 transition">
@@ -221,16 +224,15 @@
         </button>
       </div>
 
-      <!-- Tab 1: Manual Jog Pendant -->
-      <section id="panelPendant" class="p-3 space-y-3.5">
-        
-        <!-- Step Size Selector -->
-        <div>
+      <!-- Tab Content 1: Manual Jog Pendant -->
+      <section id="panelPendant" class="p-3 space-y-3.5 w-full flex flex-col">
+        <!-- Jog Increments -->
+        <div class="w-full">
           <div class="flex justify-between items-center mb-1">
-            <span class="text-[10px] font-mono-tech text-slate-400 uppercase tracking-wider">Jog Step Increment (mm)</span>
+            <span class="text-[10px] font-mono-tech text-slate-400 uppercase tracking-wider">Jog Step (mm)</span>
             <span class="text-[9px] text-slate-500 font-mono-tech">Resolution</span>
           </div>
-          <div class="grid grid-cols-4 gap-1.5 font-mono-tech text-xs">
+          <div class="grid grid-cols-4 gap-1.5 font-mono-tech text-xs w-full">
             <button class="step-btn h-9 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200" data-step="0.05">0.05</button>
             <button class="step-btn h-9 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200" data-step="0.5">0.5</button>
             <button class="step-btn h-9 rounded bg-cyan-700 font-bold border border-cyan-500 text-white" data-step="1.0">1.0</button>
@@ -238,8 +240,8 @@
           </div>
         </div>
 
-        <!-- Directional Jog Buttons -->
-        <div class="bg-slate-950/80 p-3 rounded-lg border border-slate-800 flex flex-col items-center gap-2">
+        <!-- Directional Jog Controls Layout -->
+        <div class="bg-slate-950/80 p-3 rounded-lg border border-slate-800 flex flex-col items-center gap-2 w-full">
           
           <!-- Y+ Button -->
           <button id="jogYPlus" class="w-24 h-11 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 rounded-md font-mono-tech font-bold text-sm text-emerald-400 active:scale-95 transition flex items-center justify-center gap-1.5 shadow">
@@ -273,20 +275,20 @@
           </button>
         </div>
 
-        <!-- Spindle & Coolant Controls -->
-        <div class="grid grid-cols-2 gap-2 font-mono-tech text-xs">
-          <button id="btnToggleSpindle" class="h-10 rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center gap-2 transition active:scale-95 shadow-sm">
+        <!-- Spindle & Coolant Toggles -->
+        <div class="grid grid-cols-2 gap-2 font-mono-tech text-xs w-full">
+          <button id="btnToggleSpindle" class="h-10 rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
             <i data-lucide="rotate-cw" class="w-4 h-4 text-emerald-400"></i>
             <span id="labelSpindleBtn">START SPINDLE</span>
           </button>
-          <button id="btnToggleCoolant" class="h-10 rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center gap-2 transition active:scale-95 shadow-sm">
+          <button id="btnToggleCoolant" class="h-10 rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
             <i data-lucide="droplet" class="w-4 h-4 text-cyan-400"></i>
             <span id="labelCoolantBtn">COOLANT: OFF</span>
           </button>
         </div>
 
         <!-- Spindle Speed Slider -->
-        <div class="bg-slate-950 p-3 rounded-md border border-slate-800">
+        <div class="bg-slate-950 p-2.5 rounded-md border border-slate-800 w-full">
           <div class="flex justify-between text-[11px] font-mono-tech text-slate-400 mb-1.5">
             <span>SPINDLE RPM</span>
             <span id="labelRpmTarget" class="text-emerald-400 font-bold">4000 RPM</span>
@@ -295,9 +297,9 @@
         </div>
       </section>
 
-      <!-- Tab 2: G-Code Editor & Program Run -->
-      <section id="panelGcode" class="hidden p-3 flex-col space-y-3">
-        <div class="flex items-center justify-between">
+      <!-- Tab Content 2: G-Code Editor & Run -->
+      <section id="panelGcode" class="hidden p-3 space-y-3 w-full flex-col">
+        <div class="flex items-center justify-between w-full">
           <span class="text-[10px] font-mono-tech text-slate-400 uppercase tracking-wider">Active Program (ISO 6983)</span>
           <div class="flex gap-1.5">
             <button id="btnPresetFace" class="text-[10px] font-mono-tech px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">Facing Pass</button>
@@ -305,7 +307,7 @@
           </div>
         </div>
 
-        <textarea id="gcodeEditor" spellcheck="false" class="w-full h-40 bg-slate-950 border border-slate-800 rounded p-2.5 font-mono-tech text-xs text-emerald-400 leading-relaxed custom-scroll focus:outline-none focus:border-cyan-500 resize-none">
+        <textarea id="gcodeEditor" spellcheck="false" class="w-full h-36 bg-slate-950 border border-slate-800 rounded p-2.5 font-mono-tech text-xs text-emerald-400 leading-relaxed custom-scroll focus:outline-none focus:border-cyan-500 resize-none">
 (SAMPLE FACING & CONTOUR)
 G90 G21
 M03 S5000
@@ -321,7 +323,7 @@ M05
 M30</textarea>
 
         <!-- Program Execution Controls -->
-        <div class="grid grid-cols-3 gap-2 font-industrial">
+        <div class="grid grid-cols-3 gap-2 font-industrial w-full">
           <button id="btnCycleStart" class="h-10 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs tracking-wider flex items-center justify-center gap-1 shadow active:scale-95 transition">
             <i data-lucide="play" class="w-3.5 h-3.5"></i> START
           </button>
@@ -334,70 +336,70 @@ M30</textarea>
         </div>
 
         <!-- Terminal Output -->
-        <div class="h-28 bg-slate-950 rounded border border-slate-800 p-2.5 font-mono-tech text-[10px] custom-scroll overflow-y-auto space-y-1" id="terminalLog">
+        <div class="h-28 bg-slate-950 rounded border border-slate-800 p-2 font-mono-tech text-[10px] custom-scroll overflow-y-auto space-y-1 w-full" id="terminalLog">
           <div class="text-slate-500">> Machine initialized. Stock: 6061-T6 Aluminum.</div>
           <div class="text-cyan-400">> Tool 1: Ø6mm 2-Flute Carbide End Mill mounted.</div>
         </div>
       </section>
 
-      <!-- Tab 3: Dedicated CNC Tooling Academy (NEW) -->
-      <section id="panelTools" class="hidden p-3 space-y-3 custom-scroll">
-        <div class="bg-cyan-950/40 border border-cyan-800/60 p-2.5 rounded text-[11px] text-cyan-200 leading-relaxed">
-          <strong class="font-industrial text-xs text-cyan-300 block mb-0.5">CNC CUTTING TOOLS OVERVIEW</strong>
-          Milling tools remove material by shearing metal chips as the spindle rotates at high RPM. Selecting the right cutter prevents chatter, extends tool life, and delivers the required surface finish.
+      <!-- Tab Content 3: Dedicated CNC Tooling Academy (Vertical Stacked Cards) -->
+      <section id="panelTools" class="hidden p-3 space-y-2.5 w-full flex-col custom-scroll">
+        <div class="bg-cyan-950/40 border border-cyan-800/60 p-2.5 rounded text-[11px] text-cyan-200 leading-relaxed w-full">
+          <strong class="font-industrial text-xs text-cyan-300 block mb-0.5">CNC CUTTING TOOLS</strong>
+          Milling tools shear metal chips as the spindle turns at high RPM. Select the right tool geometry for the machining task.
         </div>
 
         <!-- Tool 1: Flat End Mill -->
-        <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1">
+        <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1 w-full">
           <div class="flex justify-between items-center">
             <span class="text-xs font-bold font-industrial text-emerald-400">1. FLAT END MILL (LOADED: Ø6mm)</span>
             <span class="text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-300">GENERAL PURPOSE</span>
           </div>
           <p class="text-[11px] text-slate-400 leading-normal">
-            Features sharp $90^\circ$ bottom corners and flat face flutes. Used for 2D profiling, slotting, facing flat surfaces, and milling internal pockets with vertical sidewalls.
+            Sharp 90° bottom flutes. Ideal for facing, side shoulder profiling, slots, and flat bottom pockets.
           </p>
         </div>
 
         <!-- Tool 2: Ball Nose End Mill -->
-        <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1">
+        <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1 w-full">
           <div class="flex justify-between items-center">
             <span class="text-xs font-bold font-industrial text-cyan-400">2. BALL NOSE END MILL</span>
             <span class="text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-800 text-cyan-300">3D CONTOURING</span>
           </div>
           <p class="text-[11px] text-slate-400 leading-normal">
-            Features a hemispherical tip with radius $R = D/2$. Essential for 3D sculptured surfaces, turbine blades, molds, and organic curves where flat tools leave stepped ridges.
+            Hemispherical tip profile (R = D/2). Essential for 3D sculptured surfaces, molds, and organic curves.
           </p>
         </div>
 
         <!-- Tool 3: Face Mill -->
-        <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1">
+        <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1 w-full">
           <div class="flex justify-between items-center">
             <span class="text-xs font-bold font-industrial text-amber-400">3. INDEXABLE FACE MILL</span>
             <span class="text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-amber-950 border border-amber-800 text-amber-300">HIGH MRR FACING</span>
           </div>
           <p class="text-[11px] text-slate-400 leading-normal">
-            Large diameter cutter (40mm–100mm) holding multiple replaceable carbide inserts. Used exclusively to skim broad top surfaces flat with minimal machine passes.
+            Large diameter cutter (40–100mm) holding replaceable inserts to skim broad tops flat with fewer passes.
           </p>
         </div>
 
-        <!-- Tool 4: Chamfer & Spotting Tool -->
-        <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1">
+        <!-- Tool 4: Chamfer Mill -->
+        <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1 w-full">
           <div class="flex justify-between items-center">
-            <span class="text-xs font-bold font-industrial text-purple-400">4. CHAMFER MILL ($45^\circ / 90^\circ$)</span>
+            <span class="text-xs font-bold font-industrial text-purple-400">4. CHAMFER MILL (45° / 90°)</span>
             <span class="text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-purple-950 border border-purple-800 text-purple-300">DEBURRING</span>
           </div>
           <p class="text-[11px] text-slate-400 leading-normal">
-            Pointed cone geometry cut at $45^\circ$ or $60^\circ$. Used to deburr sharp milled edges, create beveled lead-in chamfers for bolt holes, and countersink screws.
+            Beveled cutting angle used to deburr sharp edges and countersink hole entries.
           </p>
         </div>
       </section>
 
-      <!-- Tab 4: CNC Guided Lessons -->
-      <section id="panelAcademy" class="hidden p-3 space-y-2.5">
-        <p class="text-xs text-slate-300">Step-by-step interactive missions with automated verification:</p>
+      <!-- Tab Content 4: CNC Guided Lessons (Vertical Stacked Cards) -->
+      <section id="panelAcademy" class="hidden p-3 space-y-2.5 w-full flex-col">
+        <p class="text-xs text-slate-300">Step-by-step interactive missions with automated checks:</p>
 
         <!-- Mission 1 -->
-        <div class="border border-slate-800 rounded bg-slate-950 p-2.5 space-y-1.5">
+        <div class="border border-slate-800 rounded bg-slate-950 p-2.5 space-y-1.5 w-full">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold font-industrial text-cyan-400">MISSION 1: ZERO THE WORKPIECE</span>
             <span id="badgeL1" class="text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">PENDING</span>
@@ -407,7 +409,7 @@ M30</textarea>
         </div>
 
         <!-- Mission 2 -->
-        <div class="border border-slate-800 rounded bg-slate-950 p-2.5 space-y-1.5">
+        <div class="border border-slate-800 rounded bg-slate-950 p-2.5 space-y-1.5 w-full">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold font-industrial text-cyan-400">MISSION 2: 1MM FACING PASS</span>
             <span id="badgeL2" class="text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">LOCKED</span>
@@ -417,7 +419,7 @@ M30</textarea>
         </div>
 
         <!-- Mission 3 -->
-        <div class="border border-slate-800 rounded bg-slate-950 p-2.5 space-y-1.5">
+        <div class="border border-slate-800 rounded bg-slate-950 p-2.5 space-y-1.5 w-full">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold font-industrial text-red-400">MISSION 3: PREVENT RAPID CRASH</span>
             <span id="badgeL3" class="text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">LOCKED</span>
@@ -434,12 +436,12 @@ M30</textarea>
   <div id="guideModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
     <div class="bg-slate-900 border border-slate-700 w-full max-w-xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
       <!-- Modal Header -->
-      <div class="p-4 border-b border-slate-800 bg-slate-950 flex items-center justify-between">
+      <div class="p-3 sm:p-4 border-b border-slate-800 bg-slate-950 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded bg-cyan-600 flex items-center justify-center text-white">
+          <div class="w-7 h-7 rounded bg-cyan-600 flex items-center justify-center text-white text-xs">
             <i data-lucide="book-open" class="w-4 h-4"></i>
           </div>
-          <h2 class="text-sm sm:text-base font-bold font-industrial tracking-wide text-slate-100">BEGINNER CNC FIELD GUIDE</h2>
+          <h2 class="text-sm sm:text-base font-bold font-industrial tracking-wide text-slate-100">BEGINNER CNC GUIDE</h2>
         </div>
         <button id="btnCloseHelp" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
           <i data-lucide="x" class="w-4 h-4"></i>
@@ -447,67 +449,61 @@ M30</textarea>
       </div>
 
       <!-- Modal Body -->
-      <div class="p-4 sm:p-5 space-y-4 overflow-y-auto custom-scroll text-xs text-slate-300">
-        
-        <!-- Section 1 -->
-        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1.5">
+      <div class="p-4 space-y-3 overflow-y-auto custom-scroll text-xs text-slate-300">
+        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
           <h3 class="font-industrial font-bold text-cyan-400 text-sm flex items-center gap-1.5">
             <i data-lucide="compass" class="w-4 h-4 text-cyan-400"></i>
-            1. Understanding the 3-Axis System
+            1. The 3 Cartesian Axes
           </h3>
           <p class="leading-relaxed text-slate-400">
-            A CNC milling machine maneuvers a spinning cutting tool across 3 Cartesian axes:
+            A CNC milling machine coordinates motion along 3 axes:
           </p>
-          <ul class="list-disc list-inside space-y-1 text-slate-300 pl-1">
-            <li><strong>X Axis (Left/Right):</strong> Horizontal table traverse along the long edge.</li>
-            <li><strong>Y Axis (Front/Back):</strong> Horizontal table cross-travel along the short edge.</li>
-            <li><strong>Z Axis (Up/Down):</strong> Spindle elevation. $Z > 0$ is safely above stock; $Z \le 0$ plunges into the workpiece.</li>
+          <ul class="list-disc list-inside space-y-0.5 text-slate-300 pl-1">
+            <li><strong>X Axis:</strong> Traverses along the long side (120mm).</li>
+            <li><strong>Y Axis:</strong> Traverses along the short side (80mm).</li>
+            <li><strong>Z Axis:</strong> Vertical tool height. $Z > 0$ is above material; $Z \le 0$ cuts into workpiece.</li>
           </ul>
         </div>
 
-        <!-- Section 2 -->
-        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1.5">
+        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
           <h3 class="font-industrial font-bold text-emerald-400 text-sm flex items-center gap-1.5">
             <i data-lucide="navigation" class="w-4 h-4 text-emerald-400"></i>
-            2. What the Controls & Buttons Do
+            2. Controls & Operating Rules
           </h3>
-          <ul class="space-y-1.5 text-slate-400 pl-1">
-            <li><strong class="text-slate-200">DRO (Digital Readout):</strong> Displays live coordinate position relative to workpiece zero ($G54$).</li>
-            <li><strong class="text-slate-200">Touch Off Corner:</strong> Moves the tool tip directly to ($X0, Y0, Z0$) to establish part reference zero.</li>
-            <li><strong class="text-slate-200">Jog Pendant Buttons:</strong> Nudge axes incrementally by the chosen step resolution ($0.05\text{ mm}$ to $5\text{ mm}$).</li>
-            <li><strong class="text-slate-200">Start Spindle:</strong> Spins the cutting tool at the selected RPM. <em>Crucial: Always start spindle before plunging into metal!</em></li>
-            <li><strong class="text-slate-200">E-STOP:</strong> Emergency Stop button. Instantly freezes machine motion and spindle power.</li>
+          <ul class="space-y-1 text-slate-400 pl-1">
+            <li><strong class="text-slate-200">DRO:</strong> Live coordinates relative to part zero ($G54$).</li>
+            <li><strong class="text-slate-200">Part Zero:</strong> Click "Set Part Zero" to calibrate reference zero at stock corner.</li>
+            <li><strong class="text-slate-200">Start Spindle:</strong> Always turn the spindle on before moving into material to avoid breaking tools!</li>
+            <li><strong class="text-slate-200">E-STOP:</strong> Emergency stop to instantly halt all movement.</li>
           </ul>
         </div>
 
-        <!-- Section 3 -->
-        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1.5">
+        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1">
           <h3 class="font-industrial font-bold text-amber-400 text-sm flex items-center gap-1.5">
             <i data-lucide="code" class="w-4 h-4 text-amber-400"></i>
-            3. Core G-Code Cheat Sheet
+            3. Common G-Code Commands
           </h3>
-          <div class="grid grid-cols-2 gap-2 font-mono-tech text-[11px]">
+          <div class="grid grid-cols-2 gap-2 font-mono-tech text-[10px]">
             <div class="bg-slate-900 p-1.5 rounded border border-slate-800">
-              <span class="text-cyan-300 font-bold">G00:</span> Rapid Positioning (Air moves only!)
+              <span class="text-cyan-300 font-bold">G00:</span> Rapid Positioning
             </div>
             <div class="bg-slate-900 p-1.5 rounded border border-slate-800">
-              <span class="text-emerald-300 font-bold">G01:</span> Linear Controlled Cutting Feed
+              <span class="text-emerald-300 font-bold">G01:</span> Linear Cut Feed
             </div>
             <div class="bg-slate-900 p-1.5 rounded border border-slate-800">
-              <span class="text-amber-300 font-bold">M03:</span> Spindle Clockwise Rotation
+              <span class="text-amber-300 font-bold">M03:</span> Spindle On
             </div>
             <div class="bg-slate-900 p-1.5 rounded border border-slate-800">
               <span class="text-red-300 font-bold">M05:</span> Spindle Stop
             </div>
           </div>
         </div>
-
       </div>
 
       <!-- Modal Footer -->
-      <div class="p-3 bg-slate-950 border-t border-slate-800 flex justify-end">
+      <div class="p-3 bg-slate-950 border-t border-slate-800 flex justify-end shrink-0">
         <button id="btnGotIt" class="px-4 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-industrial font-bold text-xs tracking-wider transition">
-          GOT IT, LET'S MACHINE
+          START MACHINING
         </button>
       </div>
     </div>
@@ -515,7 +511,7 @@ M30</textarea>
 
   <script>
     /* ==========================================================================
-       V-MILL 3000 ENGINE & WORKSHOP CONTROLLER
+       V-MILL 3000 CORE LOGIC & ENGINE
        ========================================================================== */
     const STOCK_DIMS = { width: 120, depth: 80, height: 20 };
     let wcsOffset = { x: -60, y: -40, z: 20 };
@@ -545,21 +541,19 @@ M30</textarea>
     let toolAssembly, spindleRotor;
     let stockMesh, stockTextureCanvas, stockTextureCtx, stockTexture;
     let toolpathGroup;
-    let chipParticles, coolantParticles;
-    const CHIP_COUNT = 60;
-    const COOLANT_COUNT = 60;
+    let chipParticles;
+    const CHIP_COUNT = 50;
 
     const CANVAS_W = 512;
     const CANVAS_H = 340;
 
-    /* Three.js Viewport with Studio Illumination */
+    /* Three.js Viewport Initialization */
     function init3DViewport() {
       const host = document.getElementById('viewport3D');
       const w = host.clientWidth || 360;
-      const h = host.clientHeight || 340;
+      const h = host.clientHeight || 290;
 
       scene = new THREE.Scene();
-      // Brighter slate background for clear tool & stock contrast
       scene.background = new THREE.Color(0x1e293b);
       scene.fog = new THREE.FogExp2(0x1e293b, 0.002);
 
@@ -579,7 +573,7 @@ M30</textarea>
       controls.target.set(0, 10, 0);
 
       // Studio Workshop Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.1);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.15);
       scene.add(ambientLight);
 
       const mainSpot = new THREE.SpotLight(0xffffff, 1.8, 600, Math.PI / 4, 0.3, 1);
@@ -614,7 +608,6 @@ M30</textarea>
       bed.receiveShadow = true;
       scene.add(bed);
 
-      // T-Slots
       for (let z = -60; z <= 60; z += 30) {
         const slotGeo = new THREE.BoxGeometry(240, 2, 8);
         const slotMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
@@ -623,7 +616,6 @@ M30</textarea>
         scene.add(slot);
       }
 
-      // Precision Machine Vise
       const viseBaseGeo = new THREE.BoxGeometry(140, 10, 96);
       const viseMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.35, metalness: 0.8 });
       const vise = new THREE.Mesh(viseBaseGeo, viseMat);
@@ -643,7 +635,6 @@ M30</textarea>
       stockTexture = new THREE.CanvasTexture(stockTextureCanvas);
       const stockGeo = new THREE.BoxGeometry(STOCK_DIMS.width, STOCK_DIMS.height, STOCK_DIMS.depth);
 
-      // Bright polished aluminum stock
       const matSides = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.3, metalness: 0.85 });
       const matTop = new THREE.MeshStandardMaterial({ map: stockTexture, roughness: 0.35, metalness: 0.8 });
 
@@ -667,7 +658,6 @@ M30</textarea>
     function buildSpindleAndToolhead() {
       toolAssembly = new THREE.Group();
 
-      // Spindle Head
       const housingGeo = new THREE.CylinderGeometry(15, 15, 48, 28);
       const housingMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4, metalness: 0.8 });
       const housing = new THREE.Mesh(housingGeo, housingMat);
@@ -676,21 +666,18 @@ M30</textarea>
 
       spindleRotor = new THREE.Group();
 
-      // Tool Holder
       const holderGeo = new THREE.CylinderGeometry(10, 7, 18, 24);
       const holderMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.2, metalness: 0.95 });
       const holder = new THREE.Mesh(holderGeo, holderMat);
       holder.position.y = 23;
       spindleRotor.add(holder);
 
-      // Collet Nut
       const colletGeo = new THREE.CylinderGeometry(6.5, 4.5, 12, 6);
       const colletMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.85 });
       const collet = new THREE.Mesh(colletGeo, colletMat);
       collet.position.y = 10;
       spindleRotor.add(collet);
 
-      // Shiny Carbide Cutter Flutes
       const cutterGeo = new THREE.CylinderGeometry(3, 3, 20, 16);
       const cutterMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.1, metalness: 0.98 });
       const cutter = new THREE.Mesh(cutterGeo, cutterMat);
@@ -708,12 +695,6 @@ M30</textarea>
       chipParticles = new THREE.Points(chipGeo, new THREE.PointsMaterial({ color: 0xf1f5f9, size: 2.0, transparent: true, opacity: 0.9 }));
       chipParticles.visible = false;
       scene.add(chipParticles);
-
-      const coolantGeo = new THREE.BufferGeometry();
-      coolantGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(COOLANT_COUNT * 3), 3));
-      coolantParticles = new THREE.Points(coolantGeo, new THREE.PointsMaterial({ color: 0x38bdf8, size: 2.2, transparent: true, opacity: 0.6 }));
-      coolantParticles.visible = false;
-      scene.add(coolantParticles);
     }
 
     function onWindowResize() {
@@ -724,7 +705,7 @@ M30</textarea>
       renderer.setSize(host.clientWidth, host.clientHeight);
     }
 
-    /* Web Audio Synthesizer */
+    /* Web Audio Workshop Synthesizer */
     let audioCtx = null, spindleOsc = null, spindleGain = null, stepperOsc = null, stepperGain = null, cutGain = null;
 
     function initAudio() {
@@ -801,7 +782,7 @@ M30</textarea>
       }
     }
 
-    /* Kinematics & Workpiece Carving */
+    /* Machine Kinematics & Workpiece Carving */
     function updateSpindleWorldTransform() {
       if (!toolAssembly) return;
       toolAssembly.position.set(wcsOffset.x + currentX, wcsOffset.z + currentZ, -(wcsOffset.y + currentY));
@@ -1029,7 +1010,6 @@ M30</textarea>
     }
 
     function updateUI() {
-      // Prevents string breaking across multiple lines on small displays
       const fmt = (v) => (v >= 0 ? '+' : '-') + Math.abs(v).toFixed(3).padStart(7, '0');
       document.getElementById('droX').innerText = fmt(currentX);
       document.getElementById('droY').innerText = fmt(currentY);
@@ -1107,17 +1087,18 @@ M30`;
       }
     }
 
+    // Fixed: Always force flex-col when showing active tabs!
     function switchTab(tab) {
       ['Pendant', 'Gcode', 'Tools', 'Academy'].forEach(t => {
         const panel = document.getElementById(`panel${t}`);
         const btn = document.getElementById(`tabBtn${t}`);
         if (t.toLowerCase() === tab.toLowerCase()) {
           panel.classList.remove('hidden');
-          panel.classList.add('flex');
-          btn.className = 'flex-1 py-2.5 text-cyan-400 border-b-2 border-cyan-400 bg-slate-900/70 transition';
+          panel.classList.add('flex', 'flex-col');
+          btn.className = 'flex-1 py-2.5 text-cyan-400 border-b-2 border-cyan-400 bg-slate-900/80 transition';
         } else {
           panel.classList.add('hidden');
-          panel.classList.remove('flex');
+          panel.classList.remove('flex', 'flex-col');
           btn.className = 'flex-1 py-2.5 text-slate-400 hover:text-slate-200 transition';
         }
       });
@@ -1128,19 +1109,19 @@ M30`;
       lucide.createIcons();
       updateUI();
 
-      // Help Modal Toggles
+      // Help Modal
       const guideModal = document.getElementById('guideModal');
       document.getElementById('btnOpenHelp').addEventListener('click', () => guideModal.classList.remove('hidden'));
       document.getElementById('btnCloseHelp').addEventListener('click', () => guideModal.classList.add('hidden'));
       document.getElementById('btnGotIt').addEventListener('click', () => guideModal.classList.add('hidden'));
 
-      // Tab Switching
+      // Tabs
       document.getElementById('tabBtnPendant').addEventListener('click', () => switchTab('pendant'));
       document.getElementById('tabBtnGcode').addEventListener('click', () => switchTab('gcode'));
       document.getElementById('tabBtnTools').addEventListener('click', () => switchTab('tools'));
       document.getElementById('tabBtnAcademy').addEventListener('click', () => switchTab('academy'));
 
-      // Camera Presets
+      // Camera
       document.getElementById('camIso').addEventListener('click', () => {
         camera.position.set(130, 150, 180);
         controls.target.set(0, 10, 0);
@@ -1158,7 +1139,7 @@ M30`;
         controls.target.set(0, 10, 0);
       });
 
-      // Step Buttons
+      // Steps
       document.querySelectorAll('.step-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           document.querySelectorAll('.step-btn').forEach(b => {
@@ -1201,7 +1182,7 @@ M30`;
         updateUI();
       });
 
-      // Zero Buttons
+      // Zeroing
       document.getElementById('btnZeroX').addEventListener('click', () => { currentX = 0; updateUI(); });
       document.getElementById('btnZeroY').addEventListener('click', () => { currentY = 0; updateUI(); });
       document.getElementById('btnZeroZ').addEventListener('click', () => { currentZ = 0; updateUI(); });
@@ -1210,7 +1191,7 @@ M30`;
         currentX = 0.0; currentY = 0.0; currentZ = 0.0;
         updateSpindleWorldTransform();
         updateUI();
-        logTerminal('> G54 Part Zero established at (0,0,0).');
+        logTerminal('> G54 Part Zero set to (0,0,0).');
         checkLessonMilestones();
       });
 
@@ -1248,8 +1229,7 @@ M30`;
 
       document.getElementById('btnAudioToggle').addEventListener('click', () => {
         audioEnabled = !audioEnabled;
-        document.getElementById('audioStatusText').innerText = audioEnabled ? 'AUDIO: ON' : 'AUDIO: OFF';
-        document.getElementById('audioIcon').className = audioEnabled ? 'w-4 h-4 text-emerald-400' : 'w-4 h-4 text-slate-500';
+        document.getElementById('audioIcon').className = audioEnabled ? 'w-3.5 h-3.5 text-emerald-400' : 'w-3.5 h-3.5 text-slate-500';
       });
 
       document.getElementById('btnCycleStart').addEventListener('click', runGCodeCycle);
