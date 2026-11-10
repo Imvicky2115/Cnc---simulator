@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>CNC Machining Simulator & Interactive Academy</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Google Fonts: Industrial & Monospace DRO -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -23,10 +23,9 @@
   <style>
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #0b0f19;
+      background-color: #070b14;
       color: #e2e8f0;
-      user-select: none;
-      -webkit-user-select: none;
+      touch-action: manipulation;
     }
     .font-mono-tech {
       font-family: 'JetBrains Mono', monospace;
@@ -34,32 +33,29 @@
     .font-industrial {
       font-family: 'Chakra Petch', sans-serif;
     }
-    .dro-glow {
-      text-shadow: 0 0 10px rgba(52, 211, 153, 0.65);
+    .dro-glow-green {
+      text-shadow: 0 0 10px rgba(52, 211, 153, 0.7);
     }
-    .dro-amber-glow {
-      text-shadow: 0 0 10px rgba(251, 191, 36, 0.65);
+    .dro-glow-amber {
+      text-shadow: 0 0 10px rgba(251, 191, 36, 0.7);
     }
-    .dro-cyan-glow {
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.65);
+    .dro-glow-cyan {
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
     }
     .custom-scroll::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     .custom-scroll::-webkit-scrollbar-track {
-      background: #111827;
+      background: #0b1120;
     }
     .custom-scroll::-webkit-scrollbar-thumb {
-      background: #374151;
-      border-radius: 3px;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb:hover {
-      background: #4b5563;
+      background: #334155;
+      border-radius: 4px;
     }
     @keyframes pulse-alarm {
-      0%, 100% { background-color: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.8); }
-      50% { background-color: rgba(239, 68, 68, 0.4); border-color: rgba(254, 202, 202, 1); }
+      0%, 100% { background-color: rgba(220, 38, 38, 0.2); border-color: rgba(239, 68, 68, 0.9); }
+      50% { background-color: rgba(220, 38, 38, 0.5); border-color: rgba(254, 202, 202, 1); }
     }
     .alarm-active {
       animation: pulse-alarm 0.9s infinite;
@@ -67,227 +63,234 @@
   </style>
 </head>
 
-<body class="h-screen w-screen overflow-hidden flex flex-col bg-slate-950 text-slate-100">
+<body class="min-h-screen w-full flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden">
 
-  <!-- Top App Navigation / Industrial Header -->
-  <header class="h-14 border-b border-slate-800 bg-slate-900/90 px-4 flex items-center justify-between shrink-0 shadow-lg">
-    <div class="flex items-center space-x-3">
-      <div class="w-8 h-8 rounded bg-cyan-600 flex items-center justify-center font-industrial font-bold text-white shadow-md shadow-cyan-500/20">
+  <!-- Top Header Bar -->
+  <header class="h-14 bg-slate-900 border-b border-slate-800 px-3 md:px-5 flex items-center justify-between shrink-0 z-30">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded bg-cyan-600 flex items-center justify-center font-industrial font-bold text-white shadow-sm shadow-cyan-500/30 text-xs">
         CNC
       </div>
       <div>
-        <h1 class="text-sm font-bold tracking-wider font-industrial text-slate-100 flex items-center gap-2">
-          V-MILL 3000 <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">ONLINE</span>
-        </h1>
-        <p class="text-[10px] text-slate-400 font-mono-tech">3-Axis Vertical Machining Simulator</p>
+        <div class="flex items-center gap-1.5 leading-none">
+          <span class="text-xs md:text-sm font-bold font-industrial tracking-wide text-slate-100">V-MILL 3000</span>
+          <span class="text-[9px] px-1 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono-tech font-semibold">ONLINE</span>
+        </div>
+        <p class="text-[10px] text-slate-400 font-mono-tech mt-0.5 hidden sm:block">3-Axis Vertical Mill Simulator</p>
       </div>
     </div>
 
-    <!-- Active Mode & Audio Controls -->
-    <div class="flex items-center space-x-3">
-      <div id="alarmBanner" class="hidden px-3 py-1 rounded text-xs font-mono-tech font-bold text-red-200 border border-red-500 alarm-active items-center gap-1.5">
-        <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
-        <span id="alarmText">COLLISION DETECTED</span>
-      </div>
-
-      <button id="btnAudioToggle" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono-tech border border-slate-700 text-slate-300 flex items-center gap-1.5 transition">
+    <!-- Header Actions -->
+    <div class="flex items-center gap-1.5 md:gap-2 font-mono-tech text-xs">
+      <button id="btnAudioToggle" class="h-8 px-2.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center gap-1.5 text-[11px] transition active:scale-95">
         <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400" id="audioIcon"></i>
-        <span id="audioStatusText">AUDIO: ON</span>
+        <span id="audioStatusText" class="hidden sm:inline">AUDIO: ON</span>
       </button>
 
-      <button id="btnResetStock" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono-tech border border-slate-700 text-slate-300 flex items-center gap-1.5 transition" title="Clean Stock Surface">
+      <button id="btnResetStock" class="h-8 px-2.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center gap-1.5 text-[11px] transition active:scale-95">
         <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-cyan-400"></i>
-        <span>RESET STOCK</span>
+        <span class="hidden sm:inline">RESET STOCK</span>
       </button>
 
-      <button id="btnEStop" class="px-3.5 py-1.5 rounded bg-red-600 hover:bg-red-500 text-xs font-industrial font-bold text-white border-2 border-red-400 shadow-lg shadow-red-600/30 active:scale-95 transition flex items-center gap-1">
-        <i data-lucide="octagon-alert" class="w-4 h-4"></i>
+      <button id="btnEStop" class="h-8 px-3 rounded bg-red-600 hover:bg-red-500 text-white font-industrial font-bold border border-red-400 shadow-sm shadow-red-600/30 flex items-center gap-1 text-[11px] active:scale-95 transition">
+        <i data-lucide="octagon-alert" class="w-3.5 h-3.5"></i>
         <span>E-STOP</span>
       </button>
     </div>
   </header>
 
-  <!-- Main Workspace -->
-  <div class="flex-1 flex overflow-hidden">
-    
-    <!-- Left Column: 3D Viewport & HUD -->
-    <main class="flex-1 relative flex flex-col bg-black">
-      <!-- 3D WebGL Canvas Container -->
+  <!-- Alarm Banner (Slides Down When Collision Occurs) -->
+  <div id="alarmBanner" class="hidden bg-red-950/90 border-b border-red-500 text-red-200 px-4 py-1.5 text-xs font-mono-tech font-bold alarm-active items-center justify-between z-20">
+    <div class="flex items-center gap-2">
+      <i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0"></i>
+      <span id="alarmText">COLLISION DETECTED</span>
+    </div>
+    <button id="btnDismissAlarm" class="text-[10px] bg-red-800 hover:bg-red-700 px-2 py-0.5 rounded text-white border border-red-400">ACKNOWLEDGE</button>
+  </div>
+
+  <!-- Main Responsive Layout Container -->
+  <!-- Mobile: flex-col with scrollable view; Desktop (md:): flex-row full-height fixed layout -->
+  <div class="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden">
+
+    <!-- Left / Top: 3D Machine Viewport & Camera Toolbar -->
+    <div class="w-full md:flex-1 h-[340px] sm:h-[420px] md:h-auto relative bg-black shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-slate-800">
+      
+      <!-- 3D Canvas Mount Point -->
       <div id="viewport3D" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
 
-      <!-- Viewport Floating Overlays / Camera Quick Toggles -->
-      <div class="absolute top-3 left-3 flex flex-wrap gap-1.5 bg-slate-900/80 p-1.5 rounded-lg border border-slate-800 backdrop-blur z-10 text-[11px] font-mono-tech">
-        <span class="text-slate-400 px-1.5 py-0.5 font-bold">VIEW:</span>
-        <button id="camIso" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">ISO</button>
-        <button id="camTop" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">TOP (XY)</button>
-        <button id="camFront" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">FRONT (XZ)</button>
-        <button id="camSide" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">SIDE (YZ)</button>
+      <!-- Camera Bar (Responsive Pill at Top-Left) -->
+      <div class="absolute top-2.5 left-2.5 flex items-center gap-1 bg-slate-900/90 backdrop-blur-md px-2 py-1.5 rounded-lg border border-slate-800 text-[10px] font-mono-tech shadow-md z-10">
+        <span class="text-slate-400 font-bold mr-1 hidden sm:inline">VIEW:</span>
+        <button id="camIso" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">ISO</button>
+        <button id="camTop" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">TOP</button>
+        <button id="camFront" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">FRONT</button>
+        <button id="camSide" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">SIDE</button>
       </div>
 
-      <!-- Spindle Status HUD Badge -->
-      <div class="absolute top-3 right-3 bg-slate-900/85 border border-slate-800 p-2 rounded-lg backdrop-blur z-10 font-mono-tech text-xs flex items-center gap-3">
+      <!-- Real-Time Machining Status HUD (Top-Right) -->
+      <div class="absolute top-2.5 right-2.5 bg-slate-900/90 backdrop-blur-md px-2.5 py-1.5 rounded-lg border border-slate-800 text-[10px] font-mono-tech flex items-center gap-2.5 shadow-md z-10">
         <div>
-          <div class="text-[10px] text-slate-400">SPINDLE</div>
-          <div id="hudSpindleRpm" class="text-emerald-400 font-bold dro-glow">0 RPM</div>
+          <span class="text-slate-500 block text-[9px] leading-tight">SPINDLE</span>
+          <span id="hudSpindleRpm" class="text-slate-400 font-bold">0 RPM</span>
         </div>
-        <div class="h-6 w-px bg-slate-700"></div>
+        <div class="h-5 w-px bg-slate-700"></div>
         <div>
-          <div class="text-[10px] text-slate-400">FEEDRATE</div>
-          <div id="hudFeedrate" class="text-cyan-400 font-bold dro-cyan-glow">F 800 mm/m</div>
-        </div>
-        <div class="h-6 w-px bg-slate-700"></div>
-        <div>
-          <div class="text-[10px] text-slate-400">COOLANT</div>
-          <div id="hudCoolant" class="text-slate-400 font-bold">M09 (OFF)</div>
+          <span class="text-slate-500 block text-[9px] leading-tight">FEED</span>
+          <span id="hudFeedrate" class="text-cyan-400 font-bold dro-glow-cyan">F600</span>
         </div>
       </div>
 
-      <!-- Bottom Interactive HUD: Workpiece Coordinate Status -->
-      <div class="absolute bottom-3 left-3 bg-slate-950/85 border border-slate-800/80 px-3 py-2 rounded-lg backdrop-blur z-10 font-mono-tech text-[11px] text-slate-400 flex items-center gap-4">
-        <div>Stock: <span class="text-slate-200 font-bold">120 × 80 × 20 mm</span></div>
-        <div>Tool: <span class="text-slate-200 font-bold">Ø6mm Flat End Mill</span></div>
-        <div>WCS: <span class="text-emerald-400 font-bold">G54 (Part Zero)</span></div>
+      <!-- Info Footer Badge (Bottom of 3D Canvas) -->
+      <div class="absolute bottom-2 left-2 bg-slate-950/80 backdrop-blur border border-slate-800/80 px-2.5 py-1 rounded text-[10px] font-mono-tech text-slate-400 flex items-center gap-2 z-10">
+        <span>Stock: <strong class="text-slate-200">120×80×20</strong></span>
+        <span>•</span>
+        <span>Tool: <strong class="text-slate-200">Ø6mm Flat</strong></span>
       </div>
-    </main>
+    </div>
 
-    <!-- Right Column: Industrial Machine Controller & Training Academy -->
-    <aside class="w-96 border-l border-slate-800 bg-slate-900 flex flex-col shrink-0 custom-scroll overflow-y-auto">
+    <!-- Right / Bottom: Control Console (Pendant, DRO, G-Code & Lessons) -->
+    <div class="w-full md:w-[420px] lg:w-[450px] bg-slate-900 flex flex-col shrink-0 custom-scroll md:overflow-y-auto">
       
-      <!-- DRO (Digital Readout) Panel -->
+      <!-- DRO (Digital Readout) Section -->
       <section class="p-3 bg-slate-950 border-b border-slate-800">
         <div class="flex items-center justify-between mb-2">
           <span class="text-[11px] font-industrial tracking-wider font-bold text-slate-400">POSITION (WORK G54)</span>
-          <span class="text-[10px] font-mono-tech text-cyan-400 bg-cyan-950/50 px-1.5 py-0.5 rounded border border-cyan-800/60">METRIC mm</span>
+          <span class="text-[10px] font-mono-tech text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-800/80">METRIC mm</span>
         </div>
 
-        <div class="grid grid-cols-1 gap-1.5 font-mono-tech font-bold">
+        <!-- 3-Axis Readout Grid -->
+        <div class="grid grid-cols-3 gap-2 font-mono-tech">
           <!-- X Axis -->
-          <div class="bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded flex items-center justify-between">
-            <span class="text-emerald-400 text-lg">X</span>
-            <div class="flex items-center gap-2">
-              <span id="droX" class="text-2xl text-emerald-400 dro-glow tracking-widest">+000.000</span>
-              <button id="btnZeroX" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">ZERO</button>
+          <div class="bg-slate-900 border border-slate-800 p-2 rounded flex flex-col items-center">
+            <div class="w-full flex justify-between items-center text-[10px] text-emerald-400 mb-0.5">
+              <span class="font-bold">X AXIS</span>
+              <button id="btnZeroX" class="bg-slate-800 hover:bg-slate-700 px-1 rounded text-[9px] text-slate-300">ZERO</button>
             </div>
+            <div id="droX" class="text-lg sm:text-xl font-bold text-emerald-400 dro-glow-green tracking-wider">+000.000</div>
           </div>
+
           <!-- Y Axis -->
-          <div class="bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded flex items-center justify-between">
-            <span class="text-emerald-400 text-lg">Y</span>
-            <div class="flex items-center gap-2">
-              <span id="droY" class="text-2xl text-emerald-400 dro-glow tracking-widest">+000.000</span>
-              <button id="btnZeroY" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">ZERO</button>
+          <div class="bg-slate-900 border border-slate-800 p-2 rounded flex flex-col items-center">
+            <div class="w-full flex justify-between items-center text-[10px] text-emerald-400 mb-0.5">
+              <span class="font-bold">Y AXIS</span>
+              <button id="btnZeroY" class="bg-slate-800 hover:bg-slate-700 px-1 rounded text-[9px] text-slate-300">ZERO</button>
             </div>
+            <div id="droY" class="text-lg sm:text-xl font-bold text-emerald-400 dro-glow-green tracking-wider">+000.000</div>
           </div>
+
           <!-- Z Axis -->
-          <div class="bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded flex items-center justify-between">
-            <span class="text-amber-400 text-lg">Z</span>
-            <div class="flex items-center gap-2">
-              <span id="droZ" class="text-2xl text-amber-400 dro-amber-glow tracking-widest">+025.000</span>
-              <button id="btnZeroZ" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">ZERO</button>
+          <div class="bg-slate-900 border border-slate-800 p-2 rounded flex flex-col items-center">
+            <div class="w-full flex justify-between items-center text-[10px] text-amber-400 mb-0.5">
+              <span class="font-bold">Z AXIS</span>
+              <button id="btnZeroZ" class="bg-slate-800 hover:bg-slate-700 px-1 rounded text-[9px] text-slate-300">ZERO</button>
             </div>
+            <div id="droZ" class="text-lg sm:text-xl font-bold text-amber-400 dro-glow-amber tracking-wider">+025.000</div>
           </div>
         </div>
 
-        <!-- Touch Off Buttons -->
-        <div class="mt-2 flex gap-1.5">
-          <button id="btnTouchOffCorner" class="flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] font-mono-tech text-cyan-300 border border-slate-700 rounded transition">
-            Touch Stock Corner (X0 Y0 Z0)
+        <!-- Touch-Off / Quick Zero Buttons -->
+        <div class="mt-2.5 grid grid-cols-2 gap-2">
+          <button id="btnTouchOffCorner" class="h-8 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-[11px] font-mono-tech text-cyan-300 flex items-center justify-center gap-1 transition active:scale-95">
+            <i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Set Part Zero (X0 Y0 Z0)
           </button>
-          <button id="btnTouchOffTop" class="flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] font-mono-tech text-amber-300 border border-slate-700 rounded transition">
-            Touch Top Face (Z0)
+          <button id="btnTouchOffTop" class="h-8 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-[11px] font-mono-tech text-amber-300 flex items-center justify-center gap-1 transition active:scale-95">
+            <i data-lucide="arrow-down-to-line" class="w-3.5 h-3.5"></i> Touch Face (Z0)
           </button>
         </div>
       </section>
 
-      <!-- Tabs: Jog Pendant / G-Code Editor / Guided Lessons -->
+      <!-- Panel Tabs (Pendant / G-Code / Academy) -->
       <div class="flex border-b border-slate-800 bg-slate-950 font-industrial text-xs tracking-wider font-bold">
-        <button id="tabBtnPendant" class="flex-1 py-2 text-cyan-400 border-b-2 border-cyan-400 bg-slate-900">PENDANT</button>
-        <button id="tabBtnGcode" class="flex-1 py-2 text-slate-400 hover:text-slate-200">G-CODE</button>
-        <button id="tabBtnAcademy" class="flex-1 py-2 text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1">
+        <button id="tabBtnPendant" class="flex-1 py-2.5 text-cyan-400 border-b-2 border-cyan-400 bg-slate-900/60 transition">PENDANT</button>
+        <button id="tabBtnGcode" class="flex-1 py-2.5 text-slate-400 hover:text-slate-200 transition">G-CODE</button>
+        <button id="tabBtnAcademy" class="flex-1 py-2.5 text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1 transition">
           <span>LESSONS</span>
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
         </button>
       </div>
 
-      <!-- Tab Content 1: Manual Jog Pendant -->
-      <section id="panelPendant" class="p-3 space-y-4">
-        <!-- Jog Increments -->
+      <!-- Tab 1: Manual Jog Pendant -->
+      <section id="panelPendant" class="p-3 space-y-3.5">
+        
+        <!-- Step Size Selector -->
         <div>
-          <label class="text-[10px] font-mono-tech text-slate-400 uppercase tracking-wider block mb-1.5">Jog Step Size (mm)</label>
+          <span class="text-[10px] font-mono-tech text-slate-400 uppercase tracking-wider block mb-1">Jog Step Increment (mm)</span>
           <div class="grid grid-cols-4 gap-1.5 font-mono-tech text-xs">
-            <button class="step-btn py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200" data-step="0.05">0.05</button>
-            <button class="step-btn py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200" data-step="0.5">0.5</button>
-            <button class="step-btn py-1 rounded bg-cyan-700 font-bold border border-cyan-500 text-white" data-step="1.0">1.0</button>
-            <button class="step-btn py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200" data-step="5.0">5.0</button>
+            <button class="step-btn h-9 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200" data-step="0.05">0.05</button>
+            <button class="step-btn h-9 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200" data-step="0.5">0.5</button>
+            <button class="step-btn h-9 rounded bg-cyan-700 font-bold border border-cyan-500 text-white" data-step="1.0">1.0</button>
+            <button class="step-btn h-9 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200" data-step="5.0">5.0</button>
           </div>
         </div>
 
-        <!-- Jog Directional Buttons Layout -->
-        <div class="flex flex-col items-center gap-2 py-1">
+        <!-- Directional Jog Controls Layout -->
+        <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800/80 flex flex-col items-center gap-2">
+          
           <!-- Y+ Button -->
-          <button id="jogYPlus" class="w-20 h-10 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded font-mono-tech font-bold text-sm text-emerald-400 active:scale-95 transition flex items-center justify-center gap-1 shadow">
+          <button id="jogYPlus" class="w-24 h-11 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 rounded-lg font-mono-tech font-bold text-sm text-emerald-400 active:scale-95 transition flex items-center justify-center gap-1.5 shadow">
             <i data-lucide="chevron-up" class="w-4 h-4"></i> Y+
           </button>
 
-          <!-- Middle Row: X- / Z+ & Z- / X+ -->
-          <div class="flex items-center gap-3">
-            <button id="jogXMinus" class="w-20 h-10 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded font-mono-tech font-bold text-sm text-emerald-400 active:scale-95 transition flex items-center justify-center gap-1 shadow">
+          <!-- Middle Row: X- | Z-Axis | X+ -->
+          <div class="flex items-center gap-2.5">
+            <button id="jogXMinus" class="w-24 h-11 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 rounded-lg font-mono-tech font-bold text-sm text-emerald-400 active:scale-95 transition flex items-center justify-center gap-1.5 shadow">
               <i data-lucide="chevron-left" class="w-4 h-4"></i> X-
             </button>
 
             <!-- Z Axis Column -->
             <div class="flex flex-col gap-1.5">
-              <button id="jogZPlus" class="w-16 h-8 bg-amber-950/60 hover:bg-amber-900/80 border border-amber-700/80 rounded font-mono-tech font-bold text-xs text-amber-300 active:scale-95 transition flex items-center justify-center gap-1">
+              <button id="jogZPlus" class="w-16 h-8 bg-amber-950/80 hover:bg-amber-900 border border-amber-700 rounded font-mono-tech font-bold text-xs text-amber-300 active:scale-95 transition flex items-center justify-center gap-1">
                 Z+ <i data-lucide="arrow-up" class="w-3 h-3"></i>
               </button>
-              <button id="jogZMinus" class="w-16 h-8 bg-amber-950/60 hover:bg-amber-900/80 border border-amber-700/80 rounded font-mono-tech font-bold text-xs text-amber-300 active:scale-95 transition flex items-center justify-center gap-1">
+              <button id="jogZMinus" class="w-16 h-8 bg-amber-950/80 hover:bg-amber-900 border border-amber-700 rounded font-mono-tech font-bold text-xs text-amber-300 active:scale-95 transition flex items-center justify-center gap-1">
                 Z- <i data-lucide="arrow-down" class="w-3 h-3"></i>
               </button>
             </div>
 
-            <button id="jogXPlus" class="w-20 h-10 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded font-mono-tech font-bold text-sm text-emerald-400 active:scale-95 transition flex items-center justify-center gap-1 shadow">
+            <button id="jogXPlus" class="w-24 h-11 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 rounded-lg font-mono-tech font-bold text-sm text-emerald-400 active:scale-95 transition flex items-center justify-center gap-1.5 shadow">
               X+ <i data-lucide="chevron-right" class="w-4 h-4"></i>
             </button>
           </div>
 
           <!-- Y- Button -->
-          <button id="jogYMinus" class="w-20 h-10 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded font-mono-tech font-bold text-sm text-emerald-400 active:scale-95 transition flex items-center justify-center gap-1 shadow">
+          <button id="jogYMinus" class="w-24 h-11 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 rounded-lg font-mono-tech font-bold text-sm text-emerald-400 active:scale-95 transition flex items-center justify-center gap-1.5 shadow">
             <i data-lucide="chevron-down" class="w-4 h-4"></i> Y-
           </button>
         </div>
 
-        <!-- Spindle & Ancillary Manual Toggles -->
-        <div class="pt-2 border-t border-slate-800 grid grid-cols-2 gap-2 font-mono-tech text-xs">
-          <button id="btnToggleSpindle" class="py-2 px-3 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center gap-1.5 transition">
+        <!-- Spindle & Coolant Toggles -->
+        <div class="grid grid-cols-2 gap-2 font-mono-tech text-xs">
+          <button id="btnToggleSpindle" class="h-10 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center gap-1.5 transition active:scale-95">
             <i data-lucide="rotate-cw" class="w-4 h-4 text-emerald-400"></i>
             <span id="labelSpindleBtn">START SPINDLE</span>
           </button>
-          <button id="btnToggleCoolant" class="py-2 px-3 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center gap-1.5 transition">
+          <button id="btnToggleCoolant" class="h-10 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center gap-1.5 transition active:scale-95">
             <i data-lucide="droplet" class="w-4 h-4 text-cyan-400"></i>
             <span id="labelCoolantBtn">COOLANT: OFF</span>
           </button>
         </div>
 
         <!-- Spindle Speed Slider -->
-        <div>
-          <div class="flex justify-between text-[11px] font-mono-tech text-slate-400 mb-1">
-            <span>RPM SPEED PRESET</span>
+        <div class="bg-slate-950 p-2.5 rounded border border-slate-800">
+          <div class="flex justify-between text-[11px] font-mono-tech text-slate-400 mb-1.5">
+            <span>SPINDLE RPM</span>
             <span id="labelRpmTarget" class="text-emerald-400 font-bold">4000 RPM</span>
           </div>
-          <input id="sliderRpm" type="range" min="1000" max="12000" step="500" value="4000" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500" />
+          <input id="sliderRpm" type="range" min="1000" max="12000" step="500" value="4000" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500" />
         </div>
       </section>
 
-      <!-- Tab Content 2: G-Code Editor & Program Run -->
-      <section id="panelGcode" class="hidden p-3 flex flex-col flex-1 space-y-3">
+      <!-- Tab 2: G-Code Editor & Program Run -->
+      <section id="panelGcode" class="hidden p-3 flex-col space-y-3">
         <div class="flex items-center justify-between">
-          <label class="text-[10px] font-mono-tech text-slate-400 uppercase tracking-wider">Active Program (ISO 6983)</label>
-          <div class="flex gap-1">
-            <button id="btnPresetFace" class="text-[10px] font-mono-tech px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Face Block</button>
-            <button id="btnPresetPocket" class="text-[10px] font-mono-tech px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Slot & Bore</button>
+          <span class="text-[10px] font-mono-tech text-slate-400 uppercase tracking-wider">G-Code Program</span>
+          <div class="flex gap-1.5">
+            <button id="btnPresetFace" class="text-[10px] font-mono-tech px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">Face Block</button>
+            <button id="btnPresetPocket" class="text-[10px] font-mono-tech px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">Slot & Bore</button>
           </div>
         </div>
 
-        <textarea id="gcodeEditor" spellcheck="false" class="w-full h-44 bg-slate-950 border border-slate-800 rounded p-2.5 font-mono-tech text-xs text-emerald-400 leading-relaxed custom-scroll focus:outline-none focus:border-cyan-500">
+        <textarea id="gcodeEditor" spellcheck="false" class="w-full h-40 bg-slate-950 border border-slate-800 rounded p-2.5 font-mono-tech text-xs text-emerald-400 leading-relaxed custom-scroll focus:outline-none focus:border-cyan-500 resize-none">
 (SAMPLE FACING & CONTOUR)
 G90 G21
 M03 S5000
@@ -302,100 +305,79 @@ G00 Z15.0
 M05
 M30</textarea>
 
-        <!-- Execution Controls -->
+        <!-- Program Action Buttons -->
         <div class="grid grid-cols-3 gap-2 font-industrial">
-          <button id="btnCycleStart" class="py-2 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs tracking-wider flex items-center justify-center gap-1 shadow-lg shadow-emerald-600/20 active:scale-95 transition">
-            <i data-lucide="play" class="w-3.5 h-3.5"></i> CYCLE START
+          <button id="btnCycleStart" class="h-10 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs tracking-wider flex items-center justify-center gap-1 shadow active:scale-95 transition">
+            <i data-lucide="play" class="w-3.5 h-3.5"></i> START
           </button>
-          <button id="btnFeedHold" class="py-2 rounded bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs tracking-wider flex items-center justify-center gap-1 active:scale-95 transition">
-            <i data-lucide="pause" class="w-3.5 h-3.5"></i> FEED HOLD
+          <button id="btnFeedHold" class="h-10 rounded bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs tracking-wider flex items-center justify-center gap-1 active:scale-95 transition">
+            <i data-lucide="pause" class="w-3.5 h-3.5"></i> HOLD
           </button>
-          <button id="btnSingleStep" class="py-2 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs tracking-wider flex items-center justify-center gap-1 active:scale-95 transition">
-            <i data-lucide="step-forward" class="w-3.5 h-3.5"></i> SINGLE STEP
+          <button id="btnSingleStep" class="h-10 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs tracking-wider flex items-center justify-center gap-1 active:scale-95 transition">
+            <i data-lucide="step-forward" class="w-3.5 h-3.5"></i> STEP
           </button>
         </div>
 
-        <!-- Terminal Output / Execution Status -->
-        <div class="flex-1 bg-slate-950 rounded border border-slate-800 p-2 font-mono-tech text-[10px] custom-scroll overflow-y-auto space-y-1" id="terminalLog">
-          <div class="text-slate-500">> Machine ready. Workpiece clamped: Aluminum 6061-T6.</div>
-          <div class="text-cyan-400">> Tool T1 loaded: 6.00mm carbide 2-flute flat endmill.</div>
+        <!-- Terminal Log Box -->
+        <div class="h-28 bg-slate-950 rounded border border-slate-800 p-2 font-mono-tech text-[10px] custom-scroll overflow-y-auto space-y-1" id="terminalLog">
+          <div class="text-slate-500">> Machine ready. Stock: 6061-T6 Aluminum.</div>
+          <div class="text-cyan-400">> Tool 1: Ø6mm Flat End Mill loaded.</div>
         </div>
       </section>
 
-      <!-- Tab Content 3: Guided CNC Lessons -->
-      <section id="panelAcademy" class="hidden p-3 space-y-3">
-        <div class="text-xs text-slate-300 font-sans">
-          Select a training mission to master basic setup, work-coordinate touch-offs, and toolpaths.
-        </div>
+      <!-- Tab 3: CNC Guided Lessons -->
+      <section id="panelAcademy" class="hidden p-3 space-y-2.5">
+        <p class="text-xs text-slate-300">Complete these core challenges to master CNC milling operations:</p>
 
-        <!-- Lesson Card 1 -->
-        <div class="border border-slate-800 rounded bg-slate-950 p-3 space-y-2 hover:border-cyan-600/50 transition">
+        <!-- Mission 1 -->
+        <div class="border border-slate-800 rounded bg-slate-950 p-2.5 space-y-1.5">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold font-industrial text-cyan-400">MISSION 1: ZERO THE WORKPIECE</span>
-            <span id="badgeL1" class="text-[10px] font-mono-tech px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">PENDING</span>
+            <span id="badgeL1" class="text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">PENDING</span>
           </div>
-          <p class="text-[11px] text-slate-400 leading-normal">
-            Jog the end mill to the top front-left corner of the stock block and establish your G54 part zero ($X=0, Y=0, Z=0$).
-          </p>
-          <button id="btnStartL1" class="w-full py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-mono-tech text-slate-200 border border-slate-700">
-            Load Mission 1
-          </button>
+          <p class="text-[11px] text-slate-400">Jog the end mill to the top front-left corner to establish G54 Part Zero ($X0, Y0, Z0$).</p>
+          <button id="btnStartL1" class="w-full h-8 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-mono-tech text-slate-200 border border-slate-700">Load Mission 1</button>
         </div>
 
-        <!-- Lesson Card 2 -->
-        <div class="border border-slate-800 rounded bg-slate-950 p-3 space-y-2 hover:border-cyan-600/50 transition">
+        <!-- Mission 2 -->
+        <div class="border border-slate-800 rounded bg-slate-950 p-2.5 space-y-1.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold font-industrial text-cyan-400">MISSION 2: THE 1MM FACING PASS</span>
-            <span id="badgeL2" class="text-[10px] font-mono-tech px-1.5 py-0.5 rounded bg-slate-700 text-slate-400">LOCKED</span>
+            <span class="text-xs font-bold font-industrial text-cyan-400">MISSION 2: 1MM FACING PASS</span>
+            <span id="badgeL2" class="text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">LOCKED</span>
           </div>
-          <p class="text-[11px] text-slate-400 leading-normal">
-            Power on the spindle, plunge into the stock to $Z=-1.0$, and mill across to $X=110$ at $600\text{ mm/min}$ feed.
-          </p>
-          <button id="btnStartL2" class="w-full py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-mono-tech text-slate-200 border border-slate-700">
-            Load Mission 2
-          </button>
+          <p class="text-[11px] text-slate-400">Power on spindle, plunge into stock at $Z=-1.0$, and mill across to $X=110$ at $F600$.</p>
+          <button id="btnStartL2" class="w-full h-8 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-mono-tech text-slate-200 border border-slate-700">Load Mission 2</button>
         </div>
 
-        <!-- Lesson Card 3 -->
-        <div class="border border-slate-800 rounded bg-slate-950 p-3 space-y-2 hover:border-cyan-600/50 transition">
+        <!-- Mission 3 -->
+        <div class="border border-slate-800 rounded bg-slate-950 p-2.5 space-y-1.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold font-industrial text-red-400">MISSION 3: PREVENT RAPID PLUNGE</span>
-            <span id="badgeL3" class="text-[10px] font-mono-tech px-1.5 py-0.5 rounded bg-slate-700 text-slate-400">LOCKED</span>
+            <span class="text-xs font-bold font-industrial text-red-400">MISSION 3: PREVENT RAPID CRASH</span>
+            <span id="badgeL3" class="text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">LOCKED</span>
           </div>
-          <p class="text-[11px] text-slate-400 leading-normal">
-            Debug a faulty G-code block that accidentally programs a rapid move (<code class="text-amber-300">G00</code>) directly into material.
-          </p>
-          <button id="btnStartL3" class="w-full py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-mono-tech text-slate-200 border border-slate-700">
-            Load Mission 3
-          </button>
+          <p class="text-[11px] text-slate-400">Debug a program containing an accidental rapid plunge (<code class="text-amber-300">G00</code>) into stock.</p>
+          <button id="btnStartL3" class="w-full h-8 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-mono-tech text-slate-200 border border-slate-700">Load Mission 3</button>
         </div>
       </section>
 
-    </aside>
+    </div>
   </div>
 
   <script>
     /* ==========================================================================
-       V-MILL 3000 CNC SIMULATOR & WORKSHOP ENGINE
+       V-MILL 3000 ENGINE & CONTROLLER LOGIC
        ========================================================================== */
-
-    // --- State & Coordinates (Metric mm) ---
-    // Physical Stock Dimensions: 120 x 80 x 20 mm
-    // Stock sits in world space: X: -60 to +60, Y: -40 to +40, Z: 0 to 20
     const STOCK_DIMS = { width: 120, depth: 80, height: 20 };
-    
-    // G54 Part Zero defaults to front-left top corner: (X: -60, Y: -40, Z: 20)
     let wcsOffset = { x: -60, y: -40, z: 20 };
 
-    // Machine Current Coordinates (Relative to WCS G54)
     let currentX = 0.0;
     let currentY = 0.0;
-    let currentZ = 25.0; // 25mm above stock part zero
+    let currentZ = 25.0;
     let targetX = currentX;
     let targetY = currentY;
     let targetZ = currentZ;
 
-    let jogIncrement = 1.0; // mm
+    let jogIncrement = 1.0;
     let isSpindleOn = false;
     let currentRpm = 0;
     let targetRpm = 4000;
@@ -403,121 +385,88 @@ M30</textarea>
     let isEStopped = false;
     let audioEnabled = true;
 
-    // G-code Interpreter State
     let isCycleRunning = false;
     let isFeedHold = false;
     let gcodeLines = [];
     let currentLineIndex = 0;
-    let feedRate = 600; // mm/min
+    let feedRate = 600;
 
-    // Three.js Core Objects
     let scene, camera, renderer, controls;
-    let toolAssembly, spindleRotor, colletMesh, cutterMesh;
+    let toolAssembly, spindleRotor;
     let stockMesh, stockTextureCanvas, stockTextureCtx, stockTexture;
     let toolpathGroup;
     let chipParticles, coolantParticles;
-    const CHIP_COUNT = 80;
-    const COOLANT_COUNT = 90;
+    const CHIP_COUNT = 60;
+    const COOLANT_COUNT = 60;
 
-    // Displacement Canvas Resolution for dynamic stock cutting
     const CANVAS_W = 512;
     const CANVAS_H = 340;
 
-    /* ==========================================================================
-       1. Three.js 3D Viewport Setup
-       ========================================================================== */
     function init3DViewport() {
       const host = document.getElementById('viewport3D');
-      const w = host.clientWidth;
-      const h = host.clientHeight;
+      const w = host.clientWidth || 360;
+      const h = host.clientHeight || 340;
 
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x070b14);
-      scene.fog = new THREE.FogExp2(0x070b14, 0.0035);
+      scene.background = new THREE.Color(0x060911);
+      scene.fog = new THREE.FogExp2(0x060911, 0.0035);
 
-      // Camera
       camera = new THREE.PerspectiveCamera(45, w / h, 1, 1500);
-      camera.position.set(130, 160, 190);
+      camera.position.set(130, 150, 180);
 
-      // WebGL Renderer
       renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
       renderer.setSize(w, h);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       host.appendChild(renderer.domElement);
 
-      // Orbit Controls
       controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
-      controls.dampingFactor = 0.06;
-      controls.maxPolarAngle = Math.PI / 2 - 0.02; // Keep camera above table bed
+      controls.dampingFactor = 0.08;
+      controls.maxPolarAngle = Math.PI / 2 - 0.03;
       controls.target.set(0, 10, 0);
 
-      // Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
       scene.add(ambientLight);
 
-      const mainSpot = new THREE.SpotLight(0xffffff, 1.2, 500, Math.PI / 4, 0.3, 1);
-      mainSpot.position.set(80, 180, 100);
+      const mainSpot = new THREE.SpotLight(0xffffff, 1.3, 600, Math.PI / 4, 0.3, 1);
+      mainSpot.position.set(70, 170, 90);
       mainSpot.castShadow = true;
-      mainSpot.shadow.mapSize.width = 1024;
-      mainSpot.shadow.mapSize.height = 1024;
       scene.add(mainSpot);
 
-      const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
+      const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.5);
       rimLight.position.set(-100, 80, -100);
       scene.add(rimLight);
 
-      // Milling Machine Table Bed (T-slot style)
       buildMachineBed();
-
-      // Aluminum Stock Block
       buildStockWorkpiece();
-
-      // Spindle & End Mill Toolhead Assembly
       buildSpindleAndToolhead();
 
-      // Toolpath Geometry Group
       toolpathGroup = new THREE.Group();
       scene.add(toolpathGroup);
 
-      // Particle Systems (Chips & Coolant)
       buildParticleSystems();
-
-      // Handle Window Resize
       window.addEventListener('resize', onWindowResize);
     }
 
-    // Machine Bed & T-Slots
     function buildMachineBed() {
-      const bedGeo = new THREE.BoxGeometry(240, 14, 180);
-      const bedMat = new THREE.MeshStandardMaterial({
-        color: 0x1f2937,
-        roughness: 0.7,
-        metalness: 0.6
-      });
+      const bedGeo = new THREE.BoxGeometry(240, 12, 180);
+      const bedMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7, metalness: 0.6 });
       const bed = new THREE.Mesh(bedGeo, bedMat);
-      bed.position.y = -7;
+      bed.position.y = -6;
       bed.receiveShadow = true;
       scene.add(bed);
 
-      // T-Slot inlays
       for (let z = -60; z <= 60; z += 30) {
         const slotGeo = new THREE.BoxGeometry(240, 2, 8);
-        const slotMat = new THREE.MeshBasicMaterial({ color: 0x0f172a });
+        const slotMat = new THREE.MeshBasicMaterial({ color: 0x090d16 });
         const slot = new THREE.Mesh(slotGeo, slotMat);
         slot.position.set(0, 0.1, z);
         scene.add(slot);
       }
 
-      // Vise / Stock Clamping Base
       const viseBaseGeo = new THREE.BoxGeometry(140, 10, 96);
-      const viseMat = new THREE.MeshStandardMaterial({
-        color: 0x334155,
-        roughness: 0.4,
-        metalness: 0.8
-      });
+      const viseMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.4, metalness: 0.8 });
       const vise = new THREE.Mesh(viseBaseGeo, viseMat);
       vise.position.set(0, 5, 0);
       vise.castShadow = true;
@@ -525,47 +474,22 @@ M30</textarea>
       scene.add(vise);
     }
 
-    // Dynamic Material Workpiece
     function buildStockWorkpiece() {
-      // Create off-screen canvas for real-time cutting displacement texture
       stockTextureCanvas = document.createElement('canvas');
       stockTextureCanvas.width = CANVAS_W;
       stockTextureCanvas.height = CANVAS_H;
       stockTextureCtx = stockTextureCanvas.getContext('2d');
-
-      // Clear stock canvas to brushed raw aluminum appearance
       resetStockCanvas();
 
       stockTexture = new THREE.CanvasTexture(stockTextureCanvas);
-      stockTexture.wrapS = THREE.ClampToEdgeWrapping;
-      stockTexture.wrapT = THREE.ClampToEdgeWrapping;
-
-      // Workpiece Box: 120 x 20 x 80 mm
       const stockGeo = new THREE.BoxGeometry(STOCK_DIMS.width, STOCK_DIMS.height, STOCK_DIMS.depth);
 
-      // Apply dynamic canvas texture to the top face (material index 2 in BoxGeometry)
-      const matBrushedSides = new THREE.MeshStandardMaterial({
-        color: 0xcfd8dc,
-        roughness: 0.35,
-        metalness: 0.85
-      });
-      const matTopCut = new THREE.MeshStandardMaterial({
-        map: stockTexture,
-        roughness: 0.4,
-        metalness: 0.8
-      });
+      const matSides = new THREE.MeshStandardMaterial({ color: 0xcfd8dc, roughness: 0.35, metalness: 0.85 });
+      const matTop = new THREE.MeshStandardMaterial({ map: stockTexture, roughness: 0.4, metalness: 0.8 });
 
-      const materials = [
-        matBrushedSides, // +X
-        matBrushedSides, // -X
-        matTopCut,       // +Y (Top Cuttable Face)
-        matBrushedSides, // -Y
-        matBrushedSides, // +Z
-        matBrushedSides  // -Z
-      ];
-
+      const materials = [matSides, matSides, matTop, matSides, matSides, matSides];
       stockMesh = new THREE.Mesh(stockGeo, materials);
-      stockMesh.position.set(0, 10 + STOCK_DIMS.height / 2, 0); // Sits resting on vise at Y=20
+      stockMesh.position.set(0, 10 + STOCK_DIMS.height / 2, 0);
       stockMesh.castShadow = true;
       stockMesh.receiveShadow = true;
       scene.add(stockMesh);
@@ -574,190 +498,107 @@ M30</textarea>
     function resetStockCanvas() {
       stockTextureCtx.fillStyle = '#b0bec5';
       stockTextureCtx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-
-      // Fine brushed grain pattern
       stockTextureCtx.fillStyle = 'rgba(255, 255, 255, 0.08)';
       for (let i = 0; i < CANVAS_H; i += 3) {
         stockTextureCtx.fillRect(0, i, CANVAS_W, 1.5);
       }
     }
 
-    // Spindle, Toolholder, and Carbide End Mill
     function buildSpindleAndToolhead() {
       toolAssembly = new THREE.Group();
 
-      // Main Spindle Housing (Cast Iron)
-      const housingGeo = new THREE.CylinderGeometry(16, 16, 50, 32);
-      const housingMat = new THREE.MeshStandardMaterial({
-        color: 0x1e293b,
-        roughness: 0.5,
-        metalness: 0.7
-      });
+      const housingGeo = new THREE.CylinderGeometry(15, 15, 48, 28);
+      const housingMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5, metalness: 0.7 });
       const housing = new THREE.Mesh(housingGeo, housingMat);
-      housing.position.y = 55;
+      housing.position.y = 52;
       toolAssembly.add(housing);
 
-      // Rotating Assembly (Spindle Nose + Tool Holder + Collet + End Mill)
       spindleRotor = new THREE.Group();
 
-      // BT30 Tool Holder Cone
-      const holderGeo = new THREE.CylinderGeometry(10, 7, 20, 24);
-      const holderMat = new THREE.MeshStandardMaterial({
-        color: 0x475569,
-        roughness: 0.2,
-        metalness: 0.95
-      });
+      const holderGeo = new THREE.CylinderGeometry(10, 7, 18, 24);
+      const holderMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.2, metalness: 0.95 });
       const holder = new THREE.Mesh(holderGeo, holderMat);
-      holder.position.y = 25;
+      holder.position.y = 23;
       spindleRotor.add(holder);
 
-      // ER20 Collet Nut
-      const colletGeo = new THREE.CylinderGeometry(7, 5, 12, 6); // Hex nut profile
-      const colletMat = new THREE.MeshStandardMaterial({
-        color: 0x0f172a,
-        roughness: 0.3,
-        metalness: 0.8
-      });
-      colletMesh = new THREE.Mesh(colletGeo, colletMat);
-      colletMesh.position.y = 11;
-      spindleRotor.add(colletMesh);
+      const colletGeo = new THREE.CylinderGeometry(6.5, 4.5, 12, 6);
+      const colletMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.8 });
+      const collet = new THREE.Mesh(colletGeo, colletMat);
+      collet.position.y = 10;
+      spindleRotor.add(collet);
 
-      // 6mm Flat End Mill (Carbide Flutes)
-      const cutterGeo = new THREE.CylinderGeometry(3, 3, 22, 16);
-      const cutterMat = new THREE.MeshStandardMaterial({
-        color: 0xe2e8f0,
-        roughness: 0.15,
-        metalness: 0.98
-      });
-      cutterMesh = new THREE.Mesh(cutterGeo, cutterMat);
-      cutterMesh.position.y = 0; // Bottom tip defines coordinate tip
-      cutterMesh.castShadow = true;
-      spindleRotor.add(cutterMesh);
+      const cutterGeo = new THREE.CylinderGeometry(3, 3, 20, 16);
+      const cutterMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.15, metalness: 0.98 });
+      const cutter = new THREE.Mesh(cutterGeo, cutterMat);
+      cutter.position.y = 0;
+      spindleRotor.add(cutter);
 
       toolAssembly.add(spindleRotor);
       scene.add(toolAssembly);
-
-      // Position tool at default initial position
       updateSpindleWorldTransform();
     }
 
-    // Particle Emitters for Chips & Coolant
     function buildParticleSystems() {
-      // Aluminum Swarf Chips
       const chipGeo = new THREE.BufferGeometry();
-      const chipPos = new Float32Array(CHIP_COUNT * 3);
-      for (let i = 0; i < CHIP_COUNT * 3; i++) chipPos[i] = 0;
-      chipGeo.setAttribute('position', new THREE.BufferAttribute(chipPos, 3));
-
-      const chipMat = new THREE.PointsMaterial({
-        color: 0xf8fafc,
-        size: 1.8,
-        transparent: true,
-        opacity: 0.9
-      });
-      chipParticles = new THREE.Points(chipGeo, chipMat);
+      chipGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(CHIP_COUNT * 3), 3));
+      chipParticles = new THREE.Points(chipGeo, new THREE.PointsMaterial({ color: 0xf8fafc, size: 1.8, transparent: true, opacity: 0.9 }));
       chipParticles.visible = false;
       scene.add(chipParticles);
 
-      // Soluble Coolant Mist
       const coolantGeo = new THREE.BufferGeometry();
-      const coolantPos = new Float32Array(COOLANT_COUNT * 3);
-      for (let i = 0; i < COOLANT_COUNT * 3; i++) coolantPos[i] = 0;
-      coolantGeo.setAttribute('position', new THREE.BufferAttribute(coolantPos, 3));
-
-      const coolantMat = new THREE.PointsMaterial({
-        color: 0x38bdf8,
-        size: 2.2,
-        transparent: true,
-        opacity: 0.6
-      });
-      coolantParticles = new THREE.Points(coolantGeo, coolantMat);
+      coolantGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(COOLANT_COUNT * 3), 3));
+      coolantParticles = new THREE.Points(coolantGeo, new THREE.PointsMaterial({ color: 0x38bdf8, size: 2.2, transparent: true, opacity: 0.6 }));
       coolantParticles.visible = false;
       scene.add(coolantParticles);
     }
 
     function onWindowResize() {
       const host = document.getElementById('viewport3D');
-      if (!host) return;
-      camera.aspect = host.clientWidth / host.clientHeight;
+      if (!host || !renderer || !camera) return;
+      const w = host.clientWidth;
+      const h = host.clientHeight;
+      camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      renderer.setSize(host.clientWidth, host.clientHeight);
+      renderer.setSize(w, h);
     }
 
-    /* ==========================================================================
-       2. Web Audio Workshop Sound Synthesizer
-       ========================================================================== */
-    let audioCtx = null;
-    let spindleOsc = null;
-    let spindleGain = null;
-    let stepperOsc = null;
-    let stepperGain = null;
-    let cutNoise = null;
-    let cutGain = null;
+    /* Web Audio Synthesizer */
+    let audioCtx = null, spindleOsc = null, spindleGain = null, stepperOsc = null, stepperGain = null, cutGain = null;
 
     function initAudio() {
       if (audioCtx) return;
       try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AudioContextClass();
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioClass();
 
-        // 1. Spindle Inverter Motor Hum
         spindleOsc = audioCtx.createOscillator();
         spindleOsc.type = 'sawtooth';
         spindleGain = audioCtx.createGain();
         spindleGain.gain.setValueAtTime(0, audioCtx.currentTime);
-
-        const spindleFilter = audioCtx.createBiquadFilter();
-        spindleFilter.type = 'lowpass';
-        spindleFilter.frequency.setValueAtTime(800, audioCtx.currentTime);
-
-        spindleOsc.connect(spindleFilter);
-        spindleFilter.connect(spindleGain);
+        spindleOsc.connect(spindleGain);
         spindleGain.connect(audioCtx.destination);
         spindleOsc.start();
 
-        // 2. Stepper Motor Traverse Whine
         stepperOsc = audioCtx.createOscillator();
         stepperOsc.type = 'square';
         stepperGain = audioCtx.createGain();
         stepperGain.gain.setValueAtTime(0, audioCtx.currentTime);
-
-        const stepperFilter = audioCtx.createBiquadFilter();
-        stepperFilter.type = 'bandpass';
-        stepperFilter.frequency.setValueAtTime(1400, audioCtx.currentTime);
-
-        stepperOsc.connect(stepperFilter);
-        stepperFilter.connect(stepperGain);
+        stepperOsc.connect(stepperGain);
         stepperGain.connect(audioCtx.destination);
         stepperOsc.start();
 
-        // 3. Cutting Action Noise (Milling Chatter)
-        const bufferSize = audioCtx.sampleRate * 2;
-        const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const output = noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          output[i] = Math.random() * 2 - 1;
-        }
-
-        const whiteNoise = audioCtx.createBufferSource();
-        whiteNoise.buffer = noiseBuffer;
-        whiteNoise.loop = true;
-
-        const cutFilter = audioCtx.createBiquadFilter();
-        cutFilter.type = 'bandpass';
-        cutFilter.frequency.setValueAtTime(2200, audioCtx.currentTime);
-
+        const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 2, audioCtx.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = noiseBuffer;
+        noise.loop = true;
         cutGain = audioCtx.createGain();
         cutGain.gain.setValueAtTime(0, audioCtx.currentTime);
-
-        whiteNoise.connect(cutFilter);
-        cutFilter.connect(cutGain);
+        noise.connect(cutGain);
         cutGain.connect(audioCtx.destination);
-        whiteNoise.start();
-
-      } catch (e) {
-        console.warn('Web Audio not initialized yet (waiting for user interaction)');
-      }
+        noise.start();
+      } catch (e) {}
     }
 
     function playAlarmSound() {
@@ -766,100 +607,67 @@ M30</textarea>
       const gain = audioCtx.createGain();
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.35);
-
-      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
-
+      osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.3);
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start();
-      osc.stop(audioCtx.currentTime + 0.36);
+      osc.stop(audioCtx.currentTime + 0.31);
     }
 
     function updateAudioSynth(isMoving, isCutting) {
       if (!audioCtx || !audioEnabled) return;
-
-      // Spindle Pitch based on RPM
       if (isSpindleOn && currentRpm > 0) {
-        const freq = 120 + (currentRpm / 12000) * 480;
-        spindleOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.08);
-        spindleGain.gain.setTargetAtTime(0.07, audioCtx.currentTime, 0.08);
+        spindleOsc.frequency.setTargetAtTime(100 + (currentRpm / 12000) * 450, audioCtx.currentTime, 0.08);
+        spindleGain.gain.setTargetAtTime(0.05, audioCtx.currentTime, 0.08);
       } else {
         spindleGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.08);
       }
 
-      // Stepper Whine when jogging or executing moves
       if (isMoving && !isEStopped) {
-        stepperGain.gain.setTargetAtTime(0.035, audioCtx.currentTime, 0.04);
-        stepperOsc.frequency.setTargetAtTime(600 + Math.random() * 200, audioCtx.currentTime, 0.04);
+        stepperGain.gain.setTargetAtTime(0.03, audioCtx.currentTime, 0.04);
+        stepperOsc.frequency.setTargetAtTime(600 + Math.random() * 150, audioCtx.currentTime, 0.04);
       } else {
         stepperGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.04);
       }
 
-      // Cutter Chatter Noise
       if (isCutting && isSpindleOn && !isEStopped) {
-        cutGain.gain.setTargetAtTime(0.09, audioCtx.currentTime, 0.05);
+        cutGain.gain.setTargetAtTime(0.08, audioCtx.currentTime, 0.05);
       } else {
         cutGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
       }
     }
 
-    /* ==========================================================================
-       3. Machine Kinematics, Coordinates, & Dynamic Cutting
-       ========================================================================== */
+    /* Machine Kinematics & Cutting */
     function updateSpindleWorldTransform() {
-      // Part Zero (G54) + Current Tool tip offset
-      const worldX = wcsOffset.x + currentX;
-      const worldY = (wcsOffset.z + currentZ); // Map Z axis to Three.js Y (up/down)
-      const worldZ = -(wcsOffset.y + currentY); // Map Y axis to Three.js -Z
-
-      if (toolAssembly) {
-        toolAssembly.position.set(worldX, worldY, worldZ);
-      }
+      if (!toolAssembly) return;
+      toolAssembly.position.set(wcsOffset.x + currentX, wcsOffset.z + currentZ, -(wcsOffset.y + currentY));
     }
 
     function checkCollisionAndCarve(prevPos, nextPos) {
-      // Stock top face is at Z = 0 relative to G54. Negative Z indicates penetration.
-      const isToolInsideStock = nextPos.z < 0.0;
-
-      if (isToolInsideStock) {
-        // Crash Rule 1: Plunge into material without spindle running
+      if (nextPos.z < 0.0) {
         if (!isSpindleOn) {
-          triggerAlarm('CRASH: TOOL PLUNGED WITH SPINDLE STOPPED (M03 REQUIRED)');
+          triggerAlarm('CRASH: PLUNGE INTO STOCK WITH SPINDLE OFF (M03 REQUIRED)');
           return false;
         }
-
-        // Real-Time Material Removal on Workpiece Texture
         carveStockTexture(prevPos, nextPos);
-        return true; // Cutting successfully
+        return true;
       }
       return false;
     }
 
     function carveStockTexture(p1, p2) {
-      // Map Work coordinates (X: 0 to 120, Y: 0 to 80) to canvas pixel coordinates (0 to CANVAS_W, 0 to CANVAS_H)
       const px1 = (p1.x / STOCK_DIMS.width) * CANVAS_W;
       const py1 = (1.0 - (p1.y / STOCK_DIMS.depth)) * CANVAS_H;
-
       const px2 = (p2.x / STOCK_DIMS.width) * CANVAS_W;
       const py2 = (1.0 - (p2.y / STOCK_DIMS.depth)) * CANVAS_H;
 
       stockTextureCtx.save();
-      // Cutter diameter 6mm mapped to canvas pixels
-      const toolPixelRadius = (6 / STOCK_DIMS.width) * CANVAS_W;
-
-      stockTextureCtx.lineWidth = toolPixelRadius;
+      stockTextureCtx.lineWidth = (6 / STOCK_DIMS.width) * CANVAS_W;
       stockTextureCtx.lineCap = 'round';
       stockTextureCtx.lineJoin = 'round';
-
-      // Depth shading: deeper cuts result in darker machined pockets
-      const depthFactor = Math.min(Math.abs(p2.z) / 10, 1.0);
-      const r = Math.floor(45 - depthFactor * 25);
-      const g = Math.floor(55 - depthFactor * 25);
-      const b = Math.floor(70 - depthFactor * 25);
-
-      stockTextureCtx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+      stockTextureCtx.strokeStyle = '#273549';
       stockTextureCtx.beginPath();
       stockTextureCtx.moveTo(px1, py1);
       stockTextureCtx.lineTo(px2, py2);
@@ -867,33 +675,19 @@ M30</textarea>
       stockTextureCtx.restore();
 
       stockTexture.needsUpdate = true;
-
-      // Emit chips and coolant particles at cut site
       emitChips(toolAssembly.position);
     }
 
     function emitChips(pos) {
       chipParticles.visible = true;
-      const positions = chipParticles.geometry.attributes.position.array;
+      const posArray = chipParticles.geometry.attributes.position.array;
       for (let i = 0; i < CHIP_COUNT; i++) {
         const i3 = i * 3;
-        positions[i3] = pos.x + (Math.random() - 0.5) * 8;
-        positions[i3 + 1] = pos.y + Math.random() * 5;
-        positions[i3 + 2] = pos.z + (Math.random() - 0.5) * 8;
+        posArray[i3] = pos.x + (Math.random() - 0.5) * 8;
+        posArray[i3 + 1] = pos.y + Math.random() * 5;
+        posArray[i3 + 2] = pos.z + (Math.random() - 0.5) * 8;
       }
       chipParticles.geometry.attributes.position.needsUpdate = true;
-
-      if (isCoolantOn) {
-        coolantParticles.visible = true;
-        const cPos = coolantParticles.geometry.attributes.position.array;
-        for (let j = 0; j < COOLANT_COUNT; j++) {
-          const j3 = j * 3;
-          cPos[j3] = pos.x + (Math.random() - 0.5) * 12;
-          cPos[j3 + 1] = pos.y + Math.random() * 8;
-          cPos[j3 + 2] = pos.z + (Math.random() - 0.5) * 12;
-        }
-        coolantParticles.geometry.attributes.position.needsUpdate = true;
-      }
     }
 
     function triggerAlarm(msg) {
@@ -903,8 +697,7 @@ M30</textarea>
       currentRpm = 0;
 
       const banner = document.getElementById('alarmBanner');
-      const text = document.getElementById('alarmText');
-      text.innerText = msg;
+      document.getElementById('alarmText').innerText = msg;
       banner.classList.remove('hidden');
       banner.classList.add('flex');
 
@@ -919,9 +712,7 @@ M30</textarea>
       banner.classList.remove('flex');
     }
 
-    /* ==========================================================================
-       4. G-Code Parser & Execution Engine
-       ========================================================================== */
+    /* G-Code Execution */
     function runGCodeCycle() {
       if (isCycleRunning) return;
       initAudio();
@@ -932,15 +723,12 @@ M30</textarea>
         .map(l => l.trim().toUpperCase())
         .filter(l => l.length > 0 && !l.startsWith('(') && !l.startsWith(';'));
 
-      if (gcodeLines.length === 0) {
-        logTerminal('> Empty program.');
-        return;
-      }
+      if (gcodeLines.length === 0) return;
 
       currentLineIndex = 0;
       isCycleRunning = true;
       isFeedHold = false;
-      logTerminal(`<span class="text-cyan-300 font-bold">> Program started. Lines: ${gcodeLines.length}</span>`);
+      logTerminal(`<span class="text-cyan-300 font-bold">> Program started (${gcodeLines.length} blocks)</span>`);
       clearToolpathVisualization();
       executeNextGCodeLine();
     }
@@ -950,19 +738,16 @@ M30</textarea>
 
       if (currentLineIndex >= gcodeLines.length) {
         isCycleRunning = false;
-        logTerminal('<span class="text-emerald-400 font-bold">> Program completed (M30).</span>');
+        logTerminal('<span class="text-emerald-400 font-bold">> Program complete (M30).</span>');
         return;
       }
 
       const line = gcodeLines[currentLineIndex];
-      logTerminal(`<span class="text-slate-400 font-mono-tech">N${(currentLineIndex + 1) * 10}:</span> ${line}`);
+      logTerminal(`<span class="text-slate-500 font-mono-tech">N${(currentLineIndex + 1) * 10}:</span> ${line}`);
 
-      // Basic modal command parser
       const tokens = line.split(/\s+/);
       let isRapid = false;
-      let newX = targetX;
-      let newY = targetY;
-      let newZ = targetZ;
+      let newX = targetX, newY = targetY, newZ = targetZ;
 
       for (let t of tokens) {
         if (t === 'G00' || t === 'G0') isRapid = true;
@@ -973,15 +758,8 @@ M30</textarea>
         if (t.startsWith('F')) feedRate = parseFloat(t.substring(1));
         if (t.startsWith('S')) targetRpm = parseFloat(t.substring(1));
 
-        // Spindle & Coolant Modals
-        if (t === 'M03' || t === 'M3') {
-          isSpindleOn = true;
-          currentRpm = targetRpm || 4000;
-        }
-        if (t === 'M05' || t === 'M5') {
-          isSpindleOn = false;
-          currentRpm = 0;
-        }
+        if (t === 'M03' || t === 'M3') { isSpindleOn = true; currentRpm = targetRpm || 4000; }
+        if (t === 'M05' || t === 'M5') { isSpindleOn = false; currentRpm = 0; }
         if (t === 'M08' || t === 'M8') isCoolantOn = true;
         if (t === 'M09' || t === 'M9') isCoolantOn = false;
         if (t === 'M30' || t === 'M02') {
@@ -989,39 +767,30 @@ M30</textarea>
           isSpindleOn = false;
           currentRpm = 0;
           updateUI();
-          logTerminal('<span class="text-emerald-400 font-bold">> Program Ended (M30). Rewound.</span>');
+          logTerminal('<span class="text-emerald-400 font-bold">> Program Ended (M30).</span>');
           return;
         }
       }
 
-      // Crash Rule 2: G00 rapid feed into workpiece material
       if (isRapid && newZ < 0.0) {
-        triggerAlarm('RAPID COLLISION: G00 RAPID PLUNGE INTO WORKPIECE AT Z' + newZ);
+        triggerAlarm('RAPID COLLISION: G00 RAPID PLUNGE INTO STOCK (Z' + newZ + ')');
         return;
       }
 
-      // Animate line interpolation
       animateLinearMove(newX, newY, newZ, isRapid, () => {
         currentLineIndex++;
         executeNextGCodeLine();
       });
-
       updateUI();
     }
 
     function animateLinearMove(toX, toY, toZ, isRapid, onComplete) {
-      const startX = currentX;
-      const startY = currentY;
-      const startZ = currentZ;
-
+      const startX = currentX, startY = currentY, startZ = currentZ;
       const dist = Math.hypot(toX - startX, toY - startY, toZ - startZ);
-      // Linear speed calculation
-      const speed = isRapid ? 2500 : (feedRate || 600); // mm/min
-      const durationMs = Math.max((dist / (speed / 60)) * 1000, 40); // minimum frame step
-
+      const speed = isRapid ? 2500 : (feedRate || 600);
+      const durationMs = Math.max((dist / (speed / 60)) * 1000, 40);
       const startTime = performance.now();
 
-      // Trace 3D Toolpath line
       drawToolpathSegment(
         { x: wcsOffset.x + startX, y: wcsOffset.z + startZ, z: -(wcsOffset.y + startY) },
         { x: wcsOffset.x + toX, y: wcsOffset.z + toZ, z: -(wcsOffset.y + toY) },
@@ -1030,7 +799,6 @@ M30</textarea>
 
       function stepMove(now) {
         if (isEStopped || isFeedHold) return;
-
         const progress = Math.min((now - startTime) / durationMs, 1.0);
         const prevP = { x: currentX, y: currentY, z: currentZ };
 
@@ -1038,10 +806,7 @@ M30</textarea>
         currentY = startY + (toY - startY) * progress;
         currentZ = startZ + (toZ - startZ) * progress;
 
-        const nextP = { x: currentX, y: currentY, z: currentZ };
-
-        // Material removal & safety check
-        const isCutting = checkCollisionAndCarve(prevP, nextP);
+        const isCutting = checkCollisionAndCarve(prevP, { x: currentX, y: currentY, z: currentZ });
         updateSpindleWorldTransform();
         updateAudioSynth(true, isCutting);
         updateUI();
@@ -1051,23 +816,17 @@ M30</textarea>
         } else {
           updateAudioSynth(false, false);
           chipParticles.visible = false;
-          coolantParticles.visible = false;
           if (onComplete) onComplete();
         }
       }
-
       requestAnimationFrame(stepMove);
     }
 
     function drawToolpathSegment(p1, p2, colorHex) {
-      const points = [
-        new THREE.Vector3(p1.x, p1.y, p1.z),
-        new THREE.Vector3(p2.x, p2.y, p2.z)
-      ];
+      const points = [new THREE.Vector3(p1.x, p1.y, p1.z), new THREE.Vector3(p2.x, p2.y, p2.z)];
       const geom = new THREE.BufferGeometry().setFromPoints(points);
       const mat = new THREE.LineBasicMaterial({ color: colorHex, linewidth: 2 });
-      const line = new THREE.Line(geom, mat);
-      toolpathGroup.add(line);
+      toolpathGroup.add(new THREE.Line(geom, mat));
     }
 
     function clearToolpathVisualization() {
@@ -1076,9 +835,7 @@ M30</textarea>
       }
     }
 
-    /* ==========================================================================
-       5. Jog Controls & UI Actions
-       ========================================================================== */
+    /* Jogging */
     function jogAxis(axis, direction) {
       if (isEStopped) return;
       initAudio();
@@ -1092,9 +849,8 @@ M30</textarea>
       const prevPos = { x: currentX, y: currentY, z: currentZ };
       const nextPos = { x: currentX + dX, y: currentY + dY, z: currentZ + dZ };
 
-      // Machine travel limits check
       if (nextPos.z < -10.0) {
-        triggerAlarm('SOFT LIMIT: Z TRAVEL EXCEEDED (-10mm MAX CUT DEPTH)');
+        triggerAlarm('SOFT LIMIT: Z TRAVEL EXCEEDED (-10mm DEPTH LIMIT)');
         return;
       }
 
@@ -1105,28 +861,20 @@ M30</textarea>
       const isCutting = checkCollisionAndCarve(prevPos, nextPos);
       updateSpindleWorldTransform();
       updateAudioSynth(true, isCutting);
-      setTimeout(() => updateAudioSynth(false, false), 150);
+      setTimeout(() => updateAudioSynth(false, false), 120);
       updateUI();
-
-      // Check Active Lesson Progress
       checkLessonMilestones();
     }
 
     function updateUI() {
-      // Monospace 3-decimal DRO display
-      const formatCoord = (val) => (val >= 0 ? '+' : '') + val.toFixed(3).padStart(7, '0');
-      document.getElementById('droX').innerText = formatCoord(currentX);
-      document.getElementById('droY').innerText = formatCoord(currentY);
-      document.getElementById('droZ').innerText = formatCoord(currentZ);
+      const fmt = (v) => (v >= 0 ? '+' : '') + v.toFixed(3).padStart(7, '0');
+      document.getElementById('droX').innerText = fmt(currentX);
+      document.getElementById('droY').innerText = fmt(currentY);
+      document.getElementById('droZ').innerText = fmt(currentZ);
 
-      // HUD Badges
       const hudRpm = document.getElementById('hudSpindleRpm');
       hudRpm.innerText = isSpindleOn ? `${currentRpm} RPM` : '0 RPM';
-      hudRpm.className = isSpindleOn ? 'text-emerald-400 font-bold dro-glow' : 'text-slate-400 font-bold';
-
-      const hudCool = document.getElementById('hudCoolant');
-      hudCool.innerText = isCoolantOn ? 'M08 (FLOOD ON)' : 'M09 (OFF)';
-      hudCool.className = isCoolantOn ? 'text-cyan-400 font-bold dro-cyan-glow' : 'text-slate-400 font-bold';
+      hudRpm.className = isSpindleOn ? 'text-emerald-400 font-bold dro-glow-green' : 'text-slate-400 font-bold';
 
       document.getElementById('labelSpindleBtn').innerText = isSpindleOn ? 'STOP SPINDLE' : 'START SPINDLE';
       document.getElementById('labelCoolantBtn').innerText = isCoolantOn ? 'COOLANT: ON' : 'COOLANT: OFF';
@@ -1140,24 +888,20 @@ M30</textarea>
       term.scrollTop = term.scrollHeight;
     }
 
-    /* ==========================================================================
-       6. Guided Training Lessons Logic
-       ========================================================================== */
+    /* Guided Lessons */
     let activeLesson = null;
-
     function startLesson(num) {
       activeLesson = num;
       initAudio();
       clearAlarm();
 
       if (num === 1) {
-        // Move cutter away from corner
         currentX = 25.0; currentY = 30.0; currentZ = 20.0;
         updateSpindleWorldTransform();
         updateUI();
-        logTerminal('<span class="text-cyan-300 font-bold">[MISSION 1] Jog X, Y, Z until DRO reads (X0, Y0, Z0).</span>');
+        logTerminal('<span class="text-cyan-300 font-bold">[MISSION 1] Jog tool until DRO reads X0, Y0, Z0.</span>');
       } else if (num === 2) {
-        document.getElementById('gcodeEditor').value = 
+        document.getElementById('gcodeEditor').value =
 `(MISSION 2: 1MM FACING PASS)
 G90 G21
 M03 S4500
@@ -1169,11 +913,11 @@ G00 Z10.0
 M05
 M30`;
         switchTab('gcode');
-        logTerminal('<span class="text-cyan-300 font-bold">[MISSION 2] Review the G-code and press CYCLE START.</span>');
+        logTerminal('<span class="text-cyan-300 font-bold">[MISSION 2] Review G-code and press START.</span>');
       } else if (num === 3) {
-        document.getElementById('gcodeEditor').value = 
+        document.getElementById('gcodeEditor').value =
 `(MISSION 3: CRASH PREVENTION)
-(FIX THE DANGEROUS G00 PLUNGE ON LINE 5)
+(FIX G00 PLUNGE ON LINE 5)
 G90 G21
 M03 S4000
 G00 X20.0 Y20.0
@@ -1182,27 +926,24 @@ G01 X80.0 F500
 M05
 M30`;
         switchTab('gcode');
-        logTerminal('<span class="text-red-300 font-bold">[MISSION 3] Find line 5! Change G00 Z-2.0 to a controlled G01 cut before running!</span>');
+        logTerminal('<span class="text-red-300 font-bold">[MISSION 3] Change G00 Z-2.0 to controlled G01 before running!</span>');
       }
     }
 
     function checkLessonMilestones() {
       if (activeLesson === 1) {
-        if (Math.abs(currentX) < 0.2 && Math.abs(currentY) < 0.2 && Math.abs(currentZ) < 0.2) {
+        if (Math.abs(currentX) < 0.25 && Math.abs(currentY) < 0.25 && Math.abs(currentZ) < 0.25) {
           const badge = document.getElementById('badgeL1');
-          badge.className = 'text-[10px] font-mono-tech px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold';
+          badge.className = 'text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold';
           badge.innerText = 'COMPLETED';
-          logTerminal('<span class="text-emerald-400 font-bold">★ MISSION 1 ACCOMPLISHED: G54 Part Zero Established!</span>');
+          logTerminal('<span class="text-emerald-400 font-bold">★ MISSION 1 COMPLETE: Part Zero Set!</span>');
           document.getElementById('badgeL2').innerText = 'UNLOCKED';
-          document.getElementById('badgeL2').className = 'text-[10px] font-mono-tech px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
+          document.getElementById('badgeL2').className = 'text-[9px] font-mono-tech px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
           activeLesson = null;
         }
       }
     }
 
-    /* ==========================================================================
-       7. Event Handlers & Initialization
-       ========================================================================== */
     function switchTab(tab) {
       ['Pendant', 'Gcode', 'Academy'].forEach(t => {
         const panel = document.getElementById(`panel${t}`);
@@ -1210,11 +951,11 @@ M30`;
         if (t.toLowerCase() === tab.toLowerCase()) {
           panel.classList.remove('hidden');
           panel.classList.add('flex');
-          btn.className = 'flex-1 py-2 text-cyan-400 border-b-2 border-cyan-400 bg-slate-900';
+          btn.className = 'flex-1 py-2.5 text-cyan-400 border-b-2 border-cyan-400 bg-slate-900/60 transition';
         } else {
           panel.classList.add('hidden');
           panel.classList.remove('flex');
-          btn.className = 'flex-1 py-2 text-slate-400 hover:text-slate-200';
+          btn.className = 'flex-1 py-2.5 text-slate-400 hover:text-slate-200 transition';
         }
       });
     }
@@ -1224,41 +965,37 @@ M30`;
       lucide.createIcons();
       updateUI();
 
-      // Tab Switching
       document.getElementById('tabBtnPendant').addEventListener('click', () => switchTab('pendant'));
       document.getElementById('tabBtnGcode').addEventListener('click', () => switchTab('gcode'));
       document.getElementById('tabBtnAcademy').addEventListener('click', () => switchTab('academy'));
 
-      // Camera Presets
       document.getElementById('camIso').addEventListener('click', () => {
-        camera.position.set(130, 160, 190);
+        camera.position.set(130, 150, 180);
         controls.target.set(0, 10, 0);
       });
       document.getElementById('camTop').addEventListener('click', () => {
-        camera.position.set(0, 240, 0.1);
+        camera.position.set(0, 230, 0.1);
         controls.target.set(0, 10, 0);
       });
       document.getElementById('camFront').addEventListener('click', () => {
-        camera.position.set(0, 30, 240);
+        camera.position.set(0, 30, 220);
         controls.target.set(0, 10, 0);
       });
       document.getElementById('camSide').addEventListener('click', () => {
-        camera.position.set(240, 30, 0);
+        camera.position.set(220, 30, 0);
         controls.target.set(0, 10, 0);
       });
 
-      // Jog Step Size Buttons
       document.querySelectorAll('.step-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           document.querySelectorAll('.step-btn').forEach(b => {
-            b.className = 'step-btn py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200';
+            b.className = 'step-btn h-9 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200';
           });
-          e.target.className = 'step-btn py-1 rounded bg-cyan-700 font-bold border border-cyan-500 text-white';
+          e.target.className = 'step-btn h-9 rounded bg-cyan-700 font-bold border border-cyan-500 text-white';
           jogIncrement = parseFloat(e.target.dataset.step);
         });
       });
 
-      // Jog Directional Buttons
       document.getElementById('jogXPlus').addEventListener('click', () => jogAxis('X', 1));
       document.getElementById('jogXMinus').addEventListener('click', () => jogAxis('X', -1));
       document.getElementById('jogYPlus').addEventListener('click', () => jogAxis('Y', 1));
@@ -1266,7 +1003,6 @@ M30`;
       document.getElementById('jogZPlus').addEventListener('click', () => jogAxis('Z', 1));
       document.getElementById('jogZMinus').addEventListener('click', () => jogAxis('Z', -1));
 
-      // Spindle & Coolant Toggles
       document.getElementById('btnToggleSpindle').addEventListener('click', () => {
         initAudio();
         isSpindleOn = !isSpindleOn;
@@ -1290,18 +1026,15 @@ M30`;
         updateUI();
       });
 
-      // Zero & Touch-off Actions
       document.getElementById('btnZeroX').addEventListener('click', () => { currentX = 0; updateUI(); });
       document.getElementById('btnZeroY').addEventListener('click', () => { currentY = 0; updateUI(); });
       document.getElementById('btnZeroZ').addEventListener('click', () => { currentZ = 0; updateUI(); });
 
       document.getElementById('btnTouchOffCorner').addEventListener('click', () => {
-        currentX = 0.0;
-        currentY = 0.0;
-        currentZ = 0.0;
+        currentX = 0.0; currentY = 0.0; currentZ = 0.0;
         updateSpindleWorldTransform();
         updateUI();
-        logTerminal('> G54 Part Zero set at stock corner (0,0,0).');
+        logTerminal('> G54 Part Zero set to (0,0,0).');
         checkLessonMilestones();
       });
 
@@ -1309,18 +1042,16 @@ M30`;
         currentZ = 0.0;
         updateSpindleWorldTransform();
         updateUI();
-        logTerminal('> Stock top plane touched off (Z=0).');
+        logTerminal('> Top face touched off (Z=0).');
       });
 
-      // Reset Stock
       document.getElementById('btnResetStock').addEventListener('click', () => {
         resetStockCanvas();
         stockTexture.needsUpdate = true;
         clearToolpathVisualization();
-        logTerminal('> Stock blank surfaced and refreshed.');
+        logTerminal('> Workpiece faced clean.');
       });
 
-      // E-STOP Button
       document.getElementById('btnEStop').addEventListener('click', () => {
         isEStopped = !isEStopped;
         if (isEStopped) {
@@ -1328,34 +1059,26 @@ M30`;
           isFeedHold = true;
           isSpindleOn = false;
           currentRpm = 0;
-          triggerAlarm('EMERGENCY STOP (E-STOP) ACTIVATED');
-          document.getElementById('btnEStop').classList.add('bg-red-800');
+          triggerAlarm('EMERGENCY STOP (E-STOP) ENGAGED');
         } else {
           clearAlarm();
-          document.getElementById('btnEStop').classList.remove('bg-red-800');
-          logTerminal('> E-STOP reset. System ready.');
+          logTerminal('> E-STOP released. System ready.');
         }
         updateAudioSynth(false, false);
         updateUI();
       });
 
-      // Audio Mute Toggle
+      document.getElementById('btnDismissAlarm').addEventListener('click', clearAlarm);
+
       document.getElementById('btnAudioToggle').addEventListener('click', () => {
         audioEnabled = !audioEnabled;
-        document.getElementById('audioStatusText').innerText = audioEnabled ? 'AUDIO: ON' : 'AUDIO: MUTED';
+        document.getElementById('audioStatusText').innerText = audioEnabled ? 'AUDIO: ON' : 'AUDIO: OFF';
         document.getElementById('audioIcon').className = audioEnabled ? 'w-3.5 h-3.5 text-emerald-400' : 'w-3.5 h-3.5 text-slate-500';
-        if (!audioEnabled && audioCtx) {
-          spindleGain.gain.setValueAtTime(0, audioCtx.currentTime);
-          stepperGain.gain.setValueAtTime(0, audioCtx.currentTime);
-          cutGain.gain.setValueAtTime(0, audioCtx.currentTime);
-        }
       });
 
-      // G-Code Execution Controls
       document.getElementById('btnCycleStart').addEventListener('click', runGCodeCycle);
       document.getElementById('btnFeedHold').addEventListener('click', () => {
         isFeedHold = !isFeedHold;
-        logTerminal(isFeedHold ? '> Feed hold applied.' : '> Feed resumed.');
         if (!isFeedHold && isCycleRunning) executeNextGCodeLine();
       });
       document.getElementById('btnSingleStep').addEventListener('click', () => {
@@ -1371,7 +1094,6 @@ M30`;
         executeNextGCodeLine();
       });
 
-      // Sample G-Code Presets
       document.getElementById('btnPresetFace').addEventListener('click', () => {
         document.getElementById('gcodeEditor').value =
 `(FACING PASS)
@@ -1408,20 +1130,15 @@ M05
 M30`;
       });
 
-      // Academy Lesson Start Buttons
       document.getElementById('btnStartL1').addEventListener('click', () => startLesson(1));
       document.getElementById('btnStartL2').addEventListener('click', () => startLesson(2));
       document.getElementById('btnStartL3').addEventListener('click', () => startLesson(3));
 
-      // Animation Loop
       function animate() {
         requestAnimationFrame(animate);
-
-        // Spin toolhead if spindle active
         if (isSpindleOn && spindleRotor) {
           spindleRotor.rotation.y += (currentRpm / 60) * 0.025;
         }
-
         controls.update();
         renderer.render(scene, camera);
       }
