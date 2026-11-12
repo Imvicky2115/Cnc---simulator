@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#E11D48" />
+  <meta name="theme-color" content="#E11D52" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Paws for Purpose | Hyderabad Rescue & Adoptions</title>
@@ -156,7 +156,7 @@
       transform: translateY(0);
     }
 
-    /* Admin/Owner-Only Controls (Hidden for Public Users) */
+    /* Admin/Owner-Only Controls (Completely invisible for Public Users) */
     .admin-only {
       display: none !important;
     }
@@ -173,12 +173,12 @@
     <!-- CLEAN, SPACIOUS STICKY HEADER -->
     <header class="sticky top-0 z-30 bg-[#FFF9FA]/95 backdrop-blur-md border-b border-pinkbrand-100">
       
-      <!-- Top Bar: Full Brand Name Visible + Clean Hamburger Menu -->
+      <!-- Top Bar: Full Brand Name + Clean Public Hamburger Menu -->
       <div class="px-5 py-3.5 flex items-center justify-between gap-3 relative">
         
-        <!-- Brand Identity (Plenty of horizontal room so name never truncates) -->
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-pinkbrand-500 to-pinkbrand-700 flex items-center justify-center text-white shadow-md shadow-pinkbrand-600/20 shrink-0">
+        <!-- Brand Identity (Secret 5-tap trigger on Paw Icon for Owner Access) -->
+        <div class="flex items-center gap-3 min-w-0 select-none">
+          <div id="secretBrandTrigger" onclick="handleSecretTap()" class="w-10 h-10 rounded-2xl bg-gradient-to-br from-pinkbrand-500 to-pinkbrand-700 flex items-center justify-center text-white shadow-md shadow-pinkbrand-600/20 shrink-0 cursor-pointer active:scale-95 transition-transform">
             <i data-lucide="paw-print" class="w-5 h-5 animate-float"></i>
           </div>
           <div>
@@ -195,13 +195,13 @@
           </div>
         </div>
 
-        <!-- Right: Clean Hamburger Menu Button -->
+        <!-- Right: Clean Hamburger Menu Button (100% Public Items Only) -->
         <div class="relative shrink-0">
           <button type="button" id="hamburgerBtn" onclick="toggleMenu(event)" aria-label="Open Menu" class="btn-press w-10 h-10 rounded-2xl bg-white hover:bg-pinkbrand-50 text-stone-700 hover:text-pinkbrand-600 border border-pinkbrand-200/70 shadow-2xs flex items-center justify-center">
             <i data-lucide="menu" id="hamburgerIcon" class="w-5 h-5"></i>
           </button>
 
-          <!-- HAMBURGER DROPDOWN MENU -->
+          <!-- HAMBURGER DROPDOWN MENU (PUBLIC ONLY — ZERO ADMIN/LOGIN CLUTTER) -->
           <div id="navDropdown" class="dropdown-menu absolute right-0 mt-2.5 w-64 bg-white rounded-3xl shadow-2xl border border-pinkbrand-100 py-2.5 z-50">
             
             <!-- Quick Support & Helpline -->
@@ -228,7 +228,7 @@
             </div>
 
             <!-- Services Section -->
-            <div class="px-3 py-2 border-b border-pinkbrand-50">
+            <div class="px-3 pt-1.5">
               <p class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-400">Our Services</p>
               
               <button type="button" onclick="closeMenu(); openServiceInfo('rehab');" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-pinkbrand-50/60 text-stone-700 text-xs font-medium transition">
@@ -252,19 +252,11 @@
               </button>
             </div>
 
-            <!-- Discreet Coordinator Portal Entry (No exposed lock button on header) -->
-            <div class="px-3 pt-1.5">
-              <button type="button" id="menuAdminBtn" onclick="closeMenu(); toggleAdminAuth();" class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-stone-50 text-stone-400 hover:text-stone-600 text-[11px] font-medium transition">
-                <span id="menuAdminLabel">Coordinator Portal</span>
-                <i data-lucide="key-round" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-
           </div>
         </div>
       </div>
 
-      <!-- Owner Mode Active Banner (Visible ONLY when coordinator is logged in) -->
+      <!-- Owner Mode Active Banner (Visible ONLY after owner unlocks via ?team=1 or 5-tap) -->
       <div id="adminBanner" class="hidden bg-pinkbrand-700 text-white px-5 py-1.5 text-[11px] font-medium flex items-center justify-between">
         <span class="flex items-center gap-1.5">
           <i data-lucide="shield-check" class="w-3.5 h-3.5 text-pinkbrand-200"></i>
@@ -702,14 +694,14 @@
     </nav>
 
     <!-- ========================================== -->
-    <!-- MODAL 0: COORDINATOR / OWNER PIN LOGIN     -->
+    <!-- MODAL 0: HIDDEN COORDINATOR PIN LOGIN      -->
     <!-- ========================================== -->
     <div id="pinModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closePinModal()">
       <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl">
         <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
           <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Team Access Only</span>
-            <h3 class="font-display font-bold text-lg text-stone-900 mt-1">Coordinator Login</h3>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Team Access</span>
+            <h3 class="font-display font-bold text-lg text-stone-900 mt-1">Coordinator Verification</h3>
           </div>
           <button onclick="closePinModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 flex items-center justify-center">
             <i data-lucide="x" class="w-5 h-5"></i>
@@ -720,10 +712,10 @@
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5">Enter 4-Digit Rescue Team PIN</label>
             <input type="password" id="adminPinInput" inputmode="numeric" maxlength="4" required placeholder="••••" class="w-full px-4 py-3.5 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-lg font-bold tracking-[0.5em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-            <p class="text-[11px] text-stone-400 mt-1.5 text-center">Demo PIN: <strong class="text-stone-600">1234</strong> (Unlocks Foster & Vet Bill posting)</p>
+            <p class="text-[11px] text-stone-400 mt-1.5 text-center">Demo PIN: <strong class="text-stone-600">1234</strong></p>
           </div>
           <button type="submit" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm">
-            Unlock Coordinator Tools
+            Unlock Listing Tools
           </button>
         </form>
       </div>
@@ -1001,19 +993,17 @@
     lucide.createIcons();
 
     // ==========================================
-    // HAMBURGER DROPDOWN MENU LOGIC
+    // HAMBURGER DROPDOWN MENU LOGIC (PUBLIC ONLY)
     // ==========================================
     function toggleMenu(event) {
       event.stopPropagation();
-      const dropdown = document.getElementById('navDropdown');
-      dropdown.classList.toggle('open');
+      document.getElementById('navDropdown').classList.toggle('open');
     }
 
     function closeMenu() {
       document.getElementById('navDropdown').classList.remove('open');
     }
 
-    // Close menu when tapping outside
     document.addEventListener('click', (e) => {
       const dropdown = document.getElementById('navDropdown');
       const btn = document.getElementById('hamburgerBtn');
@@ -1023,22 +1013,41 @@
     });
 
     // ==========================================
-    // OWNER / COORDINATOR AUTHENTICATION STATE
+    // INVISIBLE OWNER ACCESS (?team=1 OR 5-TAP PAW LOGO)
     // ==========================================
     const OWNER_PIN = '1234';
+    let secretTapCount = 0;
+    let secretTapTimer = null;
 
-    function checkSavedAdminSession() {
-      if (sessionStorage.getItem('pfp_owner_auth') === 'true') {
-        enableAdminUI();
+    function handleSecretTap() {
+      secretTapCount++;
+      clearTimeout(secretTapTimer);
+      if (secretTapCount >= 5) {
+        secretTapCount = 0;
+        openPinPrompt();
+      } else {
+        secretTapTimer = setTimeout(() => {
+          secretTapCount = 0;
+        }, 1500);
       }
     }
 
-    function toggleAdminAuth() {
-      if (document.body.classList.contains('admin-authenticated')) {
-        logoutAdmin();
-      } else {
-        document.getElementById('pinModal').classList.add('open');
-        setTimeout(() => document.getElementById('adminPinInput').focus(), 150);
+    function openPinPrompt() {
+      if (document.body.classList.contains('admin-authenticated')) return;
+      document.getElementById('pinModal').classList.add('open');
+      setTimeout(() => document.getElementById('adminPinInput').focus(), 150);
+    }
+
+    function checkOwnerAccessOnLoad() {
+      // 1. Check active session
+      if (sessionStorage.getItem('pfp_owner_auth') === 'true') {
+        enableAdminUI();
+        return;
+      }
+      // 2. Check private owner bookmark parameter (?team=1)
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('team') === '1') {
+        openPinPrompt();
       }
     }
 
@@ -1056,7 +1065,7 @@
         closePinModal();
         showToast('Coordinator Mode unlocked');
       } else {
-        showToast('Incorrect PIN. Try 1234');
+        showToast('Incorrect PIN');
         document.getElementById('adminPinInput').value = '';
       }
     }
@@ -1064,18 +1073,16 @@
     function enableAdminUI() {
       document.body.classList.add('admin-authenticated');
       document.getElementById('adminBanner').classList.remove('hidden');
-      document.getElementById('menuAdminLabel').textContent = 'Exit Coordinator Mode';
     }
 
     function logoutAdmin() {
       sessionStorage.removeItem('pfp_owner_auth');
       document.body.classList.remove('admin-authenticated');
       document.getElementById('adminBanner').classList.add('hidden');
-      document.getElementById('menuAdminLabel').textContent = 'Coordinator Portal';
       showToast('Switched back to Public View');
     }
 
-    checkSavedAdminSession();
+    checkOwnerAccessOnLoad();
 
     // ==========================================
     // TAB SWITCHING LOGIC
