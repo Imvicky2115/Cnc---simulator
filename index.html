@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#059669" />
+  <meta name="theme-color" content="#E11D48" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Paws for Purpose | Hyderabad Rescue & Adoptions</title>
@@ -24,19 +24,17 @@
             display: ['Plus Jakarta Sans', 'sans-serif'],
           },
           colors: {
-            primary: {
-              50: '#ECFDF5',
-              100: '#D1FAE5',
-              500: '#10B981',
-              600: '#059669',
-              700: '#047857',
+            pinkbrand: {
+              50: '#FFF1F5',
+              100: '#FFE4EC',
+              200: '#FECDD9',
+              500: '#F43F6E',
+              600: '#E11D52',
+              700: '#BE1241',
             },
-            warm: {
-              50: '#FFFBEB',
-              100: '#FEF3C7',
-              500: '#F59E0B',
-              600: '#D97706',
-              700: '#B45309',
+            blush: {
+              50: '#FDF8F9',
+              100: '#FCEEF2',
             },
             sos: {
               50: '#FFF1F2',
@@ -60,8 +58,8 @@
     }
     
     body {
-      background-color: #EFECE6;
-      color: #1C1917;
+      background-color: #F5EBEE;
+      color: #1F1619;
       overflow-x: hidden;
     }
 
@@ -118,12 +116,26 @@
     }
 
     @keyframes sosPulse {
-      0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.45); }
-      70% { box-shadow: 0 0 0 10px rgba(225, 29, 72, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
+      0% { box-shadow: 0 0 0 0 rgba(225, 29, 82, 0.42); }
+      70% { box-shadow: 0 0 0 10px rgba(225, 29, 82, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(225, 29, 82, 0); }
     }
     .sos-pulse {
       animation: sosPulse 2s infinite;
+    }
+
+    /* Hamburger Dropdown Menu Animation */
+    .dropdown-menu {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.97);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: top right;
+    }
+    .dropdown-menu.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
     }
 
     /* Modal Backdrop & Sheet */
@@ -153,77 +165,112 @@
     }
   </style>
 </head>
-<body class="antialiased selection:bg-warm-100 selection:text-warm-700">
+<body class="antialiased selection:bg-pinkbrand-100 selection:text-pinkbrand-700">
 
   <!-- Mobile App Container -->
-  <div class="max-w-md mx-auto min-h-screen bg-[#FAF9F6] shadow-2xl relative flex flex-col border-x border-stone-200/80">
+  <div class="max-w-md mx-auto min-h-screen bg-[#FFF9FA] shadow-2xl relative flex flex-col border-x border-pinkbrand-100">
 
-    <!-- STICKY HEADER WITH SERVICE MENU BAR -->
-    <header class="sticky top-0 z-30 bg-[#FAF9F6]/95 backdrop-blur-md border-b border-stone-200/80">
+    <!-- CLEAN, SPACIOUS STICKY HEADER -->
+    <header class="sticky top-0 z-30 bg-[#FFF9FA]/95 backdrop-blur-md border-b border-pinkbrand-100">
       
-      <!-- Top Bar: Brand + Quick QR, Helpline & Subtle Owner Lock -->
-      <div class="px-5 pt-3.5 pb-2.5 flex items-center justify-between gap-2">
-        <!-- Brand Identity -->
-        <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 flex items-center justify-center text-white shadow-md shadow-primary-600/20 shrink-0">
+      <!-- Top Bar: Full Brand Name Visible + Clean Hamburger Menu -->
+      <div class="px-5 py-3.5 flex items-center justify-between gap-3 relative">
+        
+        <!-- Brand Identity (Plenty of horizontal room so name never truncates) -->
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-pinkbrand-500 to-pinkbrand-700 flex items-center justify-center text-white shadow-md shadow-pinkbrand-600/20 shrink-0">
             <i data-lucide="paw-print" class="w-5 h-5 animate-float"></i>
           </div>
-          <div class="truncate">
-            <h1 class="font-display font-bold text-[15px] leading-tight text-stone-900 tracking-tight truncate">
+          <div>
+            <h1 class="font-display font-bold text-[17px] leading-tight text-stone-900 tracking-tight">
               Paws for Purpose
             </h1>
             <div class="flex items-center gap-1.5 mt-0.5">
               <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-500 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-primary-600"></span>
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pinkbrand-500 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-pinkbrand-600"></span>
               </span>
-              <span class="text-[11px] font-medium text-stone-500 truncate">Saving Street Souls • Hyd</span>
+              <span class="text-[11px] font-medium text-stone-500">Saving Street Souls • Hyderabad</span>
             </div>
           </div>
         </div>
 
-        <!-- Right Quick Actions: Scan QR + Call + Team Lock -->
-        <div class="flex items-center gap-1.5 shrink-0">
-          <button type="button" onclick="openQrModal()" class="btn-press inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-warm-50 hover:bg-warm-100 text-warm-700 border border-warm-200 text-xs font-semibold">
-            <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
-            <span>Donate</span>
+        <!-- Right: Clean Hamburger Menu Button -->
+        <div class="relative shrink-0">
+          <button type="button" id="hamburgerBtn" onclick="toggleMenu(event)" aria-label="Open Menu" class="btn-press w-10 h-10 rounded-2xl bg-white hover:bg-pinkbrand-50 text-stone-700 hover:text-pinkbrand-600 border border-pinkbrand-200/70 shadow-2xs flex items-center justify-center">
+            <i data-lucide="menu" id="hamburgerIcon" class="w-5 h-5"></i>
           </button>
-          <a href="tel:+919876543210" aria-label="Emergency Helpline" class="btn-press w-9 h-9 rounded-xl bg-sos-50 hover:bg-sos-100 text-sos-600 border border-sos-200/70 flex items-center justify-center">
-            <i data-lucide="phone-call" class="w-4 h-4"></i>
-          </a>
-          <button type="button" id="adminLockBtn" onclick="toggleAdminAuth()" title="Coordinator Login" class="btn-press w-9 h-9 rounded-xl bg-stone-100 hover:bg-stone-200/80 text-stone-500 border border-stone-200/80 flex items-center justify-center">
-            <i data-lucide="lock" id="adminLockIcon" class="w-3.5 h-3.5"></i>
-          </button>
+
+          <!-- HAMBURGER DROPDOWN MENU -->
+          <div id="navDropdown" class="dropdown-menu absolute right-0 mt-2.5 w-64 bg-white rounded-3xl shadow-2xl border border-pinkbrand-100 py-2.5 z-50">
+            
+            <!-- Quick Support & Helpline -->
+            <div class="px-3 pb-2 border-b border-pinkbrand-50 space-y-1">
+              <button type="button" onclick="closeMenu(); openQrModal();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-pinkbrand-50/80 hover:bg-pinkbrand-100/80 text-pinkbrand-700 text-left transition">
+                <div class="w-8 h-8 rounded-xl bg-pinkbrand-600 text-white flex items-center justify-center shrink-0">
+                  <i data-lucide="qr-code" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <p class="text-xs font-bold leading-tight">Scan & Donate (QR)</p>
+                  <p class="text-[10px] text-pinkbrand-600/80">Direct UPI • Barsha Sarkar</p>
+                </div>
+              </button>
+
+              <a href="tel:+919876543210" onclick="closeMenu()" class="w-full flex items-center gap-3 px-3 py-2 rounded-2xl hover:bg-stone-50 text-stone-700 text-left transition">
+                <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                  <i data-lucide="phone-call" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold leading-tight">Emergency Helpline</p>
+                  <p class="text-[10px] text-stone-400">Call Hyderabad rescue desk</p>
+                </div>
+              </a>
+            </div>
+
+            <!-- Services Section -->
+            <div class="px-3 py-2 border-b border-pinkbrand-50">
+              <p class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-400">Our Services</p>
+              
+              <button type="button" onclick="closeMenu(); openServiceInfo('rehab');" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-pinkbrand-50/60 text-stone-700 text-xs font-medium transition">
+                <i data-lucide="heart-pulse" class="w-4 h-4 text-pinkbrand-600"></i>
+                <span>Rehabilitation</span>
+              </button>
+
+              <button type="button" onclick="closeMenu(); openServiceInfo('feeding');" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-pinkbrand-50/60 text-stone-700 text-xs font-medium transition">
+                <i data-lucide="utensils" class="w-4 h-4 text-pinkbrand-600"></i>
+                <span>Feeding Drives</span>
+              </button>
+
+              <button type="button" onclick="closeMenu(); switchTab('adopt', document.getElementById('nav-adopt'));" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-pinkbrand-50/60 text-stone-700 text-xs font-medium transition">
+                <i data-lucide="home" class="w-4 h-4 text-pinkbrand-600"></i>
+                <span>Adoptions & Fostering</span>
+              </button>
+
+              <button type="button" onclick="closeMenu(); openServiceInfo('spay');" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-pinkbrand-50/60 text-stone-700 text-xs font-medium transition">
+                <i data-lucide="syringe" class="w-4 h-4 text-pinkbrand-600"></i>
+                <span>Spay & Vaccinate</span>
+              </button>
+            </div>
+
+            <!-- Discreet Coordinator Portal Entry (No exposed lock button on header) -->
+            <div class="px-3 pt-1.5">
+              <button type="button" id="menuAdminBtn" onclick="closeMenu(); toggleAdminAuth();" class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-stone-50 text-stone-400 hover:text-stone-600 text-[11px] font-medium transition">
+                <span id="menuAdminLabel">Coordinator Portal</span>
+                <i data-lucide="key-round" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+
+          </div>
         </div>
       </div>
 
-      <!-- Owner Mode Active Banner (Visible only when logged in) -->
-      <div id="adminBanner" class="hidden bg-primary-700 text-white px-5 py-1.5 text-[11px] font-medium flex items-center justify-between">
+      <!-- Owner Mode Active Banner (Visible ONLY when coordinator is logged in) -->
+      <div id="adminBanner" class="hidden bg-pinkbrand-700 text-white px-5 py-1.5 text-[11px] font-medium flex items-center justify-between">
         <span class="flex items-center gap-1.5">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-primary-100"></i>
-          Coordinator Mode Active — Listing tools unlocked
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-pinkbrand-200"></i>
+          Coordinator Mode — Listing tools unlocked
         </span>
-        <button onclick="logoutAdmin()" class="underline text-primary-100 hover:text-white font-semibold">Exit</button>
-      </div>
-
-      <!-- Service Menu Strip (Rehabilitation | Feeding | Adoptions | Spay & Vaccinate) -->
-      <div class="px-5 pb-3 pt-1 flex items-center gap-2 overflow-x-auto no-scrollbar">
-        <button type="button" onclick="openServiceInfo('rehab')" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-stone-200/80 hover:border-primary-300 text-stone-700 text-[11px] font-semibold shrink-0 transition shadow-2xs">
-          <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-sos-600"></i>
-          <span>Rehabilitation</span>
-        </button>
-        <button type="button" onclick="openServiceInfo('feeding')" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-stone-200/80 hover:border-warm-400 text-stone-700 text-[11px] font-semibold shrink-0 transition shadow-2xs">
-          <i data-lucide="utensils" class="w-3.5 h-3.5 text-warm-600"></i>
-          <span>Feeding Drives</span>
-        </button>
-        <button type="button" onclick="switchTab('adopt', document.getElementById('nav-adopt'))" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-stone-200/80 hover:border-primary-400 text-stone-700 text-[11px] font-semibold shrink-0 transition shadow-2xs">
-          <i data-lucide="home" class="w-3.5 h-3.5 text-primary-600"></i>
-          <span>Adoptions</span>
-        </button>
-        <button type="button" onclick="openServiceInfo('spay')" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-stone-200/80 hover:border-primary-400 text-stone-700 text-[11px] font-semibold shrink-0 transition shadow-2xs">
-          <i data-lucide="syringe" class="w-3.5 h-3.5 text-primary-600"></i>
-          <span>Spay & Vaccinate</span>
-        </button>
+        <button onclick="logoutAdmin()" class="underline text-pinkbrand-100 hover:text-white font-semibold">Exit</button>
       </div>
 
     </header>
@@ -236,14 +283,14 @@
       <!-- ========================================== -->
       <section id="tab-sos" class="tab-pane active space-y-6">
         
-        <!-- Focused Alert Banner -->
-        <div class="bg-gradient-to-r from-sos-600 to-rose-500 rounded-2xl p-4 text-white shadow-lg shadow-sos-600/15 flex items-start gap-3.5">
+        <!-- Focused Warm Pink Alert Banner -->
+        <div class="bg-gradient-to-r from-pinkbrand-600 to-pinkbrand-500 rounded-2xl p-4 text-white shadow-lg shadow-pinkbrand-600/15 flex items-start gap-3.5">
           <div class="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0 mt-0.5">
             <i data-lucide="siren" class="w-5 h-5 text-white"></i>
           </div>
           <div class="space-y-1">
             <h2 class="font-display font-bold text-sm leading-snug">Spotted an injured street soul?</h2>
-            <p class="text-xs text-rose-100 leading-relaxed">
+            <p class="text-xs text-pinkbrand-100 leading-relaxed">
               Pin the exact spot & snap a photo. Hyderabad volunteers get alerted right away.
             </p>
           </div>
@@ -258,19 +305,19 @@
               1. Animal Type
             </label>
             <div class="grid grid-cols-4 gap-2.5">
-              <button type="button" onclick="selectChip('species', 'Dog', this)" class="species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border-2 border-primary-600 bg-primary-50/80 text-primary-700 font-semibold text-xs gap-1.5">
+              <button type="button" onclick="selectChip('species', 'Dog', this)" class="species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border-2 border-pinkbrand-600 bg-pinkbrand-50 text-pinkbrand-700 font-semibold text-xs gap-1.5">
                 <i data-lucide="dog" class="w-5 h-5 icon-bounce"></i>
                 <span>Dog</span>
               </button>
-              <button type="button" onclick="selectChip('species', 'Cat', this)" class="species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border border-stone-200 bg-white text-stone-600 hover:border-stone-300 font-medium text-xs gap-1.5">
+              <button type="button" onclick="selectChip('species', 'Cat', this)" class="species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border border-pinkbrand-100 bg-white text-stone-600 hover:border-pinkbrand-300 font-medium text-xs gap-1.5">
                 <i data-lucide="cat" class="w-5 h-5 icon-bounce"></i>
                 <span>Cat</span>
               </button>
-              <button type="button" onclick="selectChip('species', 'Bird', this)" class="species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border border-stone-200 bg-white text-stone-600 hover:border-stone-300 font-medium text-xs gap-1.5">
+              <button type="button" onclick="selectChip('species', 'Bird', this)" class="species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border border-pinkbrand-100 bg-white text-stone-600 hover:border-pinkbrand-300 font-medium text-xs gap-1.5">
                 <i data-lucide="bird" class="w-5 h-5 icon-bounce"></i>
                 <span>Bird</span>
               </button>
-              <button type="button" onclick="selectChip('species', 'Other', this)" class="species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border border-stone-200 bg-white text-stone-600 hover:border-stone-300 font-medium text-xs gap-1.5">
+              <button type="button" onclick="selectChip('species', 'Other', this)" class="species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border border-pinkbrand-100 bg-white text-stone-600 hover:border-pinkbrand-300 font-medium text-xs gap-1.5">
                 <i data-lucide="heart-handshake" class="w-5 h-5 icon-bounce"></i>
                 <span>Other</span>
               </button>
@@ -284,16 +331,16 @@
               2. Condition Severity
             </label>
             <div class="grid grid-cols-3 gap-2.5">
-              <button type="button" onclick="selectChip('urgency', 'Critical / Bleeding', this)" class="urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border-2 border-sos-600 bg-sos-50 text-sos-600 font-semibold text-xs text-center">
-                <span class="w-2 h-2 rounded-full bg-sos-600 shrink-0"></span>
+              <button type="button" onclick="selectChip('urgency', 'Critical / Bleeding', this)" class="urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border-2 border-pinkbrand-600 bg-pinkbrand-50 text-pinkbrand-700 font-semibold text-xs text-center">
+                <span class="w-2 h-2 rounded-full bg-pinkbrand-600 shrink-0"></span>
                 <span>Critical</span>
               </button>
-              <button type="button" onclick="selectChip('urgency', 'Injury / Limping', this)" class="urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-stone-200 bg-white text-stone-600 font-medium text-xs text-center">
-                <span class="w-2 h-2 rounded-full bg-warm-500 shrink-0"></span>
+              <button type="button" onclick="selectChip('urgency', 'Injury / Limping', this)" class="urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-pinkbrand-100 bg-white text-stone-600 font-medium text-xs text-center">
+                <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
                 <span>Injured</span>
               </button>
-              <button type="button" onclick="selectChip('urgency', 'Abandoned / Sick', this)" class="urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-stone-200 bg-white text-stone-600 font-medium text-xs text-center">
-                <span class="w-2 h-2 rounded-full bg-primary-500 shrink-0"></span>
+              <button type="button" onclick="selectChip('urgency', 'Abandoned / Sick', this)" class="urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-pinkbrand-100 bg-white text-stone-600 font-medium text-xs text-center">
+                <span class="w-2 h-2 rounded-full bg-purple-500 shrink-0"></span>
                 <span>Sick/Pup</span>
               </button>
             </div>
@@ -301,28 +348,28 @@
           </div>
 
           <!-- Step 3: Live Location & Landmark -->
-          <div class="space-y-3 bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm">
+          <div class="space-y-3 bg-white p-4 rounded-2xl border border-pinkbrand-100 shadow-sm">
             <div class="flex items-center justify-between">
               <label class="text-xs font-semibold uppercase tracking-wider text-stone-500">
                 3. Exact Spot
               </label>
-              <button type="button" id="gpsBtn" onclick="detectLocation()" class="btn-press inline-flex items-center gap-1.5 text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 px-3 py-1.5 rounded-lg">
+              <button type="button" id="gpsBtn" onclick="detectLocation()" class="btn-press inline-flex items-center gap-1.5 text-xs font-semibold text-pinkbrand-700 bg-pinkbrand-50 hover:bg-pinkbrand-100 px-3 py-1.5 rounded-lg">
                 <i data-lucide="locate-fixed" id="gpsIcon" class="w-3.5 h-3.5"></i>
                 <span id="gpsBtnText">Auto-Pin GPS</span>
               </button>
             </div>
 
-            <div id="gpsStatusBox" class="hidden text-xs bg-primary-50 text-primary-700 border border-primary-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between gap-2">
+            <div id="gpsStatusBox" class="hidden text-xs bg-emerald-50 text-emerald-700 border border-emerald-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between gap-2">
               <div class="flex items-center gap-2 truncate">
-                <i data-lucide="map-pin-check" class="w-4 h-4 shrink-0 text-primary-600"></i>
+                <i data-lucide="map-pin-check" class="w-4 h-4 shrink-0 text-emerald-600"></i>
                 <span id="gpsCoordsText" class="font-medium truncate">17.4401° N, 78.3489° E</span>
               </div>
-              <span class="text-[10px] font-semibold uppercase bg-primary-100 px-2 py-0.5 rounded-md shrink-0">Locked</span>
+              <span class="text-[10px] font-semibold uppercase bg-emerald-100 px-2 py-0.5 rounded-md shrink-0">Locked</span>
             </div>
 
             <div>
               <input type="text" id="landmarkInput" required placeholder="Area & nearest landmark (e.g., Madhapur Metro Pillar 42)" 
-                class="w-full px-3.5 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/15 transition" />
+                class="w-full px-3.5 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:bg-white focus:border-pinkbrand-500 focus:ring-2 focus:ring-pinkbrand-500/15 transition" />
             </div>
           </div>
 
@@ -331,9 +378,9 @@
             <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500">
               4. Photo Evidence
             </label>
-            <label for="photoUpload" class="btn-press group relative flex flex-col items-center justify-center w-full h-36 rounded-2xl border-2 border-dashed border-stone-300 hover:border-primary-500 bg-white cursor-pointer overflow-hidden transition">
+            <label for="photoUpload" class="btn-press group relative flex flex-col items-center justify-center w-full h-36 rounded-2xl border-2 border-dashed border-pinkbrand-200 hover:border-pinkbrand-500 bg-white cursor-pointer overflow-hidden transition">
               <div id="uploadPlaceholder" class="flex flex-col items-center justify-center p-4 text-center space-y-1.5">
-                <div class="w-10 h-10 rounded-full bg-warm-50 text-warm-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div class="w-10 h-10 rounded-full bg-pinkbrand-50 text-pinkbrand-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <i data-lucide="camera" class="w-5 h-5"></i>
                 </div>
                 <p class="text-xs font-semibold text-stone-700">Tap to take or upload photo</p>
@@ -348,27 +395,27 @@
           </div>
 
           <!-- Step 5: Reporter Contact -->
-          <div class="space-y-3 bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm">
+          <div class="space-y-3 bg-white p-4 rounded-2xl border border-pinkbrand-100 shadow-sm">
             <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500">
               5. Your Contact (WhatsApp)
             </label>
             <div class="grid grid-cols-1 gap-3">
               <input type="text" id="reporterName" required placeholder="Your Name" 
-                class="w-full px-3.5 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/15 transition" />
+                class="w-full px-3.5 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:bg-white focus:border-pinkbrand-500 focus:ring-2 focus:ring-pinkbrand-500/15 transition" />
               <div class="relative">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-stone-400">+91</span>
                 <input type="tel" id="reporterPhone" required pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile number" 
-                  class="w-full pl-12 pr-3.5 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/15 transition" />
+                  class="w-full pl-12 pr-3.5 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:bg-white focus:border-pinkbrand-500 focus:ring-2 focus:ring-pinkbrand-500/15 transition" />
               </div>
             </div>
             <label class="flex items-center gap-2.5 pt-1 cursor-pointer select-none">
-              <input type="checkbox" id="stayAtSpot" checked class="w-4 h-4 rounded text-primary-600 focus:ring-primary-500 border-stone-300" />
+              <input type="checkbox" id="stayAtSpot" checked class="w-4 h-4 rounded text-pinkbrand-600 focus:ring-pinkbrand-500 border-pinkbrand-200" />
               <span class="text-xs text-stone-600">I can stay near the animal until a volunteer arrives</span>
             </label>
           </div>
 
           <!-- Submit Button -->
-          <button type="submit" id="sosSubmitBtn" class="btn-press sos-pulse w-full py-4 px-6 rounded-2xl bg-sos-600 hover:bg-sos-500 text-white font-display font-bold text-sm tracking-wide shadow-lg shadow-sos-600/25 flex items-center justify-center gap-2.5">
+          <button type="submit" id="sosSubmitBtn" class="btn-press sos-pulse w-full py-4 px-6 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-500 text-white font-display font-bold text-sm tracking-wide shadow-lg shadow-pinkbrand-600/25 flex items-center justify-center gap-2.5">
             <i data-lucide="send" class="w-4 h-4"></i>
             <span>Dispatch Rescue Alert</span>
           </button>
@@ -386,10 +433,10 @@
           <div class="flex items-center justify-between gap-2">
             <div>
               <h2 class="font-display font-bold text-lg text-stone-900">Adopt & Foster</h2>
-              <p class="text-xs text-stone-500">Give a rescued street soul a safe space</p>
+              <p class="text-xs text-stone-500">Give a rescued street soul a loving home</p>
             </div>
             <!-- OWNER-ONLY BUTTON: LIST ANIMAL FOR FOSTERING -->
-            <button type="button" onclick="openListFosterModal()" class="admin-only btn-press items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-warm-600 hover:bg-warm-700 text-white font-display font-bold text-xs shadow-md shadow-warm-600/20 shrink-0">
+            <button type="button" onclick="openListFosterModal()" class="admin-only btn-press items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-xs shadow-md shadow-pinkbrand-600/20 shrink-0">
               <i data-lucide="plus-circle" class="w-4 h-4"></i>
               <span>List for Foster</span>
             </button>
@@ -397,17 +444,17 @@
 
           <!-- Horizontal Scrollable Filter Chips -->
           <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-            <button onclick="filterPets('all', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-stone-900 text-white text-xs font-semibold shrink-0">
+            <button onclick="filterPets('all', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-pinkbrand-600 text-white text-xs font-semibold shrink-0">
               All (<span id="petCount">3</span>)
             </button>
-            <button onclick="filterPets('cat', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-white border border-stone-200 text-stone-600 text-xs font-medium shrink-0">
+            <button onclick="filterPets('cat', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-white border border-pinkbrand-100 text-stone-600 text-xs font-medium shrink-0">
               Cats & Kittens
             </button>
-            <button onclick="filterPets('dog', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-white border border-stone-200 text-stone-600 text-xs font-medium shrink-0">
+            <button onclick="filterPets('dog', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-white border border-pinkbrand-100 text-stone-600 text-xs font-medium shrink-0">
               Dogs & Pups
             </button>
-            <button onclick="filterPets('foster', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-warm-50 border border-warm-200 text-warm-700 text-xs font-semibold shrink-0 flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-warm-500"></span>
+            <button onclick="filterPets('foster', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-pinkbrand-50 border border-pinkbrand-200 text-pinkbrand-700 text-xs font-semibold shrink-0 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-pinkbrand-500"></span>
               Urgent Foster
             </button>
           </div>
@@ -417,11 +464,11 @@
         <div id="petGrid" class="space-y-4">
           
           <!-- Pet Card 1: Lisbon -->
-          <article data-category="cat foster" class="pet-card bg-white rounded-3xl border border-stone-200/80 overflow-hidden shadow-sm transition-all">
-            <div class="relative h-52 bg-stone-200">
+          <article data-category="cat foster" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
+            <div class="relative h-52 bg-pinkbrand-50">
               <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80" alt="Lisbon" class="w-full h-full object-cover" />
               <div class="absolute top-3 left-3 flex gap-1.5">
-                <span class="px-2.5 py-1 rounded-full bg-warm-600/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
+                <span class="px-2.5 py-1 rounded-full bg-amber-500/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
                   Post-Op Foster Needed
                 </span>
               </div>
@@ -435,11 +482,11 @@
                   <h3 class="font-display font-bold text-base text-stone-900">Lisbon</h3>
                   <p class="text-xs text-stone-500 mt-0.5">Calico • Surgery done, needs 14-day indoor recovery</p>
                 </div>
-                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-primary-700 bg-primary-50 px-2.5 py-1 rounded-lg shrink-0">
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-1 rounded-lg shrink-0">
                   <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Vaccinated
                 </span>
               </div>
-              <button onclick="openAdoptModal('Lisbon', 'Foster / Adoption')" class="btn-press w-full py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
+              <button onclick="openAdoptModal('Lisbon', 'Foster / Adoption')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
                 <i data-lucide="heart" class="w-4 h-4"></i>
                 <span>Apply to Foster or Adopt</span>
               </button>
@@ -447,11 +494,11 @@
           </article>
 
           <!-- Pet Card 2: Leo -->
-          <article data-category="cat" class="pet-card bg-white rounded-3xl border border-stone-200/80 overflow-hidden shadow-sm transition-all">
-            <div class="relative h-52 bg-stone-200">
+          <article data-category="cat" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
+            <div class="relative h-52 bg-pinkbrand-50">
               <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=800&q=80" alt="Leo" class="w-full h-full object-cover" />
               <div class="absolute top-3 left-3">
-                <span class="px-2.5 py-1 rounded-full bg-primary-600/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
+                <span class="px-2.5 py-1 rounded-full bg-pinkbrand-600/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
                   Ready for Adoption
                 </span>
               </div>
@@ -465,11 +512,11 @@
                   <h3 class="font-display font-bold text-base text-stone-900">Leo</h3>
                   <p class="text-xs text-stone-500 mt-0.5">Ginger Tabby • Litter trained & playful</p>
                 </div>
-                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-primary-700 bg-primary-50 px-2.5 py-1 rounded-lg shrink-0">
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-1 rounded-lg shrink-0">
                   <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Dewormed
                 </span>
               </div>
-              <button onclick="openAdoptModal('Leo', 'Adoption')" class="btn-press w-full py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
+              <button onclick="openAdoptModal('Leo', 'Adoption')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
                 <i data-lucide="heart" class="w-4 h-4"></i>
                 <span>Adopt Leo</span>
               </button>
@@ -477,11 +524,11 @@
           </article>
 
           <!-- Pet Card 3: Snowy -->
-          <article data-category="dog" class="pet-card bg-white rounded-3xl border border-stone-200/80 overflow-hidden shadow-sm transition-all">
-            <div class="relative h-52 bg-stone-200">
+          <article data-category="dog" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
+            <div class="relative h-52 bg-pinkbrand-50">
               <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80" alt="Snowy" class="w-full h-full object-cover" />
               <div class="absolute top-3 left-3">
-                <span class="px-2.5 py-1 rounded-full bg-primary-600/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
+                <span class="px-2.5 py-1 rounded-full bg-pinkbrand-600/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
                   Ready for Adoption
                 </span>
               </div>
@@ -495,11 +542,11 @@
                   <h3 class="font-display font-bold text-base text-stone-900">Snowy</h3>
                   <p class="text-xs text-stone-500 mt-0.5">Indie Pup • Rescued in Hyderabad, great with kids</p>
                 </div>
-                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-primary-700 bg-primary-50 px-2.5 py-1 rounded-lg shrink-0">
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-1 rounded-lg shrink-0">
                   <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 7-in-1 Done
                 </span>
               </div>
-              <button onclick="openAdoptModal('Snowy', 'Adoption')" class="btn-press w-full py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
+              <button onclick="openAdoptModal('Snowy', 'Adoption')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
                 <i data-lucide="heart" class="w-4 h-4"></i>
                 <span>Adopt Snowy</span>
               </button>
@@ -515,17 +562,17 @@
       <section id="tab-funds" class="tab-pane space-y-6">
         
         <!-- Scannable UPI QR Code Card -->
-        <div class="bg-stone-900 text-white rounded-3xl p-5 shadow-xl relative overflow-hidden space-y-4">
+        <div class="bg-gradient-to-br from-pinkbrand-700 via-pinkbrand-600 to-rose-500 text-white rounded-3xl p-5 shadow-xl shadow-pinkbrand-600/20 relative overflow-hidden space-y-4">
           <div class="flex items-center justify-between">
             <div>
-              <span class="text-[10px] font-bold uppercase tracking-widest text-warm-100 bg-white/10 px-2.5 py-1 rounded-full">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-pinkbrand-100 bg-white/15 px-2.5 py-1 rounded-full">
                 Official Rescue UPI
               </span>
               <h3 class="font-display font-bold text-base text-white mt-2">Barsha Sarkar</h3>
-              <p class="text-[11px] text-stone-400">Punjab National Bank • Scan with any UPI app</p>
+              <p class="text-[11px] text-pinkbrand-100">Punjab National Bank • Scan with any UPI app</p>
             </div>
-            <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center">
-              <i data-lucide="scan-line" class="w-5 h-5 text-warm-500"></i>
+            <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center">
+              <i data-lucide="scan-line" class="w-5 h-5 text-white"></i>
             </div>
           </div>
 
@@ -541,29 +588,29 @@
 
           <!-- Copyable UPI ID & Direct Pay Intent -->
           <div class="space-y-2.5">
-            <div class="flex items-center justify-between gap-2 bg-white/10 border border-white/10 rounded-2xl px-3.5 py-2.5">
+            <div class="flex items-center justify-between gap-2 bg-black/15 border border-white/15 rounded-2xl px-3.5 py-2.5">
               <code id="upiIdText" class="text-xs font-semibold text-white tracking-tight truncate">barshasarkar45@okaxis</code>
-              <button onclick="copyUpi()" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-warm-600 hover:bg-warm-500 text-white text-xs font-semibold shrink-0">
+              <button onclick="copyUpi()" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white text-pinkbrand-700 hover:bg-pinkbrand-50 text-xs font-bold shrink-0">
                 <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                 <span id="copyText">Copy</span>
               </button>
             </div>
-            <a href="upi://pay?pa=barshasarkar45@okaxis&pn=Barsha%20Sarkar&cu=INR" class="btn-press w-full py-3 rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-display font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-primary-600/20">
-              <i data-lucide="smartphone" class="w-4 h-4"></i>
+            <a href="upi://pay?pa=barshasarkar45@okaxis&pn=Barsha%20Sarkar&cu=INR" class="btn-press w-full py-3 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-display font-bold text-xs flex items-center justify-center gap-2 shadow-lg">
+              <i data-lucide="smartphone" class="w-4 h-4 text-pinkbrand-200"></i>
               <span>Open UPI App Directly</span>
             </a>
           </div>
         </div>
 
         <!-- Urgent Shelter Supply Alert (Whiskas Dry Food) -->
-        <div class="bg-warm-50 border border-warm-200/80 rounded-2xl p-4 flex items-start gap-3">
-          <div class="w-9 h-9 rounded-xl bg-warm-100 text-warm-700 flex items-center justify-center shrink-0 mt-0.5">
+        <div class="bg-pinkbrand-50 border border-pinkbrand-200/80 rounded-2xl p-4 flex items-start gap-3">
+          <div class="w-9 h-9 rounded-xl bg-pinkbrand-100 text-pinkbrand-700 flex items-center justify-center shrink-0 mt-0.5">
             <i data-lucide="package-open" class="w-5 h-5"></i>
           </div>
           <div class="space-y-1 flex-1">
             <div class="flex items-center justify-between">
               <h4 class="font-display font-bold text-xs text-stone-900">Shelter Need: Whiskas Dry Food</h4>
-              <span class="text-[10px] font-bold uppercase text-warm-700 bg-warm-200/70 px-2 py-0.5 rounded">Low Stock</span>
+              <span class="text-[10px] font-bold uppercase text-pinkbrand-700 bg-pinkbrand-200/60 px-2 py-0.5 rounded">Low Stock</span>
             </div>
             <p class="text-[11px] text-stone-600 leading-relaxed">
               Running low on kitten & adult cat dry food for shelter rescues. Sponsor a pack via UPI or drop off in Hyderabad.
@@ -579,7 +626,7 @@
               <span class="text-[11px] text-stone-500">Transparent treatment tracker</span>
             </div>
             <!-- OWNER-ONLY BUTTON: LIST ACTIVE VET BILL -->
-            <button type="button" onclick="openAddBillModal()" class="admin-only btn-press items-center gap-1.5 px-3 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-display font-bold text-xs shadow-sm shrink-0">
+            <button type="button" onclick="openAddBillModal()" class="admin-only btn-press items-center gap-1.5 px-3 py-2 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-xs shadow-sm shrink-0">
               <i data-lucide="plus" class="w-3.5 h-3.5"></i>
               <span>Add Vet Bill</span>
             </button>
@@ -587,42 +634,42 @@
 
           <div id="vetBillsList" class="space-y-3.5">
             <!-- Case 1 -->
-            <div class="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm space-y-3">
+            <div class="bg-white p-4 rounded-2xl border border-pinkbrand-100 shadow-sm space-y-3">
               <div class="flex items-start justify-between gap-2">
                 <div>
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-sos-600 bg-sos-50 px-2 py-0.5 rounded-md">Orthopedic Surgery</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2 py-0.5 rounded-md">Orthopedic Surgery</span>
                   <h4 class="font-display font-bold text-sm text-stone-900 mt-1">Bruno — Hind Leg Fracture</h4>
                 </div>
                 <span class="text-xs font-bold text-stone-700">₹8,500 / ₹12,000</span>
               </div>
               
-              <div class="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-warm-500 to-primary-600 rounded-full" style="width: 71%"></div>
+              <div class="w-full h-2.5 bg-pinkbrand-50 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-pinkbrand-500 to-pinkbrand-600 rounded-full" style="width: 71%"></div>
               </div>
 
               <div class="flex items-center justify-between text-[11px] text-stone-500">
                 <span>71% funded • Vet Care Hyd</span>
-                <span class="font-semibold text-warm-700">₹3,500 needed</span>
+                <span class="font-semibold text-pinkbrand-600">₹3,500 needed</span>
               </div>
             </div>
 
             <!-- Case 2 -->
-            <div class="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm space-y-3">
+            <div class="bg-white p-4 rounded-2xl border border-pinkbrand-100 shadow-sm space-y-3">
               <div class="flex items-start justify-between gap-2">
                 <div>
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2 py-0.5 rounded-md">Post-Op Recovery</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">Post-Op Recovery</span>
                   <h4 class="font-display font-bold text-sm text-stone-900 mt-1">Lisbon — Surgery & Bloodwork</h4>
                 </div>
-                <span class="text-xs font-bold text-primary-600">₹4,200 / ₹4,200</span>
+                <span class="text-xs font-bold text-emerald-600">₹4,200 / ₹4,200</span>
               </div>
               
-              <div class="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden">
-                <div class="h-full bg-primary-600 rounded-full" style="width: 100%"></div>
+              <div class="w-full h-2.5 bg-pinkbrand-50 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-500 rounded-full" style="width: 100%"></div>
               </div>
 
               <div class="flex items-center justify-between text-[11px] text-stone-500">
                 <span>100% Goal Reached — Thank you!</span>
-                <span class="font-semibold text-primary-600">Bill Settled</span>
+                <span class="font-semibold text-emerald-600">Bill Settled</span>
               </div>
             </div>
           </div>
@@ -633,10 +680,10 @@
     </main>
 
     <!-- CLEAN BOTTOM NAVIGATION BAR -->
-    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-30 bg-[#FAF9F6]/95 backdrop-blur-md border-t border-stone-200/80 px-4 py-2.5">
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-30 bg-[#FFF9FA]/95 backdrop-blur-md border-t border-pinkbrand-100 px-4 py-2.5">
       <div class="grid grid-cols-3 gap-2">
         
-        <button id="nav-sos" onclick="switchTab('sos', this)" class="nav-btn active group flex flex-col items-center justify-center py-1.5 rounded-2xl text-sos-600 bg-sos-50/80 transition-colors">
+        <button id="nav-sos" onclick="switchTab('sos', this)" class="nav-btn active group flex flex-col items-center justify-center py-1.5 rounded-2xl text-pinkbrand-600 bg-pinkbrand-50 transition-colors">
           <i data-lucide="siren" class="w-5 h-5 icon-bounce"></i>
           <span class="text-[11px] font-bold mt-1 tracking-tight">SOS Rescue</span>
         </button>
@@ -659,9 +706,9 @@
     <!-- ========================================== -->
     <div id="pinModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closePinModal()">
       <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl">
-        <div class="flex items-center justify-between border-b border-stone-100 pb-3.5">
+        <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
           <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full">Team Access Only</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Team Access Only</span>
             <h3 class="font-display font-bold text-lg text-stone-900 mt-1">Coordinator Login</h3>
           </div>
           <button onclick="closePinModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 flex items-center justify-center">
@@ -672,10 +719,10 @@
         <form onsubmit="verifyAdminPin(event)" class="space-y-4">
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5">Enter 4-Digit Rescue Team PIN</label>
-            <input type="password" id="adminPinInput" inputmode="numeric" maxlength="4" required placeholder="••••" class="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 text-center text-lg font-bold tracking-[0.5em] focus:outline-none focus:bg-white focus:border-primary-600" />
+            <input type="password" id="adminPinInput" inputmode="numeric" maxlength="4" required placeholder="••••" class="w-full px-4 py-3.5 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-lg font-bold tracking-[0.5em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             <p class="text-[11px] text-stone-400 mt-1.5 text-center">Demo PIN: <strong class="text-stone-600">1234</strong> (Unlocks Foster & Vet Bill posting)</p>
           </div>
-          <button type="submit" class="btn-press w-full py-3.5 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-display font-bold text-sm">
+          <button type="submit" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm">
             Unlock Coordinator Tools
           </button>
         </form>
@@ -687,9 +734,9 @@
     <!-- ========================================== -->
     <div id="qrModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeQrModal()">
       <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl">
-        <div class="flex items-center justify-between border-b border-stone-100 pb-3.5">
+        <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
           <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-warm-700 bg-warm-50 px-2.5 py-0.5 rounded-full">Scan & Support</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Scan & Support</span>
             <h3 class="font-display font-bold text-lg text-stone-900 mt-1">Barsha Sarkar (Paws for Purpose)</h3>
           </div>
           <button onclick="closeQrModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 flex items-center justify-center">
@@ -697,7 +744,7 @@
           </button>
         </div>
 
-        <div class="bg-stone-50 border border-stone-200/80 rounded-2xl p-5 flex flex-col items-center justify-center space-y-3">
+        <div class="bg-blush-50 border border-pinkbrand-100 rounded-2xl p-5 flex flex-col items-center justify-center space-y-3">
           <img 
             src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=upi%3A%2F%2Fpay%3Fpa%3Dbarshasarkar45%40okaxis%26pn%3DBarsha%2520Sarkar%26cu%3DINR" 
             alt="UPI QR Code" 
@@ -710,11 +757,11 @@
         </div>
 
         <div class="grid grid-cols-2 gap-3">
-          <button onclick="copyUpi()" class="btn-press py-3 px-4 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold text-xs flex items-center justify-center gap-2">
+          <button onclick="copyUpi()" class="btn-press py-3 px-4 rounded-xl bg-pinkbrand-50 hover:bg-pinkbrand-100 text-pinkbrand-700 font-semibold text-xs flex items-center justify-center gap-2">
             <i data-lucide="copy" class="w-4 h-4"></i>
             <span>Copy UPI ID</span>
           </button>
-          <a href="upi://pay?pa=barshasarkar45@okaxis&pn=Barsha%20Sarkar&cu=INR" class="btn-press py-3 px-4 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
+          <a href="upi://pay?pa=barshasarkar45@okaxis&pn=Barsha%20Sarkar&cu=INR" class="btn-press py-3 px-4 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
             <i data-lucide="external-link" class="w-4 h-4"></i>
             <span>Pay via App</span>
           </a>
@@ -727,9 +774,9 @@
     <!-- ========================================== -->
     <div id="listFosterModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeListFosterModal()">
       <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between border-b border-stone-100 pb-3.5">
+        <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
           <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-warm-700 bg-warm-50 px-2.5 py-0.5 rounded-full">Coordinator Tool</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Coordinator Tool</span>
             <h3 class="font-display font-bold text-lg text-stone-900 mt-1">List Animal for Fostering</h3>
           </div>
           <button onclick="closeListFosterModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 flex items-center justify-center">
@@ -741,9 +788,9 @@
           
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5">Animal Photo</label>
-            <label for="fosterPhotoInput" class="flex items-center justify-center w-full h-28 rounded-2xl border-2 border-dashed border-stone-300 hover:border-warm-500 bg-stone-50 cursor-pointer overflow-hidden relative">
+            <label for="fosterPhotoInput" class="flex items-center justify-center w-full h-28 rounded-2xl border-2 border-dashed border-pinkbrand-200 hover:border-pinkbrand-500 bg-blush-50 cursor-pointer overflow-hidden relative">
               <div id="fosterPhotoPlaceholder" class="flex flex-col items-center text-center p-2">
-                <i data-lucide="image-plus" class="w-5 h-5 text-warm-600 mb-1"></i>
+                <i data-lucide="image-plus" class="w-5 h-5 text-pinkbrand-600 mb-1"></i>
                 <span class="text-xs font-medium text-stone-600">Upload clear photo</span>
               </div>
               <img id="fosterPhotoPreview" class="hidden w-full h-full object-cover" alt="Foster Preview" />
@@ -754,11 +801,11 @@
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5">Name / Temp ID</label>
-              <input type="text" id="newPetName" required placeholder="e.g., Coco" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+              <input type="text" id="newPetName" required placeholder="e.g., Coco" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5">Species</label>
-              <select id="newPetSpecies" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm text-stone-700 focus:outline-none focus:border-primary-600">
+              <select id="newPetSpecies" class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm text-stone-700 focus:outline-none focus:border-pinkbrand-600">
                 <option value="cat">Cat / Kitten</option>
                 <option value="dog">Dog / Pup</option>
               </select>
@@ -768,20 +815,20 @@
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5">Age & Gender</label>
-              <input type="text" id="newPetAge" required placeholder="e.g., 2 Months • Male" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+              <input type="text" id="newPetAge" required placeholder="e.g., 2 Months • Male" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5">Foster Duration</label>
-              <input type="text" id="newPetDuration" required placeholder="e.g., 15 Days / Post-Op" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+              <input type="text" id="newPetDuration" required placeholder="e.g., 15 Days / Post-Op" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5">Medical & Care Notes</label>
-            <input type="text" id="newPetDesc" required placeholder="e.g., Dewormed, needs eye drops twice daily" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+            <input type="text" id="newPetDesc" required placeholder="e.g., Dewormed, needs eye drops twice daily" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
 
-          <button type="submit" class="btn-press w-full py-3.5 rounded-2xl bg-warm-600 hover:bg-warm-700 text-white font-display font-bold text-sm shadow-lg shadow-warm-600/25">
+          <button type="submit" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm shadow-lg shadow-pinkbrand-600/25">
             Publish Foster Listing
           </button>
         </form>
@@ -793,9 +840,9 @@
     <!-- ========================================== -->
     <div id="addBillModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeAddBillModal()">
       <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between border-b border-stone-100 pb-3.5">
+        <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
           <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full">Coordinator Tool</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Coordinator Tool</span>
             <h3 class="font-display font-bold text-lg text-stone-900 mt-1">Post Active Vet Bill</h3>
           </div>
           <button onclick="closeAddBillModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 flex items-center justify-center">
@@ -807,11 +854,11 @@
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5">Animal Name</label>
-              <input type="text" id="billAnimalName" required placeholder="e.g., Rocky" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+              <input type="text" id="billAnimalName" required placeholder="e.g., Rocky" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5">Treatment Category</label>
-              <select id="billCategory" class="w-full px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs font-medium text-stone-700 focus:outline-none focus:border-primary-600">
+              <select id="billCategory" class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
                 <option value="Emergency Surgery">Emergency Surgery</option>
                 <option value="Parvo / Viral Care">Parvo / Viral Care</option>
                 <option value="Spay & Vaccination">Spay & Vaccination</option>
@@ -822,26 +869,26 @@
 
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5">Procedure / Case Summary</label>
-            <input type="text" id="billSummary" required placeholder="e.g., Paw wound dressing & 5-day antibiotics" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+            <input type="text" id="billSummary" required placeholder="e.g., Paw wound dressing & 5-day antibiotics" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5">Total Bill Goal (₹)</label>
-              <input type="number" id="billTotal" required min="100" placeholder="e.g., 6500" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+              <input type="number" id="billTotal" required min="100" placeholder="e.g., 6500" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5">Already Raised (₹)</label>
-              <input type="number" id="billRaised" required min="0" value="0" placeholder="e.g., 1500" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+              <input type="number" id="billRaised" required min="0" value="0" placeholder="e.g., 1500" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5">Vet Clinic / Hospital Name</label>
-            <input type="text" id="billClinic" required placeholder="e.g., Pet Care Clinic, Banjara Hills" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+            <input type="text" id="billClinic" required placeholder="e.g., Pet Care Clinic, Banjara Hills" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
 
-          <button type="submit" class="btn-press w-full py-3.5 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-display font-bold text-sm shadow-lg shadow-primary-600/20">
+          <button type="submit" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm shadow-lg shadow-pinkbrand-600/20">
             Publish Vet Bill
           </button>
         </form>
@@ -854,9 +901,9 @@
     <div id="adoptModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeAdoptModal()">
       <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
         
-        <div class="flex items-center justify-between border-b border-stone-100 pb-3.5">
+        <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
           <div>
-            <span id="modalBadge" class="text-[10px] font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full">Adoption Inquiry</span>
+            <span id="modalBadge" class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Adoption Inquiry</span>
             <h3 id="modalTitle" class="font-display font-bold text-lg text-stone-900 mt-1">Apply for Lisbon</h3>
           </div>
           <button onclick="closeAdoptModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 flex items-center justify-center">
@@ -869,23 +916,23 @@
           
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5">Full Name</label>
-            <input type="text" required placeholder="e.g., Rahul Sharma" class="w-full px-3.5 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+            <input type="text" required placeholder="e.g., Rahul Sharma" class="w-full px-3.5 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5">WhatsApp Number</label>
-            <input type="tel" required pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile number" class="w-full px-3.5 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+            <input type="tel" required pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile number" class="w-full px-3.5 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5">Locality in Hyderabad</label>
-            <input type="text" required placeholder="e.g., Banjara Hills, Kondapur, Madhapur" class="w-full px-3.5 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm focus:outline-none focus:bg-white focus:border-primary-600" />
+            <input type="text" required placeholder="e.g., Banjara Hills, Kondapur, Madhapur" class="w-full px-3.5 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5">Home Type</label>
-              <select class="w-full px-3 py-3 rounded-xl bg-stone-50 border border-stone-200 text-xs font-medium text-stone-700 focus:outline-none focus:border-primary-600">
+              <select class="w-full px-3 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
                 <option>Apartment (Netted)</option>
                 <option>Apartment (Un-netted)</option>
                 <option>Independent House</option>
@@ -893,7 +940,7 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5">Existing Pets?</label>
-              <select class="w-full px-3 py-3 rounded-xl bg-stone-50 border border-stone-200 text-xs font-medium text-stone-700 focus:outline-none focus:border-primary-600">
+              <select class="w-full px-3 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
                 <option>No other pets</option>
                 <option>Yes, Cat(s)</option>
                 <option>Yes, Dog(s)</option>
@@ -901,7 +948,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn-press w-full py-3.5 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-display font-bold text-sm shadow-lg shadow-primary-600/20 mt-2">
+          <button type="submit" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm shadow-lg shadow-pinkbrand-600/20 mt-2">
             Submit Application
           </button>
         </form>
@@ -914,9 +961,9 @@
     <!-- ========================================== -->
     <div id="serviceModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeServiceModal()">
       <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-4 shadow-2xl">
-        <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+        <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3">
           <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center">
+            <div class="w-9 h-9 rounded-xl bg-pinkbrand-50 text-pinkbrand-600 flex items-center justify-center">
               <i data-lucide="heart-pulse" class="w-5 h-5"></i>
             </div>
             <h3 id="serviceTitle" class="font-display font-bold text-base text-stone-900">Rehabilitation</h3>
@@ -927,7 +974,7 @@
         </div>
         <p id="serviceBody" class="text-xs text-stone-600 leading-relaxed"></p>
         <div class="pt-1 flex gap-2.5">
-          <button onclick="closeServiceModal(); openQrModal();" class="btn-press flex-1 py-3 rounded-xl bg-primary-600 text-white font-semibold text-xs">
+          <button onclick="closeServiceModal(); openQrModal();" class="btn-press flex-1 py-3 rounded-xl bg-pinkbrand-600 text-white font-semibold text-xs">
             Support This Cause
           </button>
           <button onclick="closeServiceModal()" class="btn-press px-4 py-3 rounded-xl bg-stone-100 text-stone-700 font-semibold text-xs">
@@ -940,9 +987,9 @@
     <!-- ========================================== -->
     <!-- TOAST NOTIFICATION                         -->
     <!-- ========================================== -->
-    <div id="toast" class="fixed top-28 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform -translate-y-2">
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform -translate-y-2">
       <div class="bg-stone-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs font-medium border border-white/10">
-        <i data-lucide="check-circle-2" class="w-4 h-4 text-primary-500 shrink-0"></i>
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-pinkbrand-500 shrink-0"></i>
         <span id="toastMessage">Alert sent to rescue volunteers!</span>
       </div>
     </div>
@@ -954,9 +1001,31 @@
     lucide.createIcons();
 
     // ==========================================
+    // HAMBURGER DROPDOWN MENU LOGIC
+    // ==========================================
+    function toggleMenu(event) {
+      event.stopPropagation();
+      const dropdown = document.getElementById('navDropdown');
+      dropdown.classList.toggle('open');
+    }
+
+    function closeMenu() {
+      document.getElementById('navDropdown').classList.remove('open');
+    }
+
+    // Close menu when tapping outside
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('navDropdown');
+      const btn = document.getElementById('hamburgerBtn');
+      if (dropdown.classList.contains('open') && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+        closeMenu();
+      }
+    });
+
+    // ==========================================
     // OWNER / COORDINATOR AUTHENTICATION STATE
     // ==========================================
-    const OWNER_PIN = '1234'; // Will be verified against Google Apps Script later
+    const OWNER_PIN = '1234';
 
     function checkSavedAdminSession() {
       if (sessionStorage.getItem('pfp_owner_auth') === 'true') {
@@ -995,26 +1064,17 @@
     function enableAdminUI() {
       document.body.classList.add('admin-authenticated');
       document.getElementById('adminBanner').classList.remove('hidden');
-      const lockBtn = document.getElementById('adminLockBtn');
-      lockBtn.classList.replace('bg-stone-100', 'bg-primary-100');
-      lockBtn.classList.replace('text-stone-500', 'text-primary-700');
-      document.getElementById('adminLockIcon').setAttribute('data-lucide', 'unlock');
-      lucide.createIcons();
+      document.getElementById('menuAdminLabel').textContent = 'Exit Coordinator Mode';
     }
 
     function logoutAdmin() {
       sessionStorage.removeItem('pfp_owner_auth');
       document.body.classList.remove('admin-authenticated');
       document.getElementById('adminBanner').classList.add('hidden');
-      const lockBtn = document.getElementById('adminLockBtn');
-      lockBtn.classList.replace('bg-primary-100', 'bg-stone-100');
-      lockBtn.classList.replace('text-primary-700', 'text-stone-500');
-      document.getElementById('adminLockIcon').setAttribute('data-lucide', 'lock');
-      lucide.createIcons();
+      document.getElementById('menuAdminLabel').textContent = 'Coordinator Portal';
       showToast('Switched back to Public View');
     }
 
-    // Check session on load
     checkSavedAdminSession();
 
     // ==========================================
@@ -1025,20 +1085,14 @@
       document.getElementById('tab-' + tabId).classList.add('active');
 
       document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('active', 'text-sos-600', 'bg-sos-50/80', 'text-primary-700', 'bg-primary-50/80');
+        btn.classList.remove('active', 'text-pinkbrand-600', 'bg-pinkbrand-50');
         btn.classList.add('text-stone-500');
         btn.querySelector('span').classList.replace('font-bold', 'font-semibold');
       });
 
-      btnEl.classList.add('active');
+      btnEl.classList.add('active', 'text-pinkbrand-600', 'bg-pinkbrand-50');
       btnEl.classList.remove('text-stone-500');
       btnEl.querySelector('span').classList.replace('font-semibold', 'font-bold');
-
-      if (tabId === 'sos') {
-        btnEl.classList.add('text-sos-600', 'bg-sos-50/80');
-      } else {
-        btnEl.classList.add('text-primary-700', 'bg-primary-50/80');
-      }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1120,11 +1174,11 @@
       const imgSrc = uploadedFosterImgUrl || fallbackImg;
 
       const cardHtml = `
-        <article data-category="${species} foster" class="pet-card bg-white rounded-3xl border border-stone-200/80 overflow-hidden shadow-sm transition-all">
-          <div class="relative h-52 bg-stone-200">
+        <article data-category="${species} foster" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
+          <div class="relative h-52 bg-pinkbrand-50">
             <img src="${imgSrc}" alt="${name}" class="w-full h-full object-cover" />
             <div class="absolute top-3 left-3 flex gap-1.5">
-              <span class="px-2.5 py-1 rounded-full bg-warm-600/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
+              <span class="px-2.5 py-1 rounded-full bg-amber-500/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
                 Foster: ${duration}
               </span>
             </div>
@@ -1138,11 +1192,11 @@
                 <h3 class="font-display font-bold text-base text-stone-900">${name}</h3>
                 <p class="text-xs text-stone-500 mt-0.5">${desc}</p>
               </div>
-              <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-warm-700 bg-warm-50 px-2.5 py-1 rounded-lg shrink-0">
+              <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-1 rounded-lg shrink-0">
                 Urgent Foster
               </span>
             </div>
-            <button onclick="openAdoptModal('${name}', 'Foster')" class="btn-press w-full py-3 rounded-xl bg-warm-600 hover:bg-warm-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
+            <button onclick="openAdoptModal('${name}', 'Foster')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
               <i data-lucide="heart" class="w-4 h-4"></i>
               <span>Step Up to Foster ${name}</span>
             </button>
@@ -1187,22 +1241,22 @@
       const remaining = Math.max(total - raised, 0);
 
       const billCardHtml = `
-        <div class="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm space-y-3">
+        <div class="bg-white p-4 rounded-2xl border border-pinkbrand-100 shadow-sm space-y-3">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-sos-600 bg-sos-50 px-2 py-0.5 rounded-md">${category}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2 py-0.5 rounded-md">${category}</span>
               <h4 class="font-display font-bold text-sm text-stone-900 mt-1">${animalName} — ${summary}</h4>
             </div>
             <span class="text-xs font-bold text-stone-700 shrink-0">₹${raised.toLocaleString('en-IN')} / ₹${total.toLocaleString('en-IN')}</span>
           </div>
           
-          <div class="w-full h-2.5 bg-stone-100 rounded-full overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-warm-500 to-primary-600 rounded-full" style="width: ${pct}%"></div>
+          <div class="w-full h-2.5 bg-pinkbrand-50 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-pinkbrand-500 to-pinkbrand-600 rounded-full" style="width: ${pct}%"></div>
           </div>
 
           <div class="flex items-center justify-between text-[11px] text-stone-500">
             <span>${pct}% funded • ${clinic}</span>
-            <span class="font-semibold text-warm-700">${remaining > 0 ? '₹' + remaining.toLocaleString('en-IN') + ' needed' : 'Bill Settled'}</span>
+            <span class="font-semibold text-pinkbrand-600">${remaining > 0 ? '₹' + remaining.toLocaleString('en-IN') + ' needed' : 'Bill Settled'}</span>
           </div>
         </div>
       `;
@@ -1220,15 +1274,15 @@
       if (group === 'species') {
         document.getElementById('speciesInput').value = value;
         document.querySelectorAll('.species-chip').forEach(chip => {
-          chip.className = 'species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border border-stone-200 bg-white text-stone-600 hover:border-stone-300 font-medium text-xs gap-1.5';
+          chip.className = 'species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border border-pinkbrand-100 bg-white text-stone-600 hover:border-pinkbrand-300 font-medium text-xs gap-1.5';
         });
-        btnEl.className = 'species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border-2 border-primary-600 bg-primary-50/80 text-primary-700 font-semibold text-xs gap-1.5';
+        btnEl.className = 'species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border-2 border-pinkbrand-600 bg-pinkbrand-50 text-pinkbrand-700 font-semibold text-xs gap-1.5';
       } else if (group === 'urgency') {
         document.getElementById('urgencyInput').value = value;
         document.querySelectorAll('.urgency-chip').forEach(chip => {
-          chip.className = 'urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-stone-200 bg-white text-stone-600 font-medium text-xs text-center';
+          chip.className = 'urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-pinkbrand-100 bg-white text-stone-600 font-medium text-xs text-center';
         });
-        btnEl.className = 'urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border-2 border-sos-600 bg-sos-50 text-sos-600 font-semibold text-xs text-center';
+        btnEl.className = 'urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border-2 border-pinkbrand-600 bg-pinkbrand-50 text-pinkbrand-700 font-semibold text-xs text-center';
       }
     }
 
@@ -1317,17 +1371,13 @@
     function filterPets(category, btnEl) {
       document.querySelectorAll('.filter-pill').forEach(pill => {
         if (pill.textContent.includes('Urgent')) {
-          pill.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-warm-50 border border-warm-200 text-warm-700 text-xs font-semibold shrink-0 flex items-center gap-1.5';
+          pill.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-pinkbrand-50 border border-pinkbrand-200 text-pinkbrand-700 text-xs font-semibold shrink-0 flex items-center gap-1.5';
         } else {
-          pill.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-white border border-stone-200 text-stone-600 text-xs font-medium shrink-0';
+          pill.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-white border border-pinkbrand-100 text-stone-600 text-xs font-medium shrink-0';
         }
       });
 
-      if (category === 'foster') {
-        btnEl.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-warm-600 text-white text-xs font-semibold shrink-0 flex items-center gap-1.5';
-      } else {
-        btnEl.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-stone-900 text-white text-xs font-semibold shrink-0';
-      }
+      btnEl.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-pinkbrand-600 text-white text-xs font-semibold shrink-0 flex items-center gap-1.5';
 
       document.querySelectorAll('.pet-card').forEach(card => {
         const categories = card.getAttribute('data-category');
