@@ -262,7 +262,10 @@
           <i data-lucide="shield-check" class="w-3.5 h-3.5 text-pinkbrand-200"></i>
           Coordinator Mode — Live Sheet Sync Active
         </span>
-        <button onclick="logoutAdmin()" class="underline text-pinkbrand-100 hover:text-white font-semibold">Exit</button>
+        <div class="flex items-center gap-3">
+          <button onclick="openChangePinModal()" class="underline text-pinkbrand-100 hover:text-white font-semibold">Change PIN</button>
+          <button onclick="logoutAdmin()" class="underline text-pinkbrand-100 hover:text-white font-semibold">Exit</button>
+        </div>
       </div>
 
     </header>
@@ -437,7 +440,7 @@
           <!-- Horizontal Scrollable Filter Chips -->
           <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
             <button onclick="filterPets('all', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-pinkbrand-600 text-white text-xs font-semibold shrink-0">
-              All (<span id="petCount">3</span>)
+              All (<span id="petCount">0</span>)
             </button>
             <button onclick="filterPets('cat', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-white border border-pinkbrand-100 text-stone-600 text-xs font-medium shrink-0">
               Cats & Kittens
@@ -452,99 +455,17 @@
           </div>
         </div>
 
-        <!-- Pet Cards Grid (Populated live from Google Sheet + default cards) -->
+        <!-- Live Pet Cards Grid (Populated exclusively from Google Sheet) -->
         <div id="petGrid" class="space-y-4">
-          
-          <!-- Default Pet Card 1: Lisbon -->
-          <article data-category="cat foster" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
-            <div class="relative h-52 bg-pinkbrand-50">
-              <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80" alt="Lisbon" class="w-full h-full object-cover" />
-              <div class="absolute top-3 left-3 flex gap-1.5">
-                <span class="px-2.5 py-1 rounded-full bg-amber-500/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
-                  Post-Op Foster Needed
-                </span>
-              </div>
-              <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-stone-900/70 backdrop-blur-md text-white text-[11px] font-medium">
-                8 Months • Female
-              </div>
+          <div id="petsEmptyState" class="bg-white rounded-3xl border border-pinkbrand-100 p-8 text-center space-y-2.5">
+            <div class="w-12 h-12 rounded-2xl bg-pinkbrand-50 text-pinkbrand-600 flex items-center justify-center mx-auto">
+              <i data-lucide="paw-print" class="w-6 h-6"></i>
             </div>
-            <div class="p-4 space-y-3.5">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <h3 class="font-display font-bold text-base text-stone-900">Lisbon</h3>
-                  <p class="text-xs text-stone-500 mt-0.5">Calico • Surgery done, needs 14-day indoor recovery</p>
-                </div>
-                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-1 rounded-lg shrink-0">
-                  <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Vaccinated
-                </span>
-              </div>
-              <button onclick="openAdoptModal('Lisbon', 'Foster / Adoption')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
-                <i data-lucide="heart" class="w-4 h-4"></i>
-                <span>Apply to Foster or Adopt</span>
-              </button>
-            </div>
-          </article>
-
-          <!-- Default Pet Card 2: Leo -->
-          <article data-category="cat" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
-            <div class="relative h-52 bg-pinkbrand-50">
-              <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=800&q=80" alt="Leo" class="w-full h-full object-cover" />
-              <div class="absolute top-3 left-3">
-                <span class="px-2.5 py-1 rounded-full bg-pinkbrand-600/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
-                  Ready for Adoption
-                </span>
-              </div>
-              <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-stone-900/70 backdrop-blur-md text-white text-[11px] font-medium">
-                3 Months • Male
-              </div>
-            </div>
-            <div class="p-4 space-y-3.5">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <h3 class="font-display font-bold text-base text-stone-900">Leo</h3>
-                  <p class="text-xs text-stone-500 mt-0.5">Ginger Tabby • Litter trained & playful</p>
-                </div>
-                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-1 rounded-lg shrink-0">
-                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Dewormed
-                </span>
-              </div>
-              <button onclick="openAdoptModal('Leo', 'Adoption')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
-                <i data-lucide="heart" class="w-4 h-4"></i>
-                <span>Adopt Leo</span>
-              </button>
-            </div>
-          </article>
-
-          <!-- Default Pet Card 3: Snowy -->
-          <article data-category="dog" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
-            <div class="relative h-52 bg-pinkbrand-50">
-              <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80" alt="Snowy" class="w-full h-full object-cover" />
-              <div class="absolute top-3 left-3">
-                <span class="px-2.5 py-1 rounded-full bg-pinkbrand-600/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
-                  Ready for Adoption
-                </span>
-              </div>
-              <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-stone-900/70 backdrop-blur-md text-white text-[11px] font-medium">
-                5 Months • Female
-              </div>
-            </div>
-            <div class="p-4 space-y-3.5">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <h3 class="font-display font-bold text-base text-stone-900">Snowy</h3>
-                  <p class="text-xs text-stone-500 mt-0.5">Indie Pup • Rescued in Hyderabad, great with kids</p>
-                </div>
-                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-1 rounded-lg shrink-0">
-                  <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 7-in-1 Done
-                </span>
-              </div>
-              <button onclick="openAdoptModal('Snowy', 'Adoption')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
-                <i data-lucide="heart" class="w-4 h-4"></i>
-                <span>Adopt Snowy</span>
-              </button>
-            </div>
-          </article>
-
+            <h3 id="petsEmptyTitle" class="font-display font-bold text-sm text-stone-800">Loading rescued souls...</h3>
+            <p id="petsEmptyDesc" class="text-xs text-stone-500 max-w-xs mx-auto leading-relaxed">
+              Checking live foster and adoption listings from Hyderabad shelter.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -625,44 +546,14 @@
           </div>
 
           <div id="vetBillsList" class="space-y-3.5">
-            <!-- Default Case 1 -->
-            <div class="bg-white p-4 rounded-2xl border border-pinkbrand-100 shadow-sm space-y-3">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2 py-0.5 rounded-md">Orthopedic Surgery</span>
-                  <h4 class="font-display font-bold text-sm text-stone-900 mt-1">Bruno — Hind Leg Fracture</h4>
-                </div>
-                <span class="text-xs font-bold text-stone-700">₹8,500 / ₹12,000</span>
+            <div id="billsEmptyState" class="bg-white rounded-2xl border border-pinkbrand-100 p-6 text-center space-y-2">
+              <div class="w-10 h-10 rounded-xl bg-pinkbrand-50 text-pinkbrand-600 flex items-center justify-center mx-auto">
+                <i data-lucide="file-heart" class="w-5 h-5"></i>
               </div>
-              
-              <div class="w-full h-2.5 bg-pinkbrand-50 rounded-full overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-pinkbrand-500 to-pinkbrand-600 rounded-full" style="width: 71%"></div>
-              </div>
-
-              <div class="flex items-center justify-between text-[11px] text-stone-500">
-                <span>71% funded • Vet Care Hyd</span>
-                <span class="font-semibold text-pinkbrand-600">₹3,500 needed</span>
-              </div>
-            </div>
-
-            <!-- Default Case 2 -->
-            <div class="bg-white p-4 rounded-2xl border border-pinkbrand-100 shadow-sm space-y-3">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">Post-Op Recovery</span>
-                  <h4 class="font-display font-bold text-sm text-stone-900 mt-1">Lisbon — Surgery & Bloodwork</h4>
-                </div>
-                <span class="text-xs font-bold text-emerald-600">₹4,200 / ₹4,200</span>
-              </div>
-              
-              <div class="w-full h-2.5 bg-pinkbrand-50 rounded-full overflow-hidden">
-                <div class="h-full bg-emerald-500 rounded-full" style="width: 100%"></div>
-              </div>
-
-              <div class="flex items-center justify-between text-[11px] text-stone-500">
-                <span>100% Goal Reached — Thank you!</span>
-                <span class="font-semibold text-emerald-600">Bill Settled</span>
-              </div>
+              <h4 id="billsEmptyTitle" class="font-display font-bold text-xs text-stone-800">Checking active vet bills...</h4>
+              <p id="billsEmptyDesc" class="text-[11px] text-stone-500 leading-relaxed">
+                Live medical fundraising cases posted by the rescue team will appear here.
+              </p>
             </div>
           </div>
         </div>
@@ -694,27 +585,53 @@
     </nav>
 
     <!-- ========================================== -->
-    <!-- MODAL 0: HIDDEN COORDINATOR PIN LOGIN      -->
+    <!-- MODAL 0: HIDDEN COORDINATOR PIN & SETUP    -->
     <!-- ========================================== -->
     <div id="pinModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closePinModal()">
       <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl">
         <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
           <div>
             <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Team Access</span>
-            <h3 class="font-display font-bold text-lg text-stone-900 mt-1">Coordinator Verification</h3>
+            <h3 class="font-display font-bold text-lg text-stone-900 mt-1">Coordinator Portal</h3>
           </div>
           <button onclick="closePinModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 flex items-center justify-center">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
 
-        <form onsubmit="verifyAdminPin(event)" class="space-y-4">
+        <!-- Mode Toggle: Unlock vs Set/Update PIN -->
+        <div class="grid grid-cols-2 gap-2 p-1 bg-blush-50 rounded-2xl border border-pinkbrand-100">
+          <button type="button" id="tabUnlockPinBtn" onclick="switchPinMode('unlock')" class="py-2 rounded-xl bg-pinkbrand-600 text-white text-xs font-bold transition">
+            Unlock Tools
+          </button>
+          <button type="button" id="tabSetPinBtn" onclick="switchPinMode('set')" class="py-2 rounded-xl text-stone-600 text-xs font-semibold transition">
+            Set / Update PIN
+          </button>
+        </div>
+
+        <!-- Form A: Unlock with PIN -->
+        <form id="unlockPinForm" onsubmit="verifyAdminPin(event)" class="space-y-4">
           <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Enter 4-Digit Rescue Team PIN</label>
-            <input type="password" id="adminPinInput" inputmode="numeric" maxlength="4" required placeholder="••••" class="w-full px-4 py-3.5 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-lg font-bold tracking-[0.5em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Enter Your Coordinator PIN</label>
+            <input type="password" id="adminPinInput" inputmode="numeric" minlength="4" maxlength="6" required placeholder="••••" class="w-full px-4 py-3.5 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-lg font-bold tracking-[0.5em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
           <button type="submit" id="pinSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm">
             Unlock Listing Tools
+          </button>
+        </form>
+
+        <!-- Form B: Set or Change Owner PIN -->
+        <form id="setPinForm" onsubmit="handleSetOwnerPin(event)" class="hidden space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Current PIN (Leave blank if setting first time)</label>
+            <input type="password" id="currentOwnerPinInput" inputmode="numeric" maxlength="6" placeholder="••••" class="w-full px-4 py-3 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-base font-bold tracking-[0.4em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1.5">New Coordinator PIN (4–6 digits) *</label>
+            <input type="password" id="newOwnerPinInput" inputmode="numeric" pattern="[0-9]{4,6}" minlength="4" maxlength="6" required placeholder="••••" class="w-full px-4 py-3 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-base font-bold tracking-[0.4em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+          </div>
+          <button type="submit" id="setPinSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-display font-bold text-sm">
+            Save PIN & Unlock
           </button>
         </form>
       </div>
@@ -768,7 +685,7 @@
         <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
           <div>
             <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Coordinator Tool</span>
-            <h3 class="font-display font-bold text-lg text-stone-900 mt-1">List Animal for Fostering</h3>
+            <h3 class="font-display font-bold text-lg text-stone-900 mt-1">List Animal for Foster / Adoption</h3>
           </div>
           <button onclick="closeListFosterModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 flex items-center justify-center">
             <i data-lucide="x" class="w-5 h-5"></i>
@@ -778,25 +695,25 @@
         <form id="listFosterForm" onsubmit="handleAddFosterListing(event)" class="space-y-4">
           
           <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Animal Photo</label>
+            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Animal Photo *</label>
             <label for="fosterPhotoInput" class="flex items-center justify-center w-full h-28 rounded-2xl border-2 border-dashed border-pinkbrand-200 hover:border-pinkbrand-500 bg-blush-50 cursor-pointer overflow-hidden relative">
               <div id="fosterPhotoPlaceholder" class="flex flex-col items-center text-center p-2">
                 <i data-lucide="image-plus" class="w-5 h-5 text-pinkbrand-600 mb-1"></i>
                 <span class="text-xs font-medium text-stone-600">Upload clear photo</span>
               </div>
               <img id="fosterPhotoPreview" class="hidden w-full h-full object-cover" alt="Foster Preview" />
-              <input id="fosterPhotoInput" type="file" accept="image/*" class="hidden" onchange="previewFosterPhoto(event)" />
+              <input id="fosterPhotoInput" type="file" accept="image/*" required class="hidden" onchange="previewFosterPhoto(event)" />
             </label>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Name / Temp ID</label>
+              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Name / Temp ID *</label>
               <input type="text" id="newPetName" required placeholder="e.g., Coco" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
             <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Species</label>
-              <select id="newPetSpecies" class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm text-stone-700 focus:outline-none focus:border-pinkbrand-600">
+              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Species *</label>
+              <select id="newPetSpecies" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm text-stone-700 focus:outline-none focus:border-pinkbrand-600">
                 <option value="cat">Cat / Kitten</option>
                 <option value="dog">Dog / Pup</option>
               </select>
@@ -805,22 +722,22 @@
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Age & Gender</label>
+              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Age & Gender *</label>
               <input type="text" id="newPetAge" required placeholder="e.g., 2 Months • Male" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
             <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Foster Duration</label>
-              <input type="text" id="newPetDuration" required placeholder="e.g., 15 Days / Post-Op" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Listing Type / Duration *</label>
+              <input type="text" id="newPetDuration" required placeholder="e.g., 15 Days Foster / Adoption" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Medical & Care Notes</label>
-            <input type="text" id="newPetDesc" required placeholder="e.g., Dewormed, needs eye drops twice daily" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Medical & Care Notes *</label>
+            <input type="text" id="newPetDesc" required placeholder="e.g., Dewormed, vaccinated, litter trained" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
 
           <button type="submit" id="fosterSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm shadow-lg shadow-pinkbrand-600/25">
-            Publish Foster Listing
+            Publish Live Listing
           </button>
         </form>
       </div>
@@ -844,12 +761,12 @@
         <form id="addBillForm" onsubmit="handleAddVetBill(event)" class="space-y-4">
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Animal Name</label>
+              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Animal Name *</label>
               <input type="text" id="billAnimalName" required placeholder="e.g., Rocky" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
             <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Treatment Category</label>
-              <select id="billCategory" class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
+              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Treatment Category *</label>
+              <select id="billCategory" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
                 <option value="Emergency Surgery">Emergency Surgery</option>
                 <option value="Parvo / Viral Care">Parvo / Viral Care</option>
                 <option value="Spay & Vaccination">Spay & Vaccination</option>
@@ -859,23 +776,23 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Procedure / Case Summary</label>
+            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Procedure / Case Summary *</label>
             <input type="text" id="billSummary" required placeholder="e.g., Paw wound dressing & 5-day antibiotics" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Total Bill Goal (₹)</label>
+              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Total Bill Goal (₹) *</label>
               <input type="number" id="billTotal" required min="100" placeholder="e.g., 6500" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
             <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Already Raised (₹)</label>
+              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Already Raised (₹) *</label>
               <input type="number" id="billRaised" required min="0" value="0" placeholder="e.g., 1500" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Vet Clinic / Hospital Name</label>
+            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Vet Clinic / Hospital Name *</label>
             <input type="text" id="billClinic" required placeholder="e.g., Pet Care Clinic, Banjara Hills" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
 
@@ -887,61 +804,129 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAL 4: PUBLIC — APPLY TO ADOPT / FOSTER  -->
+    <!-- MODAL 4: MANDATORY ADOPTION / FOSTER FORM  -->
     <!-- ========================================== -->
     <div id="adoptModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeAdoptModal()">
-      <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[92vh] overflow-y-auto">
         
-        <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
+        <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5 sticky top-0 bg-white z-10">
           <div>
-            <span id="modalBadge" class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Adoption Inquiry</span>
-            <h3 id="modalTitle" class="font-display font-bold text-lg text-stone-900 mt-1">Apply for Lisbon</h3>
+            <span id="modalBadge" class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Mandatory Vetting Form</span>
+            <h3 id="modalTitle" class="font-display font-bold text-lg text-stone-900 mt-1">Apply for Adoption / Foster</h3>
           </div>
-          <button onclick="closeAdoptModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 flex items-center justify-center">
+          <button onclick="closeAdoptModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 flex items-center justify-center shrink-0">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
+
+        <p class="text-[11px] text-stone-500 bg-blush-50 border border-pinkbrand-100 rounded-xl px-3.5 py-2.5 leading-relaxed">
+          All fields marked with <span class="text-pinkbrand-600 font-bold">*</span> are mandatory to ensure a safe, permanent, or recovery home for our rescued animals.
+        </p>
 
         <form id="adoptForm" onsubmit="handleAdoptSubmit(event)" class="space-y-4">
           <input type="hidden" id="adoptPetName" />
           <input type="hidden" id="adoptInquiryType" />
           
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Full Name</label>
-            <input type="text" id="appNameInput" required placeholder="e.g., Rahul Sharma" class="w-full px-3.5 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">WhatsApp Number</label>
-            <input type="tel" id="appPhoneInput" required pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile number" class="w-full px-3.5 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Locality in Hyderabad</label>
-            <input type="text" id="appLocalityInput" required placeholder="e.g., Banjara Hills, Kondapur, Madhapur" class="w-full px-3.5 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+          <!-- Personal Identity -->
+          <div class="grid grid-cols-3 gap-3">
+            <div class="col-span-2">
+              <label class="block text-xs font-semibold text-stone-700 mb-1.5">Full Name <span class="text-pinkbrand-600">*</span></label>
+              <input type="text" id="appNameInput" required placeholder="Your full legal name" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1.5">Age <span class="text-pinkbrand-600">*</span></label>
+              <input type="number" id="appAgeInput" required min="18" max="90" placeholder="24" class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+            </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Home Type</label>
-              <select id="appHomeInput" class="w-full px-3 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
-                <option>Apartment (Netted)</option>
-                <option>Apartment (Un-netted)</option>
-                <option>Independent House</option>
+              <label class="block text-xs font-semibold text-stone-700 mb-1.5">WhatsApp Number <span class="text-pinkbrand-600">*</span></label>
+              <input type="tel" id="appPhoneInput" required pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1.5">Occupation <span class="text-pinkbrand-600">*</span></label>
+              <input type="text" id="appOccupationInput" required placeholder="e.g., IT / Student" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+            </div>
+          </div>
+
+          <!-- Address & Locality -->
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1.5">Complete Address & Locality in Hyderabad <span class="text-pinkbrand-600">*</span></label>
+            <textarea id="appLocalityInput" required rows="2" placeholder="Flat/House No., Street, Area (e.g., Kondapur, Banjara Hills, Gachibowli)" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600"></textarea>
+          </div>
+
+          <!-- Housing & Safety -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1.5">Home & Balcony Safety <span class="text-pinkbrand-600">*</span></label>
+              <select id="appHomeInput" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
+                <option value="">Select housing...</option>
+                <option value="Apartment (Fully Netted)">Apartment (Fully Netted)</option>
+                <option value="Apartment (Willing to Net)">Apartment (Will Install Net)</option>
+                <option value="Independent House (Fenced)">Independent House (Fenced)</option>
+                <option value="PG / Shared Flat">PG / Shared Flat</option>
               </select>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Existing Pets?</label>
-              <select id="appPetsInput" class="w-full px-3 py-3 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
-                <option>No other pets</option>
-                <option>Yes, Cat(s)</option>
-                <option>Yes, Dog(s)</option>
+              <label class="block text-xs font-semibold text-stone-700 mb-1.5">Owned or Rented? <span class="text-pinkbrand-600">*</span></label>
+              <select id="appOwnershipInput" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
+                <option value="">Select status...</option>
+                <option value="Own Home">Own Home</option>
+                <option value="Rented (Landlord Approved)">Rented (Landlord Approved)</option>
+                <option value="Rented (Need to Check)">Rented (Need to Check)</option>
               </select>
             </div>
           </div>
 
+          <!-- Pet Experience & Daily Routine -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1.5">Existing / Past Pets? <span class="text-pinkbrand-600">*</span></label>
+              <select id="appPetsInput" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
+                <option value="">Select option...</option>
+                <option value="First-time pet parent">First-time pet parent</option>
+                <option value="Yes, Vaccinated Cat(s)">Yes, Vaccinated Cat(s)</option>
+                <option value="Yes, Vaccinated Dog(s)">Yes, Vaccinated Dog(s)</option>
+                <option value="Had pets previously">Had pets previously</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1.5">Hours Alone Daily <span class="text-pinkbrand-600">*</span></label>
+              <select id="appAloneHoursInput" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
+                <option value="">Select hours...</option>
+                <option value="0–2 hrs (WFH / Family home)">0–2 hrs (WFH / Family home)</option>
+                <option value="3–5 hrs">3–5 hrs</option>
+                <option value="6–8 hrs">6–8 hrs</option>
+                <option value="8+ hrs">8+ hrs</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Reason & Care Plan -->
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1.5">Why do you want to adopt/foster & who will be the primary caregiver? <span class="text-pinkbrand-600">*</span></label>
+            <textarea id="appReasonInput" required rows="2" placeholder="Briefly share your family agreement, diet plan, and emergency vet readiness..." class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600"></textarea>
+          </div>
+
+          <!-- Mandatory Policy Checkboxes -->
+          <div class="space-y-2.5 bg-blush-50 p-3.5 rounded-2xl border border-pinkbrand-100">
+            <label class="flex items-start gap-2.5 cursor-pointer select-none">
+              <input type="checkbox" id="agreeSpayVaccInput" required class="w-4 h-4 mt-0.5 rounded text-pinkbrand-600 focus:ring-pinkbrand-500 border-pinkbrand-200 shrink-0" />
+              <span class="text-[11px] text-stone-700 leading-snug">
+                I agree to mandatory timely vaccinations, sterilization (spay/neuter), and keeping the animal strictly indoors / leash-supervised. <span class="text-pinkbrand-600 font-bold">*</span>
+              </span>
+            </label>
+            <label class="flex items-start gap-2.5 cursor-pointer select-none">
+              <input type="checkbox" id="agreeFollowupInput" required class="w-4 h-4 mt-0.5 rounded text-pinkbrand-600 focus:ring-pinkbrand-500 border-pinkbrand-200 shrink-0" />
+              <span class="text-[11px] text-stone-700 leading-snug">
+                I agree to a pre-adoption house check / video call and periodic photo updates with Paws for Purpose, and will never abandon or rehome without informing the team. <span class="text-pinkbrand-600 font-bold">*</span>
+              </span>
+            </label>
+          </div>
+
           <button type="submit" id="adoptSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm shadow-lg shadow-pinkbrand-600/20 mt-2">
-            Submit Application
+            Submit Mandatory Application
           </button>
         </form>
 
@@ -992,7 +977,7 @@
     // ============================================================
     // LIVE GOOGLE APPS SCRIPT DATABASE ENDPOINT
     // ============================================================
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwpgEowQCMCdjczOHaw5uRFo6Wlg5rmL36DA1iX9piAj3_X-uvCzjoAEAPzaCIx_fXc7g/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyTf9FA6vz-7qovsKwyT4TxRmKhsaRbn6u10ohaLuQ-R6QHpVQLK6W2qYQ1Ib_RDSsk/exec';
 
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -1027,18 +1012,20 @@
     }
 
     // ============================================================
-    // FETCH LIVE PETS & VET BILLS FROM GOOGLE SHEETS
+    // FETCH LIVE PETS & VET BILLS FROM GOOGLE SHEETS (NO FAKE DATA)
     // ============================================================
     async function syncLiveDatabase() {
+      const petGrid = document.getElementById('petGrid');
+      const billsList = document.getElementById('vetBillsList');
+
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
-        if (data.status !== 'success') return;
+        if (data.status !== 'success') throw new Error('Sync failed');
 
-        // Render live Pets / Foster cards if any exist in sheet
+        // 1. Render Live Pets / Foster Cards
         if (Array.isArray(data.pets) && data.pets.length > 0) {
-          const petGrid = document.getElementById('petGrid');
-          const livePetCards = data.pets.map(pet => {
+          petGrid.innerHTML = data.pets.map(pet => {
             const species = (pet.Species || 'cat').toLowerCase();
             const isFoster = (pet.Badge_Duration || '').toLowerCase().includes('foster') || (pet.Badge_Duration || '').toLowerCase().includes('day');
             const categoryAttr = isFoster ? `${species} foster` : species;
@@ -1046,6 +1033,7 @@
               ? 'https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?auto=format&fit=crop&w=800&q=80'
               : 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80';
             const photo = (pet.Photo_URL && pet.Photo_URL.startsWith('http')) ? pet.Photo_URL : fallbackImg;
+            const safeName = String(pet.Name || 'Rescue').replace(/'/g, "\\'");
 
             return `
               <article data-category="${categoryAttr}" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
@@ -1067,27 +1055,28 @@
                       <p class="text-xs text-stone-500 mt-0.5">${pet.Description || ''}</p>
                     </div>
                     <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-1 rounded-lg shrink-0">
-                      Live
+                      Verified
                     </span>
                   </div>
-                  <button onclick="openAdoptModal('${pet.Name.replace(/'/g, "\\'")}', '${isFoster ? 'Foster' : 'Adoption'}')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
+                  <button onclick="openAdoptModal('${safeName}', '${isFoster ? 'Foster' : 'Adoption'}')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
                     <i data-lucide="heart" class="w-4 h-4"></i>
-                    <span>${isFoster ? 'Step Up to Foster ' + pet.Name : 'Adopt ' + pet.Name}</span>
+                    <span>${isFoster ? 'Apply to Foster ' + pet.Name : 'Apply to Adopt ' + pet.Name}</span>
                   </button>
                 </div>
               </article>
             `;
           }).join('');
-
-          petGrid.insertAdjacentHTML('afterbegin', livePetCards);
           lucide.createIcons();
-          document.getElementById('petCount').textContent = document.querySelectorAll('.pet-card').length;
+          document.getElementById('petCount').textContent = data.pets.length;
+        } else {
+          document.getElementById('petCount').textContent = '0';
+          document.getElementById('petsEmptyTitle').textContent = 'No active foster or adoption listings right now';
+          document.getElementById('petsEmptyDesc').textContent = 'Check back soon! New rescued cats and dogs will appear here as soon as they are cleared by our vets.';
         }
 
-        // Render live Active Vet Bills if any exist in sheet
+        // 2. Render Live Active Vet Bills
         if (Array.isArray(data.bills) && data.bills.length > 0) {
-          const billsList = document.getElementById('vetBillsList');
-          const liveBillCards = data.bills.map(bill => {
+          billsList.innerHTML = data.bills.map(bill => {
             const total = Number(bill.Total_Goal) || 1;
             const raised = Math.min(Number(bill.Amount_Raised) || 0, total);
             const pct = Math.round((raised / total) * 100);
@@ -1112,11 +1101,14 @@
               </div>
             `;
           }).join('');
-
-          billsList.insertAdjacentHTML('afterbegin', liveBillCards);
+        } else {
+          document.getElementById('billsEmptyTitle').textContent = 'No pending vet bills listed right now';
+          document.getElementById('billsEmptyDesc').textContent = 'You can still support daily shelter feeding and emergency medicines via the UPI QR code above.';
         }
       } catch (err) {
-        console.warn('Live sheet sync skipped or offline:', err);
+        document.getElementById('petsEmptyTitle').textContent = 'No active listings loaded';
+        document.getElementById('petsEmptyDesc').textContent = 'Please check your internet connection and refresh.';
+        document.getElementById('billsEmptyTitle').textContent = 'No active vet bills loaded';
       }
     }
 
@@ -1141,7 +1133,7 @@
     });
 
     // ============================================================
-    // INVISIBLE OWNER ACCESS (?team=1 OR 5-TAP PAW LOGO)
+    // INVISIBLE OWNER ACCESS (?team=1 OR 5-TAP PAW LOGO) + SET PIN
     // ============================================================
     let secretTapCount = 0;
     let secretTapTimer = null;
@@ -1159,10 +1151,35 @@
       }
     }
 
+    function switchPinMode(mode) {
+      const unlockForm = document.getElementById('unlockPinForm');
+      const setForm = document.getElementById('setPinForm');
+      const unlockTab = document.getElementById('tabUnlockPinBtn');
+      const setTab = document.getElementById('tabSetPinBtn');
+
+      if (mode === 'unlock') {
+        unlockForm.classList.remove('hidden');
+        setForm.classList.add('hidden');
+        unlockTab.className = 'py-2 rounded-xl bg-pinkbrand-600 text-white text-xs font-bold transition';
+        setTab.className = 'py-2 rounded-xl text-stone-600 text-xs font-semibold transition';
+      } else {
+        unlockForm.classList.add('hidden');
+        setForm.classList.remove('hidden');
+        setTab.className = 'py-2 rounded-xl bg-pinkbrand-600 text-white text-xs font-bold transition';
+        unlockTab.className = 'py-2 rounded-xl text-stone-600 text-xs font-semibold transition';
+      }
+    }
+
     function openPinPrompt() {
-      if (document.body.classList.contains('admin-authenticated')) return;
+      switchPinMode('unlock');
       document.getElementById('pinModal').classList.add('open');
       setTimeout(() => document.getElementById('adminPinInput').focus(), 150);
+    }
+
+    function openChangePinModal() {
+      switchPinMode('set');
+      document.getElementById('pinModal').classList.add('open');
+      setTimeout(() => document.getElementById('currentOwnerPinInput').focus(), 150);
     }
 
     function checkOwnerAccessOnLoad() {
@@ -1179,6 +1196,8 @@
     function closePinModal() {
       document.getElementById('pinModal').classList.remove('open');
       document.getElementById('adminPinInput').value = '';
+      document.getElementById('currentOwnerPinInput').value = '';
+      document.getElementById('newOwnerPinInput').value = '';
     }
 
     async function verifyAdminPin(event) {
@@ -1201,7 +1220,7 @@
           closePinModal();
           showToast('Coordinator Mode unlocked');
         } else {
-          showToast('Incorrect PIN');
+          showToast(result.message || 'Incorrect PIN');
           document.getElementById('adminPinInput').value = '';
         }
       } catch (err) {
@@ -1209,6 +1228,42 @@
       } finally {
         btn.disabled = false;
         btn.textContent = 'Unlock Listing Tools';
+      }
+    }
+
+    async function handleSetOwnerPin(event) {
+      event.preventDefault();
+      const currentPin = document.getElementById('currentOwnerPinInput').value.trim();
+      const newPin = document.getElementById('newOwnerPinInput').value.trim();
+      const btn = document.getElementById('setPinSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving PIN...';
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'SET_PIN',
+            currentPin: currentPin,
+            newPin: newPin,
+            pin: newPin
+          })
+        });
+        const result = await res.json();
+
+        if (result.status === 'success') {
+          sessionStorage.setItem('pfp_owner_pin', newPin);
+          enableAdminUI();
+          closePinModal();
+          showToast('New Coordinator PIN saved & unlocked!');
+        } else {
+          showToast(result.message || 'Could not update PIN');
+        }
+      } catch (err) {
+        showToast('Network error saving PIN');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save PIN & Unlock';
       }
     }
 
@@ -1314,7 +1369,7 @@
       const name = document.getElementById('newPetName').value.trim();
       const species = document.getElementById('newPetSpecies').value;
       const age = document.getElementById('newPetAge').value.trim();
-      const duration = 'Foster: ' + document.getElementById('newPetDuration').value.trim();
+      const duration = document.getElementById('newPetDuration').value.trim();
       const desc = document.getElementById('newPetDesc').value.trim();
       const fallbackImg = species === 'cat'
         ? 'https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?auto=format&fit=crop&w=800&q=80'
@@ -1338,13 +1393,19 @@
         const result = await res.json();
 
         if (result.status === 'success') {
+          const emptyEl = document.getElementById('petsEmptyState');
+          if (emptyEl) emptyEl.remove();
+
+          const isFoster = duration.toLowerCase().includes('foster') || duration.toLowerCase().includes('day');
           const imgSrc = compressedFosterPhotoBase64 || result.photoUrl || fallbackImg;
+          const safeName = name.replace(/'/g, "\\'");
+
           const cardHtml = `
-            <article data-category="${species} foster" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
+            <article data-category="${species} ${isFoster ? 'foster' : ''}" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
               <div class="relative h-52 bg-pinkbrand-50">
                 <img src="${imgSrc}" alt="${name}" class="w-full h-full object-cover" />
                 <div class="absolute top-3 left-3 flex gap-1.5">
-                  <span class="px-2.5 py-1 rounded-full bg-amber-500/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
+                  <span class="px-2.5 py-1 rounded-full ${isFoster ? 'bg-amber-500/95' : 'bg-pinkbrand-600/95'} backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
                     ${duration}
                   </span>
                 </div>
@@ -1359,12 +1420,12 @@
                     <p class="text-xs text-stone-500 mt-0.5">${desc}</p>
                   </div>
                   <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-1 rounded-lg shrink-0">
-                    Urgent Foster
+                    Verified
                   </span>
                 </div>
-                <button onclick="openAdoptModal('${name.replace(/'/g, "\\'")}', 'Foster')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
+                <button onclick="openAdoptModal('${safeName}', '${isFoster ? 'Foster' : 'Adoption'}')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
                   <i data-lucide="heart" class="w-4 h-4"></i>
-                  <span>Step Up to Foster ${name}</span>
+                  <span>${isFoster ? 'Apply to Foster ' + name : 'Apply to Adopt ' + name}</span>
                 </button>
               </div>
             </article>
@@ -1432,6 +1493,9 @@
         const result = await res.json();
 
         if (result.status === 'success') {
+          const emptyEl = document.getElementById('billsEmptyState');
+          if (emptyEl) emptyEl.remove();
+
           const pct = Math.round((raised / total) * 100);
           const remaining = Math.max(total - raised, 0);
 
@@ -1597,7 +1661,7 @@
     }
 
     // ============================================================
-    // PUBLIC: PET FILTERS & ADOPTION / FOSTER APPLICATION
+    // PUBLIC: PET FILTERS & MANDATORY ADOPTION / FOSTER APPLICATION
     // ============================================================
     function filterPets(category, btnEl) {
       document.querySelectorAll('.filter-pill').forEach(pill => {
@@ -1624,7 +1688,7 @@
       document.getElementById('adoptPetName').value = petName;
       document.getElementById('adoptInquiryType').value = type;
       document.getElementById('modalTitle').textContent = `Apply for ${petName}`;
-      document.getElementById('modalBadge').textContent = `${type} Inquiry`;
+      document.getElementById('modalBadge').textContent = `Mandatory ${type} Vetting`;
       document.getElementById('adoptModal').classList.add('open');
     }
 
@@ -1642,6 +1706,24 @@
       const petName = document.getElementById('adoptPetName').value;
       const inquiryType = document.getElementById('adoptInquiryType').value;
 
+      const fullApplicantProfile = [
+        `Age: ${document.getElementById('appAgeInput').value}`,
+        `Job: ${document.getElementById('appOccupationInput').value.trim()}`,
+        `Address: ${document.getElementById('appLocalityInput').value.trim()}`
+      ].join(' | ');
+
+      const fullHousingDetails = [
+        document.getElementById('appHomeInput').value,
+        document.getElementById('appOwnershipInput').value,
+        `Alone: ${document.getElementById('appAloneHoursInput').value}`
+      ].join(' • ');
+
+      const fullPetCareNotes = [
+        document.getElementById('appPetsInput').value,
+        `Care Plan: ${document.getElementById('appReasonInput').value.trim()}`,
+        'Agreed to Indoor/Vaccination/Follow-ups: Yes'
+      ].join(' | ');
+
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
@@ -1649,11 +1731,11 @@
             action: 'NEW_APPLICATION',
             petName,
             inquiryType,
-            applicantName: document.getElementById('appNameInput').value.trim(),
+            applicantName: `${document.getElementById('appNameInput').value.trim()} (${document.getElementById('appAgeInput').value} yrs, ${document.getElementById('appOccupationInput').value.trim()})`,
             applicantPhone: document.getElementById('appPhoneInput').value.trim(),
-            locality: document.getElementById('appLocalityInput').value.trim(),
-            homeType: document.getElementById('appHomeInput').value,
-            existingPets: document.getElementById('appPetsInput').value
+            locality: fullApplicantProfile,
+            homeType: fullHousingDetails,
+            existingPets: fullPetCareNotes
           })
         });
         const result = await res.json();
@@ -1661,7 +1743,7 @@
         if (result.status === 'success') {
           closeAdoptModal();
           event.target.reset();
-          showToast(`Application #${result.appId} for ${petName} sent!`);
+          showToast(`Application #${result.appId} for ${petName} submitted!`);
         } else {
           showToast(result.message || 'Submission failed');
         }
