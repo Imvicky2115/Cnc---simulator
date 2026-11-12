@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#7C3AED" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>Paws for Purpose | Rescue & Adoption</title>
+  <title>Paws for Purpose | Hyderabad Rescue & Adoptions</title>
   
   <!-- Google Fonts: Plus Jakarta Sans & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,7 +58,7 @@
       overflow-x: hidden;
     }
 
-    /* Hide scrollbar for horizontal chips */
+    /* Hide scrollbar for horizontal chips & service menu */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -87,7 +87,7 @@
       }
     }
 
-    /* Icon Micro-Interactions */
+    /* Micro-Interactions */
     .btn-press {
       transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, border-color 0.2s ease;
     }
@@ -120,7 +120,7 @@
       animation: sosPulse 2s infinite;
     }
 
-    /* Modal Backdrop */
+    /* Modal Backdrop & Sheet */
     .modal-backdrop {
       opacity: 0;
       pointer-events: none;
@@ -144,16 +144,18 @@
   <!-- Mobile App Container -->
   <div class="max-w-md mx-auto min-h-screen bg-[#F8FAFC] shadow-2xl relative flex flex-col border-x border-slate-200/70">
 
-    <!-- CLEAN, DECLUTTERED STICKY HEADER -->
-    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-5 py-3.5">
-      <div class="flex items-center justify-between gap-3">
-        <!-- Left: Brand Identity -->
+    <!-- STICKY HEADER WITH SERVICE MENU BAR -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80">
+      
+      <!-- Top Bar: Brand + Quick QR & Helpline -->
+      <div class="px-5 pt-3.5 pb-2.5 flex items-center justify-between gap-2.5">
+        <!-- Brand Identity -->
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-700 flex items-center justify-center text-white shadow-md shadow-brand-600/20 shrink-0">
             <i data-lucide="paw-print" class="w-5 h-5 animate-float"></i>
           </div>
           <div class="truncate">
-            <h1 class="font-display font-bold text-[17px] leading-tight text-slate-900 tracking-tight truncate">
+            <h1 class="font-display font-bold text-[16px] leading-tight text-slate-900 tracking-tight truncate">
               Paws for Purpose
             </h1>
             <div class="flex items-center gap-1.5 mt-0.5">
@@ -161,17 +163,43 @@
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span class="text-[11px] font-medium text-slate-500 tracking-wide">Hyderabad Rescue Desk</span>
+              <span class="text-[11px] font-medium text-slate-500 truncate">Saving Street Souls • Hyd</span>
             </div>
           </div>
         </div>
 
-        <!-- Right: Single Primary Emergency Call Action -->
-        <a href="tel:+919876543210" class="btn-press inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sos-50 hover:bg-sos-100 text-sos-600 border border-sos-200/70 text-xs font-semibold shrink-0">
-          <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
-          <span>Helpline</span>
-        </a>
+        <!-- Right Quick Actions: Scan QR + Call -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button type="button" onclick="openQrModal()" class="btn-press inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200/70 text-xs font-semibold">
+            <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+            <span>Donate</span>
+          </button>
+          <a href="tel:+919876543210" aria-label="Emergency Helpline" class="btn-press w-9 h-9 rounded-xl bg-sos-50 hover:bg-sos-100 text-sos-600 border border-sos-200/70 flex items-center justify-center">
+            <i data-lucide="phone-call" class="w-4 h-4"></i>
+          </a>
+        </div>
       </div>
+
+      <!-- Service Menu Strip (From Profile: Rehabilitation | Feeding | Adoptions | Spay & Vaccinate) -->
+      <div class="px-5 pb-3 pt-1 flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <button type="button" onclick="openServiceInfo('rehab')" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-brand-50 text-slate-700 hover:text-brand-700 text-[11px] font-semibold shrink-0 transition">
+          <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-rose-500"></i>
+          <span>Rehabilitation</span>
+        </button>
+        <button type="button" onclick="openServiceInfo('feeding')" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-brand-50 text-slate-700 hover:text-brand-700 text-[11px] font-semibold shrink-0 transition">
+          <i data-lucide="utensils" class="w-3.5 h-3.5 text-amber-500"></i>
+          <span>Feeding Drives</span>
+        </button>
+        <button type="button" onclick="switchTab('adopt', document.getElementById('nav-adopt'))" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-brand-50 text-slate-700 hover:text-brand-700 text-[11px] font-semibold shrink-0 transition">
+          <i data-lucide="home" class="w-3.5 h-3.5 text-brand-600"></i>
+          <span>Adoptions</span>
+        </button>
+        <button type="button" onclick="openServiceInfo('spay')" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-brand-50 text-slate-700 hover:text-brand-700 text-[11px] font-semibold shrink-0 transition">
+          <i data-lucide="syringe" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span>Spay & Vaccinate</span>
+        </button>
+      </div>
+
     </header>
 
     <!-- MAIN SCROLLABLE WORKSPACE -->
@@ -188,9 +216,9 @@
             <i data-lucide="siren" class="w-5 h-5 text-white"></i>
           </div>
           <div class="space-y-1">
-            <h2 class="font-display font-bold text-sm leading-snug">Spotted an injured street animal?</h2>
+            <h2 class="font-display font-bold text-sm leading-snug">Spotted an injured street soul?</h2>
             <p class="text-xs text-rose-100 leading-relaxed">
-              Pin the exact spot & snap a quick photo. Nearby volunteers get alerted immediately.
+              Pin the exact spot & snap a photo. Hyderabad volunteers get alerted right away.
             </p>
           </div>
         </div>
@@ -267,7 +295,7 @@
             </div>
 
             <div>
-              <input type="text" id="landmarkInput" required placeholder="Area & nearest landmark (e.g., Gachibowli Flyover, Pillar 14)" 
+              <input type="text" id="landmarkInput" required placeholder="Area & nearest landmark (e.g., Madhapur Metro Pillar 42)" 
                 class="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15 transition" />
             </div>
           </div>
@@ -327,17 +355,24 @@
       <!-- ========================================== -->
       <section id="tab-adopt" class="tab-pane space-y-5">
         
-        <!-- Header & Filter Pills -->
-        <div class="space-y-3">
-          <div class="flex items-baseline justify-between">
-            <h2 class="font-display font-bold text-lg text-slate-900">Ready for a Home</h2>
-            <span class="text-xs font-medium text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full">4 Souls</span>
+        <!-- Header + List for Fostering CTA -->
+        <div class="space-y-3.5">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <h2 class="font-display font-bold text-lg text-slate-900">Adopt & Foster</h2>
+              <p class="text-xs text-slate-500">Give a rescued street soul a safe space</p>
+            </div>
+            <!-- LIST ANIMAL FOR FOSTERING BUTTON -->
+            <button type="button" onclick="openListFosterModal()" class="btn-press inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-display font-bold text-xs shadow-md shadow-amber-500/20 shrink-0">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>List for Foster</span>
+            </button>
           </div>
 
           <!-- Horizontal Scrollable Filter Chips -->
           <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
             <button onclick="filterPets('all', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-semibold shrink-0">
-              All
+              All (<span id="petCount">3</span>)
             </button>
             <button onclick="filterPets('cat', this)" class="filter-pill btn-press px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 text-xs font-medium shrink-0">
               Cats & Kittens
@@ -372,7 +407,7 @@
               <div class="flex items-start justify-between gap-2">
                 <div>
                   <h3 class="font-display font-bold text-base text-slate-900">Lisbon</h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Calico • Recovered from surgery, super gentle</p>
+                  <p class="text-xs text-slate-500 mt-0.5">Calico • Surgery done, needs 14-day indoor recovery</p>
                 </div>
                 <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg shrink-0">
                   <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Vaccinated
@@ -432,7 +467,7 @@
               <div class="flex items-start justify-between gap-2">
                 <div>
                   <h3 class="font-display font-bold text-base text-slate-900">Snowy</h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Indie Pup • Rescued from Kondapur, great with kids</p>
+                  <p class="text-xs text-slate-500 mt-0.5">Indie Pup • Rescued in Hyderabad, great with kids</p>
                 </div>
                 <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg shrink-0">
                   <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 7-in-1 Done
@@ -449,33 +484,65 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- TAB 3: MEDICAL FUND & TRANSPARENCY TRACKER -->
+      <!-- TAB 3: MEDICAL FUND, QR & FOOD WISHLIST    -->
       <!-- ========================================== -->
       <section id="tab-funds" class="tab-pane space-y-6">
         
-        <!-- Direct UPI Card -->
+        <!-- Scannable UPI QR Code Card -->
         <div class="bg-slate-900 text-white rounded-3xl p-5 shadow-xl relative overflow-hidden space-y-4">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-semibold uppercase tracking-widest text-brand-100 bg-white/10 px-3 py-1 rounded-full">
-              100% Direct Vet Care
-            </span>
-            <i data-lucide="qr-code" class="w-5 h-5 text-brand-400"></i>
-          </div>
-
-          <div class="space-y-1">
-            <p class="text-xs text-slate-400">Official Rescue UPI ID</p>
-            <div class="flex items-center justify-between gap-2 bg-white/10 border border-white/10 rounded-2xl px-3.5 py-2.5">
-              <code id="upiIdText" class="text-sm font-semibold text-white tracking-tight truncate">pawsforpurpose.hyd@okaxis</code>
-              <button onclick="copyUpi()" id="copyUpiBtn" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold shrink-0">
-                <i data-lucide="copy" id="copyIcon" class="w-3.5 h-3.5"></i>
-                <span id="copyText">Copy</span>
-              </button>
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-brand-100 bg-white/10 px-2.5 py-1 rounded-full">
+                Official Rescue UPI
+              </span>
+              <h3 class="font-display font-bold text-base text-white mt-2">Barsha Sarkar</h3>
+              <p class="text-[11px] text-slate-400">Punjab National Bank • Scan with any UPI app</p>
+            </div>
+            <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center">
+              <i data-lucide="scan-line" class="w-5 h-5 text-brand-400"></i>
             </div>
           </div>
 
-          <p class="text-[11px] text-slate-400 leading-relaxed">
-            Every rupee goes directly toward emergency surgeries, vaccinations, and daily feeding drives across Hyderabad.
-          </p>
+          <!-- Crisp Scannable QR Box -->
+          <div class="bg-white rounded-2xl p-4 flex flex-col items-center justify-center space-y-2.5 shadow-inner">
+            <img 
+              src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi%3A%2F%2Fpay%3Fpa%3Dbarshasarkar45%40okaxis%26pn%3DBarsha%2520Sarkar%26cu%3DINR" 
+              alt="UPI QR Code for barshasarkar45@okaxis" 
+              class="w-44 h-44 rounded-lg"
+            />
+            <span class="text-[11px] font-semibold text-slate-500">GPay • PhonePe • Paytm • BHIM</span>
+          </div>
+
+          <!-- Copyable UPI ID & Direct Pay Intent -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between gap-2 bg-white/10 border border-white/10 rounded-2xl px-3.5 py-2.5">
+              <code id="upiIdText" class="text-xs font-semibold text-white tracking-tight truncate">barshasarkar45@okaxis</code>
+              <button onclick="copyUpi()" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold shrink-0">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span id="copyText">Copy</span>
+              </button>
+            </div>
+            <a href="upi://pay?pa=barshasarkar45@okaxis&pn=Barsha%20Sarkar&cu=INR" class="btn-press w-full py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+              <i data-lucide="smartphone" class="w-4 h-4"></i>
+              <span>Open UPI App Directly</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Urgent Shelter Supply Alert (From Instagram Post: Whiskas Dry Food) -->
+        <div class="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 flex items-start gap-3">
+          <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+            <i data-lucide="package-open" class="w-5 h-5"></i>
+          </div>
+          <div class="space-y-1 flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-display font-bold text-xs text-amber-950">Shelter Supply Need: Whiskas Dry Food</h4>
+              <span class="text-[10px] font-bold uppercase text-amber-700 bg-amber-200/60 px-2 py-0.5 rounded">Low Stock</span>
+            </div>
+            <p class="text-[11px] text-amber-800 leading-relaxed">
+              Running low on kitten & adult cat dry food for shelter rescues. Sponsor a pack via UPI or drop off in Hyderabad.
+            </p>
+          </div>
         </div>
 
         <!-- Active Medical Cases -->
@@ -495,13 +562,12 @@
               <span class="text-xs font-bold text-slate-700">₹8,500 / ₹12,000</span>
             </div>
             
-            <!-- Progress Bar -->
             <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
               <div class="h-full bg-gradient-to-r from-brand-500 to-brand-600 rounded-full" style="width: 71%"></div>
             </div>
 
             <div class="flex items-center justify-between text-[11px] text-slate-500">
-              <span>71% funded • Vet: Blue Cross Hyd</span>
+              <span>71% funded • Vet Care Hyd</span>
               <span class="font-semibold text-brand-600">₹3,500 needed</span>
             </div>
           </div>
@@ -511,12 +577,11 @@
             <div class="flex items-start justify-between gap-2">
               <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">Post-Op Recovery</span>
-                <h4 class="font-display font-bold text-sm text-slate-900 mt-1">Lisbon — Sterilization & Bloodwork</h4>
+                <h4 class="font-display font-bold text-sm text-slate-900 mt-1">Lisbon — Surgery & Bloodwork</h4>
               </div>
               <span class="text-xs font-bold text-emerald-600">₹4,200 / ₹4,200</span>
             </div>
             
-            <!-- Progress Bar -->
             <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
               <div class="h-full bg-emerald-500 rounded-full" style="width: 100%"></div>
             </div>
@@ -536,28 +601,135 @@
     <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-30 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-4 py-2.5">
       <div class="grid grid-cols-3 gap-2">
         
-        <button onclick="switchTab('sos', this)" class="nav-btn active group flex flex-col items-center justify-center py-1.5 rounded-2xl text-sos-600 bg-sos-50/80 transition-colors">
+        <button id="nav-sos" onclick="switchTab('sos', this)" class="nav-btn active group flex flex-col items-center justify-center py-1.5 rounded-2xl text-sos-600 bg-sos-50/80 transition-colors">
           <i data-lucide="siren" class="w-5 h-5 icon-bounce"></i>
           <span class="text-[11px] font-bold mt-1 tracking-tight">SOS Rescue</span>
         </button>
 
-        <button onclick="switchTab('adopt', this)" class="nav-btn group flex flex-col items-center justify-center py-1.5 rounded-2xl text-slate-500 hover:text-slate-800 transition-colors">
+        <button id="nav-adopt" onclick="switchTab('adopt', this)" class="nav-btn group flex flex-col items-center justify-center py-1.5 rounded-2xl text-slate-500 hover:text-slate-800 transition-colors">
           <i data-lucide="heart" class="w-5 h-5 icon-bounce"></i>
           <span class="text-[11px] font-semibold mt-1 tracking-tight">Adopt & Foster</span>
         </button>
 
-        <button onclick="switchTab('funds', this)" class="nav-btn group flex flex-col items-center justify-center py-1.5 rounded-2xl text-slate-500 hover:text-slate-800 transition-colors">
+        <button id="nav-funds" onclick="switchTab('funds', this)" class="nav-btn group flex flex-col items-center justify-center py-1.5 rounded-2xl text-slate-500 hover:text-slate-800 transition-colors">
           <i data-lucide="hand-coins" class="w-5 h-5 icon-bounce"></i>
-          <span class="text-[11px] font-semibold mt-1 tracking-tight">Vet Funds</span>
+          <span class="text-[11px] font-semibold mt-1 tracking-tight">Donate & Bills</span>
         </button>
 
       </div>
     </nav>
 
     <!-- ========================================== -->
-    <!-- BOTTOM SHEET MODAL: ADOPTION / FOSTER FORM -->
+    <!-- MODAL 1: QUICK SCAN QR DONATION MODAL      -->
     <!-- ========================================== -->
-    <div id="adoptModal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end justify-center">
+    <div id="qrModal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeQrModal()">
+      <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2.5 py-0.5 rounded-full">Scan & Support</span>
+            <h3 class="font-display font-bold text-lg text-slate-900 mt-1">Barsha Sarkar (Paws for Purpose)</h3>
+          </div>
+          <button onclick="closeQrModal()" class="w-9 h-9 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 flex flex-col items-center justify-center space-y-3">
+          <img 
+            src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=upi%3A%2F%2Fpay%3Fpa%3Dbarshasarkar45%40okaxis%26pn%3DBarsha%2520Sarkar%26cu%3DINR" 
+            alt="UPI QR Code" 
+            class="w-48 h-48 rounded-xl bg-white p-2 shadow-sm"
+          />
+          <div class="text-center">
+            <p class="text-xs font-bold text-slate-800">UPI ID: barshasarkar45@okaxis</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">Punjab National Bank • Scan with any UPI app</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="copyUpi()" class="btn-press py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs flex items-center justify-center gap-2">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+            <span>Copy UPI ID</span>
+          </button>
+          <a href="upi://pay?pa=barshasarkar45@okaxis&pn=Barsha%20Sarkar&cu=INR" class="btn-press py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+            <span>Pay via App</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 2: LIST AN ANIMAL FOR FOSTERING      -->
+    <!-- ========================================== -->
+    <div id="listFosterModal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeListFosterModal()">
+      <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full">Rescuer / Coordinator Portal</span>
+            <h3 class="font-display font-bold text-lg text-slate-900 mt-1">List Animal for Fostering</h3>
+          </div>
+          <button onclick="closeListFosterModal()" class="w-9 h-9 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <form id="listFosterForm" onsubmit="handleAddFosterListing(event)" class="space-y-4">
+          
+          <!-- Photo Upload for Listing -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Animal Photo</label>
+            <label for="fosterPhotoInput" class="flex items-center justify-center w-full h-28 rounded-2xl border-2 border-dashed border-slate-300 hover:border-amber-500 bg-slate-50 cursor-pointer overflow-hidden relative">
+              <div id="fosterPhotoPlaceholder" class="flex flex-col items-center text-center p-2">
+                <i data-lucide="image-plus" class="w-5 h-5 text-amber-600 mb-1"></i>
+                <span class="text-xs font-medium text-slate-600">Upload clear photo</span>
+              </div>
+              <img id="fosterPhotoPreview" class="hidden w-full h-full object-cover" alt="Foster Preview" />
+              <input id="fosterPhotoInput" type="file" accept="image/*" class="hidden" onchange="previewFosterPhoto(event)" />
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Name / Temp ID</label>
+              <input type="text" id="newPetName" required placeholder="e.g., Coco" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:bg-white focus:border-brand-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Species</label>
+              <select id="newPetSpecies" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 focus:outline-none focus:border-brand-500">
+                <option value="cat">Cat / Kitten</option>
+                <option value="dog">Dog / Pup</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Age & Gender</label>
+              <input type="text" id="newPetAge" required placeholder="e.g., 2 Months • Male" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:bg-white focus:border-brand-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1.5">Foster Duration</label>
+              <input type="text" id="newPetDuration" required placeholder="e.g., 15 Days / Post-Op" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:bg-white focus:border-brand-500" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Medical & Care Notes</label>
+            <input type="text" id="newPetDesc" required placeholder="e.g., Dewormed, needs eye drops twice daily" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:bg-white focus:border-brand-500" />
+          </div>
+
+          <button type="submit" class="btn-press w-full py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-display font-bold text-sm shadow-lg shadow-amber-500/25">
+            Publish Foster Listing
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 3: APPLY TO ADOPT / FOSTER           -->
+    <!-- ========================================== -->
+    <div id="adoptModal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeAdoptModal()">
       <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
         
         <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
@@ -616,9 +788,37 @@
     </div>
 
     <!-- ========================================== -->
+    <!-- MODAL 4: SERVICE INFO SHEET                -->
+    <!-- ========================================== -->
+    <div id="serviceModal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeServiceModal()">
+      <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-4 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div id="serviceIconBox" class="w-9 h-9 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
+              <i data-lucide="heart-pulse" class="w-5 h-5"></i>
+            </div>
+            <h3 id="serviceTitle" class="font-display font-bold text-base text-slate-900">Rehabilitation</h3>
+          </div>
+          <button onclick="closeServiceModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <p id="serviceBody" class="text-xs text-slate-600 leading-relaxed"></p>
+        <div class="pt-1 flex gap-2.5">
+          <button onclick="closeServiceModal(); openQrModal();" class="btn-press flex-1 py-3 rounded-xl bg-brand-600 text-white font-semibold text-xs">
+            Support This Cause
+          </button>
+          <button onclick="closeServiceModal()" class="btn-press px-4 py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold text-xs">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
     <!-- TOAST NOTIFICATION                         -->
     <!-- ========================================== -->
-    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform -translate-y-2">
+    <div id="toast" class="fixed top-28 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform -translate-y-2">
       <div class="bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs font-medium border border-white/10">
         <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
         <span id="toastMessage">Alert sent to rescue volunteers!</span>
@@ -633,19 +833,15 @@
 
     // Tab Switching Logic
     function switchTab(tabId, btnEl) {
-      // Hide all panes
       document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-      // Show target pane
       document.getElementById('tab-' + tabId).classList.add('active');
 
-      // Reset all nav buttons
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('active', 'text-sos-600', 'bg-sos-50/80', 'text-brand-600', 'bg-brand-50/80');
         btn.classList.add('text-slate-500');
         btn.querySelector('span').classList.replace('font-bold', 'font-semibold');
       });
 
-      // Highlight active nav button
       btnEl.classList.add('active');
       btnEl.classList.remove('text-slate-500');
       btnEl.querySelector('span').classList.replace('font-semibold', 'font-bold');
@@ -656,8 +852,124 @@
         btnEl.classList.add('text-brand-600', 'bg-brand-50/80');
       }
 
-      // Smooth scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Service Menu Info Drawer
+    const serviceDetails = {
+      rehab: {
+        title: 'Rehabilitation & Trauma Care',
+        body: 'We rescue critically injured, accident-hit, and abandoned street animals across Hyderabad, providing emergency hospitalization, orthopedic surgeries, and safe post-operative recovery until they can walk and thrive again.'
+      },
+      feeding: {
+        title: 'Daily Street Feeding Drives',
+        body: 'Our volunteers conduct daily feeding runs across Hyderabad colonies and shelter zones. You can sponsor dry kibble (like Whiskas for rescued kittens/cats) or volunteer for a feeding route in your neighborhood.'
+      },
+      spay: {
+        title: 'Spay, Neuter & Vaccination (ABC)',
+        body: 'Sterilization and anti-rabies / 7-in-1 / Tricat vaccinations are the most humane way to prevent street suffering. Report unsterilized community animals or sponsor a vaccination kit today.'
+      }
+    };
+
+    function openServiceInfo(key) {
+      const data = serviceDetails[key];
+      if (!data) return;
+      document.getElementById('serviceTitle').textContent = data.title;
+      document.getElementById('serviceBody').textContent = data.body;
+      document.getElementById('serviceModal').classList.add('open');
+    }
+    function closeServiceModal() {
+      document.getElementById('serviceModal').classList.remove('open');
+    }
+
+    // QR Modal Controls
+    function openQrModal() {
+      document.getElementById('qrModal').classList.add('open');
+    }
+    function closeQrModal() {
+      document.getElementById('qrModal').classList.remove('open');
+    }
+
+    // List for Fostering Modal Controls
+    let uploadedFosterImgUrl = null;
+    function openListFosterModal() {
+      document.getElementById('listFosterModal').classList.add('open');
+    }
+    function closeListFosterModal() {
+      document.getElementById('listFosterModal').classList.remove('open');
+    }
+
+    function previewFosterPhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedFosterImgUrl = e.target.result;
+        document.getElementById('fosterPhotoPreview').src = uploadedFosterImgUrl;
+        document.getElementById('fosterPhotoPreview').classList.remove('hidden');
+        document.getElementById('fosterPhotoPlaceholder').classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleAddFosterListing(event) {
+      event.preventDefault();
+      const name = document.getElementById('newPetName').value.trim();
+      const species = document.getElementById('newPetSpecies').value;
+      const age = document.getElementById('newPetAge').value.trim();
+      const duration = document.getElementById('newPetDuration').value.trim();
+      const desc = document.getElementById('newPetDesc').value.trim();
+
+      const fallbackImg = species === 'cat'
+        ? 'https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?auto=format&fit=crop&w=800&q=80'
+        : 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80';
+      const imgSrc = uploadedFosterImgUrl || fallbackImg;
+
+      const cardHtml = `
+        <article data-category="${species} foster" class="pet-card bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-sm transition-all">
+          <div class="relative h-52 bg-slate-200">
+            <img src="${imgSrc}" alt="${name}" class="w-full h-full object-cover" />
+            <div class="absolute top-3 left-3 flex gap-1.5">
+              <span class="px-2.5 py-1 rounded-full bg-amber-500/95 backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
+                Foster: ${duration}
+              </span>
+            </div>
+            <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-slate-900/70 backdrop-blur-md text-white text-[11px] font-medium">
+              ${age}
+            </div>
+          </div>
+          <div class="p-4 space-y-3.5">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h3 class="font-display font-bold text-base text-slate-900">${name}</h3>
+                <p class="text-xs text-slate-500 mt-0.5">${desc}</p>
+              </div>
+              <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg shrink-0">
+                New Listing
+              </span>
+            </div>
+            <button onclick="openAdoptModal('${name}', 'Foster')" class="btn-press w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs flex items-center justify-center gap-2">
+              <i data-lucide="heart" class="w-4 h-4"></i>
+              <span>Step Up to Foster ${name}</span>
+            </button>
+          </div>
+        </article>
+      `;
+
+      document.getElementById('petGrid').insertAdjacentHTML('afterbegin', cardHtml);
+      lucide.createIcons();
+
+      // Update total count badge
+      const totalCards = document.querySelectorAll('.pet-card').length;
+      document.getElementById('petCount').textContent = totalCards;
+
+      // Reset form & close modal
+      event.target.reset();
+      uploadedFosterImgUrl = null;
+      document.getElementById('fosterPhotoPreview').classList.add('hidden');
+      document.getElementById('fosterPhotoPlaceholder').classList.remove('hidden');
+      closeListFosterModal();
+      showToast(`${name} listed for urgent fostering!`);
     }
 
     // Species & Urgency Chip Selection
@@ -705,7 +1017,7 @@
           statusBox.classList.remove('hidden');
           showToast('GPS location locked!');
         },
-        (err) => {
+        () => {
           gpsIcon.classList.remove('animate-spin');
           btnText.textContent = 'Retry GPS';
           showToast('Enable location permission or type landmark');
@@ -714,7 +1026,7 @@
       );
     }
 
-    // Photo Preview
+    // SOS Photo Preview
     function previewPhoto(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -738,7 +1050,7 @@
       document.getElementById('clearPhotoBtn').classList.add('hidden');
     }
 
-    // SOS Form Submission (Ready for Google Apps Script Webhook)
+    // SOS Form Submission
     function handleSosSubmit(event) {
       event.preventDefault();
       const submitBtn = document.getElementById('sosSubmitBtn');
@@ -747,20 +1059,6 @@
       submitBtn.disabled = true;
       submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Sending SOS Alert...</span>`;
       lucide.createIcons();
-
-      // Payload structured for Google Apps Script doPost(e)
-      const payload = {
-        action: 'NEW_SOS',
-        species: document.getElementById('speciesInput').value,
-        urgency: document.getElementById('urgencyInput').value,
-        gps: capturedCoords || 'Not shared',
-        landmark: document.getElementById('landmarkInput').value,
-        reporterName: document.getElementById('reporterName').value,
-        reporterPhone: document.getElementById('reporterPhone').value,
-        stayingAtSpot: document.getElementById('stayAtSpot').checked
-      };
-
-      console.log('SOS Payload ready for Apps Script:', payload);
 
       setTimeout(() => {
         submitBtn.disabled = false;
@@ -825,11 +1123,11 @@
       navigator.clipboard.writeText(upi);
       
       const copyText = document.getElementById('copyText');
-      copyText.textContent = 'Copied!';
-      showToast('UPI ID copied to clipboard');
+      if (copyText) copyText.textContent = 'Copied!';
+      showToast('Copied: barshasarkar45@okaxis');
 
       setTimeout(() => {
-        copyText.textContent = 'Copy';
+        if (copyText) copyText.textContent = 'Copy';
       }, 2000);
     }
 
