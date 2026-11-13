@@ -257,13 +257,14 @@
       </div>
 
       <!-- Owner Mode Active Banner (Visible ONLY after owner unlocks via ?team=1 or 5-tap) -->
-      <div id="adminBanner" class="hidden bg-pinkbrand-700 text-white px-5 py-1.5 text-[11px] font-medium flex items-center justify-between">
-        <span class="flex items-center gap-1.5">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-pinkbrand-200"></i>
-          Coordinator Mode — Live Sheet Sync Active
+      <div id="adminBanner" class="hidden bg-pinkbrand-700 text-white px-5 py-1.5 text-[11px] font-medium flex items-center justify-between gap-2">
+        <span class="flex items-center gap-1.5 truncate">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-pinkbrand-200 shrink-0"></i>
+          <span>Coordinator Mode</span>
         </span>
-        <div class="flex items-center gap-3">
-          <button onclick="openChangePinModal()" class="underline text-pinkbrand-100 hover:text-white font-semibold">Change PIN</button>
+        <div class="flex items-center gap-3 shrink-0">
+          <a id="openDbSheetLink" href="#" target="_blank" rel="noopener" class="hidden underline text-pinkbrand-100 hover:text-white font-semibold">Open Sheet</a>
+          <button onclick="openChangePinModal()" class="underline text-pinkbrand-100 hover:text-white font-semibold">PIN</button>
           <button onclick="logoutAdmin()" class="underline text-pinkbrand-100 hover:text-white font-semibold">Exit</button>
         </div>
       </div>
@@ -977,7 +978,7 @@
     // ============================================================
     // LIVE GOOGLE APPS SCRIPT DATABASE ENDPOINT
     // ============================================================
-    const API_URL = 'https://script.google.com/macros/s/AKfycby60Zn4Yew9ateNcx-BcPqZJtfpLoEqRJtUCYmNacjFHsx0exFb_7jCY8LImznszTMJ4Q/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycby3IMY-5vBax2q3X3zNJk1IiI52nmiKahejFVNu2gtPTl24NrYCbtMke8vEBVxJHfvH/exec';
 
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -1022,6 +1023,13 @@
         const res = await fetch(API_URL);
         const data = await res.json();
         if (data.status !== 'success') throw new Error('Sync failed');
+
+        // Wire direct Google Sheet link in Coordinator Banner if returned
+        if (data.sheetUrl) {
+          const sheetLink = document.getElementById('openDbSheetLink');
+          sheetLink.href = data.sheetUrl;
+          sheetLink.classList.remove('hidden');
+        }
 
         // 1. Render Live Pets / Foster Cards
         if (Array.isArray(data.pets) && data.pets.length > 0) {
