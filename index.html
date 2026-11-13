@@ -612,8 +612,8 @@
         <!-- Form A: Unlock with PIN -->
         <form id="unlockPinForm" onsubmit="verifyAdminPin(event)" class="space-y-4">
           <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Enter Your Coordinator PIN</label>
-            <input type="password" id="adminPinInput" inputmode="numeric" minlength="4" maxlength="6" required placeholder="••••" class="w-full px-4 py-3.5 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-lg font-bold tracking-[0.5em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Enter Your Coordinator PIN (4–6 digits)</label>
+            <input type="password" id="adminPinInput" inputmode="numeric" minlength="4" maxlength="6" required placeholder="••••••" class="w-full px-4 py-3.5 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-lg font-bold tracking-[0.5em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
           <button type="submit" id="pinSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm">
             Unlock Listing Tools
@@ -624,11 +624,11 @@
         <form id="setPinForm" onsubmit="handleSetOwnerPin(event)" class="hidden space-y-4">
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5">Current PIN (Leave blank if setting first time)</label>
-            <input type="password" id="currentOwnerPinInput" inputmode="numeric" maxlength="6" placeholder="••••" class="w-full px-4 py-3 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-base font-bold tracking-[0.4em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+            <input type="password" id="currentOwnerPinInput" inputmode="numeric" maxlength="6" placeholder="••••••" class="w-full px-4 py-3 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-base font-bold tracking-[0.4em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5">New Coordinator PIN (4–6 digits) *</label>
-            <input type="password" id="newOwnerPinInput" inputmode="numeric" pattern="[0-9]{4,6}" minlength="4" maxlength="6" required placeholder="••••" class="w-full px-4 py-3 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-base font-bold tracking-[0.4em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+            <input type="password" id="newOwnerPinInput" inputmode="numeric" pattern="[0-9]{4,6}" minlength="4" maxlength="6" required placeholder="••••••" class="w-full px-4 py-3 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-base font-bold tracking-[0.4em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
           </div>
           <button type="submit" id="setPinSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-display font-bold text-sm">
             Save PIN & Unlock
@@ -835,7 +835,7 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-stone-700 mb-1.5">Age <span class="text-pinkbrand-600">*</span></label>
-              <input type="number" id="appAgeInput" required min="18" max="90" placeholder="24" class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+              <input type="number" id="appAgeInput" required min="18" max="90" placeholder="24" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
             </div>
           </div>
 
@@ -977,7 +977,7 @@
     // ============================================================
     // LIVE GOOGLE APPS SCRIPT DATABASE ENDPOINT
     // ============================================================
-    const API_URL = 'https://script.google.com/macros/s/AKfycbyTf9FA6vz-7qovsKwyT4TxRmKhsaRbn6u10ohaLuQ-R6QHpVQLK6W2qYQ1Ib_RDSsk/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycby60Zn4Yew9ateNcx-BcPqZJtfpLoEqRJtUCYmNacjFHsx0exFb_7jCY8LImznszTMJ4Q/exec';
 
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -1026,13 +1026,13 @@
         // 1. Render Live Pets / Foster Cards
         if (Array.isArray(data.pets) && data.pets.length > 0) {
           petGrid.innerHTML = data.pets.map(pet => {
-            const species = (pet.Species || 'cat').toLowerCase();
-            const isFoster = (pet.Badge_Duration || '').toLowerCase().includes('foster') || (pet.Badge_Duration || '').toLowerCase().includes('day');
+            const species = String(pet.Species || 'cat').toLowerCase();
+            const isFoster = String(pet.Badge_Duration || '').toLowerCase().includes('foster') || String(pet.Badge_Duration || '').toLowerCase().includes('day');
             const categoryAttr = isFoster ? `${species} foster` : species;
             const fallbackImg = species === 'cat'
               ? 'https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?auto=format&fit=crop&w=800&q=80'
               : 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80';
-            const photo = (pet.Photo_URL && pet.Photo_URL.startsWith('http')) ? pet.Photo_URL : fallbackImg;
+            const photo = (pet.Photo_URL && String(pet.Photo_URL).startsWith('http')) ? pet.Photo_URL : fallbackImg;
             const safeName = String(pet.Name || 'Rescue').replace(/'/g, "\\'");
 
             return `
@@ -1202,7 +1202,7 @@
 
     async function verifyAdminPin(event) {
       event.preventDefault();
-      const enteredPin = document.getElementById('adminPinInput').value.trim();
+      const enteredPin = String(document.getElementById('adminPinInput').value || '').trim();
       const btn = document.getElementById('pinSubmitBtn');
       btn.disabled = true;
       btn.textContent = 'Verifying...';
@@ -1210,6 +1210,7 @@
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'VERIFY_PIN', pin: enteredPin })
         });
         const result = await res.json();
@@ -1224,6 +1225,7 @@
           document.getElementById('adminPinInput').value = '';
         }
       } catch (err) {
+        console.error(err);
         showToast('Network error verifying PIN');
       } finally {
         btn.disabled = false;
@@ -1233,8 +1235,8 @@
 
     async function handleSetOwnerPin(event) {
       event.preventDefault();
-      const currentPin = document.getElementById('currentOwnerPinInput').value.trim();
-      const newPin = document.getElementById('newOwnerPinInput').value.trim();
+      const currentPin = String(document.getElementById('currentOwnerPinInput').value || '').trim();
+      const newPin = String(document.getElementById('newOwnerPinInput').value || '').trim();
       const btn = document.getElementById('setPinSubmitBtn');
       btn.disabled = true;
       btn.textContent = 'Saving PIN...';
@@ -1242,6 +1244,7 @@
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             action: 'SET_PIN',
             currentPin: currentPin,
@@ -1260,6 +1263,7 @@
           showToast(result.message || 'Could not update PIN');
         }
       } catch (err) {
+        console.error(err);
         showToast('Network error saving PIN');
       } finally {
         btn.disabled = false;
@@ -1378,9 +1382,10 @@
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             action: 'ADD_PET',
-            pin: sessionStorage.getItem('pfp_owner_pin'),
+            pin: String(sessionStorage.getItem('pfp_owner_pin') || '').trim(),
             name,
             species,
             age,
@@ -1479,9 +1484,10 @@
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             action: 'ADD_VET_BILL',
-            pin: sessionStorage.getItem('pfp_owner_pin'),
+            pin: String(sessionStorage.getItem('pfp_owner_pin') || '').trim(),
             animalName,
             category,
             summary,
@@ -1624,6 +1630,7 @@
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             action: 'NEW_SOS',
             species: document.getElementById('speciesInput').value,
@@ -1727,6 +1734,7 @@
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             action: 'NEW_APPLICATION',
             petName,
