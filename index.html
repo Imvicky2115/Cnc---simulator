@@ -780,13 +780,13 @@
       // ============================================================
       // LIVE GOOGLE APPS SCRIPT DATABASE ENDPOINT
       // ============================================================
-      const API_URL = 'https://script.google.com/macros/s/AKfycbz3gszGvaErJ9zQDXp6k3bqUD2VaJ-cjB83CwcEPIWQOWrbSEVxktEglCP2nGAVs5UxqQ/exec';
+      const API_URL = 'https://script.google.com/macros/s/AKfycbym_oZwkq6T5yb0a-PngboQ7fs066WfzJ2bRFPleK1ZbI4J-aBhUaEruMQiymi_ogCR/exec';
 
       // ============================================================
-      // HIGH-CONCURRENCY CACHE & RETRY ENGINE (No backend changes)
+      // STALE-WHILE-REVALIDATE CACHE & RETRY ENGINE
       // ============================================================
-      const CACHE_KEY = '_pfp_live_cache_v1';
-      const CACHE_TTL_MS = 3 * 60 * 1000; // 3-minute local read cache to absorb traffic spikes
+      const CACHE_KEY = '_pfp_live_cache_v2';
+      let lastRenderedSignature = '';
       let inFlightSync = null;
       let isSubmitting = false;
 
@@ -795,8 +795,7 @@
           const raw = localStorage.getItem(CACHE_KEY);
           if (!raw) return null;
           const parsed = JSON.parse(raw);
-          if (!parsed || !parsed.data) return null;
-          return parsed;
+          return parsed && parsed.data ? parsed : null;
         } catch (e) {
           return null;
         }
@@ -819,9 +818,8 @@
             return await res.json();
           } catch (err) {
             if (attempt === retries) throw err;
-            // Exponential backoff with random jitter to prevent thundering herd
-            const baseDelay = 750 * Math.pow(2, attempt);
-            const jitter = Math.floor(Math.random() * 450);
+            const baseDelay = 700 * Math.pow(2, attempt);
+            const jitter = Math.floor(Math.random() * 400);
             await new Promise(r => setTimeout(r, baseDelay + jitter));
           }
         }
@@ -905,7 +903,7 @@
       }
 
       // ============================================================
-      // FAST IMAGE COMPRESSION HELPER (Smaller payload = faster queue)
+      // FAST IMAGE COMPRESSION HELPER
       // ============================================================
       function compressImageFile(file, maxWidth = 800, quality = 0.72) {
         return new Promise((resolve) => {
@@ -1233,15 +1231,20 @@
       }
 
       // ============================================================
-      // RENDER LIVE DATA PAYLOAD INTO UI
+      // RENDER LIVE DATA PAYLOAD INTO UI (With Diff Check to Avoid Flicker)
       // ============================================================
-      function applyDatabasePayload(data) {
+      function applyDatabasePayload(data, forceRender = false) {
+        const isAdmin = isCoordinatorActive();
+        const sig = JSON.stringify({ pets: data.pets || [], bills: data.bills || [], isAdmin });
+        if (!forceRender && sig === lastRenderedSignature) return;
+        lastRenderedSignature = sig;
+
         const petGrid = document.getElementById('petGrid');
         const billsList = document.getElementById('vetBillsList');
 
         if (data.sheetUrl) {
           cachedSheetUrl = data.sheetUrl;
-          if (isCoordinatorActive()) mountAdminUI();
+          if (isAdmin) mountAdminUI();
         }
 
         if (Array.isArray(data.pets) && data.pets.length > 0) {
@@ -1284,30 +1287,23 @@
       }
 
       // ============================================================
-      // STALE-WHILE-REVALIDATE SYNC (Protects Apps Script under heavy traffic)
+      // TRUE STALE-WHILE-REVALIDATE SYNC (Instant Loads + Live Updates)
       // ============================================================
-      window.syncLiveDatabase = async function (forceFresh = false) {
+      window.syncLiveDatabase = async function (bypassServerCache = false) {
         const cached = readLocalCache();
-        const isCacheFresh = cached && (Date.now() - cached.ts < CACHE_TTL_MS);
 
-        // Render cached snapshot immediately for zero-latency UX
+        // 1. Paint cached snapshot immediately in 0ms if available
         if (cached && cached.data) {
           applyDatabasePayload(cached.data);
-          if (isCacheFresh && !forceFresh && !isCoordinatorActive()) {
-            return; // Skip network call when fresh cache exists
-          }
         }
 
-        // Deduplicate overlapping sync calls in same tab
+        // 2. Always revalidate in background so new adoption posts appear within ~1s
         if (inFlightSync) return inFlightSync;
 
         inFlightSync = (async () => {
           try {
-            // Stagger uncached public reads by 0–1200ms to prevent burst spikes
-            if (!forceFresh && !isCoordinatorActive()) {
-              await new Promise(r => setTimeout(r, Math.floor(Math.random() * 1200)));
-            }
-            const data = await fetchWithRetry(API_URL, {}, 2);
+            const fetchUrl = bypassServerCache ? `${API_URL}?fresh=1&t=${Date.now()}` : API_URL;
+            const data = await fetchWithRetry(fetchUrl, {}, 2);
             if (data && data.status === 'success') {
               writeLocalCache(data);
               applyDatabasePayload(data);
@@ -1324,6 +1320,13 @@
 
         return inFlightSync;
       };
+
+      // Re-sync automatically when a user returns to the browser tab
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          syncLiveDatabase(false);
+        }
+      });
 
       // ============================================================
       // COORDINATOR: DELETE / CLOSE PET LISTING
@@ -1646,7 +1649,7 @@
       }
 
       // ============================================================
-      // TAB SWITCHING LOGIC
+      // TAB SWITCHING LOGIC (Triggers fresh sync when opening Adopt/Funds)
       // ============================================================
       window.switchTab = function (tabId, btnEl) {
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
@@ -1661,6 +1664,10 @@
         btnEl.classList.add('active', 'text-pinkbrand-600', 'bg-pinkbrand-50');
         btnEl.classList.remove('text-stone-500');
         btnEl.querySelector('span').classList.replace('font-semibold', 'font-bold');
+
+        if (tabId === 'adopt' || tabId === 'funds') {
+          syncLiveDatabase(false);
+        }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
       };
@@ -1852,7 +1859,7 @@
       };
 
       // ============================================================
-      // PUBLIC: SOS RESCUE ALERT SUBMISSION (With Auto-Retry Queue)
+      // PUBLIC: SOS RESCUE ALERT SUBMISSION
       // ============================================================
       let compressedSosPhotoBase64 = null;
       let capturedCoords = null;
@@ -2111,7 +2118,7 @@
 
       // Boot
       checkOwnerAccessOnLoad();
-      syncLiveDatabase();
+      syncLiveDatabase(false);
     })();
   </script>
 </body>
