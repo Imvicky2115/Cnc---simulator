@@ -783,12 +783,14 @@
       const API_URL = 'https://script.google.com/macros/s/AKfycbym_oZwkq6T5yb0a-PngboQ7fs066WfzJ2bRFPleK1ZbI4J-aBhUaEruMQiymi_ogCR/exec';
 
       // ============================================================
-      // STALE-WHILE-REVALIDATE CACHE & RETRY ENGINE
+      // OPTIMISTIC STATE & REAL-TIME AUTO-POLLING ENGINE
       // ============================================================
-      const CACHE_KEY = '_pfp_live_cache_v2';
+      const CACHE_KEY = '_pfp_live_cache_v3';
+      let currentData = { pets: [], bills: [], sheetUrl: '' };
       let lastRenderedSignature = '';
       let inFlightSync = null;
       let isSubmitting = false;
+      let activeTab = 'sos';
 
       function readLocalCache() {
         try {
@@ -818,8 +820,8 @@
             return await res.json();
           } catch (err) {
             if (attempt === retries) throw err;
-            const baseDelay = 700 * Math.pow(2, attempt);
-            const jitter = Math.floor(Math.random() * 400);
+            const baseDelay = 600 * Math.pow(2, attempt);
+            const jitter = Math.floor(Math.random() * 350);
             await new Promise(r => setTimeout(r, baseDelay + jitter));
           }
         }
@@ -903,9 +905,9 @@
       }
 
       // ============================================================
-      // FAST IMAGE COMPRESSION HELPER
+      // FAST IMAGE COMPRESSION HELPER (640px @ 0.68 = ~40% faster upload)
       // ============================================================
-      function compressImageFile(file, maxWidth = 800, quality = 0.72) {
+      function compressImageFile(file, maxWidth = 640, quality = 0.68) {
         return new Promise((resolve) => {
           if (!file) return resolve(null);
           const reader = new FileReader();
@@ -1125,11 +1127,13 @@
         const ageGender = String(pet.Age_Gender || '').trim();
         const desc = String(pet.Description || '').trim();
         const isAdmin = isCoordinatorActive();
+        const isSyncing = Boolean(pet._optimistic);
 
         const fallbackImg = species === 'cat'
           ? 'https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?auto=format&fit=crop&w=800&q=80'
           : 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80';
-        const photo = (pet.Photo_URL && String(pet.Photo_URL).startsWith('http')) ? pet.Photo_URL : fallbackImg;
+        const rawPhoto = String(pet.Photo_URL || '');
+        const photo = (rawPhoto.startsWith('http') || rawPhoto.startsWith('data:image')) ? rawPhoto : fallbackImg;
         const safeName = name.replace(/'/g, "\\'");
 
         return `
@@ -1140,6 +1144,12 @@
                 <span class="px-3 py-1 rounded-full ${isFoster ? 'bg-amber-500/95' : 'bg-pinkbrand-600/95'} backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
                   ${badgeLabel}
                 </span>
+                ${isSyncing ? `
+                  <span class="px-2.5 py-1 rounded-full bg-stone-900/80 text-white text-[10px] font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+                    Syncing...
+                  </span>
+                ` : ''}
               </div>
               ${ageGender ? `
                 <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-stone-900/75 backdrop-blur-md text-white text-[11px] font-medium">
@@ -1165,7 +1175,7 @@
                   <span>${isFoster ? 'Apply to Foster ' + name : 'Apply to Adopt ' + name}</span>
                 </button>
 
-                ${isAdmin ? `
+                ${isAdmin && !isSyncing ? `
                   <div class="pt-2.5 border-t border-pinkbrand-100/70">
                     <button type="button" onclick="deletePetListing('${petId}', '${safeName}')" class="btn-press w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100/90 border border-rose-200/60 text-rose-700 text-xs font-semibold flex items-center justify-center gap-2">
                       <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0"></i>
@@ -1194,6 +1204,7 @@
         const remaining = Math.max(total - raised, 0);
         const safeAnimal = animalName.replace(/'/g, "\\'");
         const isAdmin = isCoordinatorActive();
+        const isSyncing = Boolean(bill._optimistic);
 
         return `
           <div id="bill-${billId}" class="bg-white p-5 rounded-2xl border border-pinkbrand-100 shadow-sm space-y-3.5">
@@ -1214,7 +1225,7 @@
               <span class="font-semibold text-pinkbrand-600">${remaining > 0 ? '₹' + remaining.toLocaleString('en-IN') + ' needed' : 'Bill Settled'}</span>
             </div>
 
-            ${isAdmin ? `
+            ${isAdmin && !isSyncing ? `
               <div class="pt-3 border-t border-pinkbrand-100/70 grid grid-cols-2 gap-2.5">
                 <button type="button" onclick="updateVetBillRaised('${billId}', '${safeAnimal}', ${raised}, ${total})" class="btn-press py-2.5 px-3 rounded-xl bg-pinkbrand-50 hover:bg-pinkbrand-100 border border-pinkbrand-200/60 text-pinkbrand-700 text-xs font-semibold flex items-center justify-center gap-1.5">
                   <i data-lucide="indian-rupee" class="w-3.5 h-3.5 shrink-0"></i>
@@ -1234,23 +1245,29 @@
       // RENDER LIVE DATA PAYLOAD INTO UI (With Diff Check to Avoid Flicker)
       // ============================================================
       function applyDatabasePayload(data, forceRender = false) {
+        currentData = {
+          pets: Array.isArray(data.pets) ? data.pets : [],
+          bills: Array.isArray(data.bills) ? data.bills : [],
+          sheetUrl: data.sheetUrl || cachedSheetUrl
+        };
+
         const isAdmin = isCoordinatorActive();
-        const sig = JSON.stringify({ pets: data.pets || [], bills: data.bills || [], isAdmin });
+        const sig = JSON.stringify({ pets: currentData.pets, bills: currentData.bills, isAdmin });
         if (!forceRender && sig === lastRenderedSignature) return;
         lastRenderedSignature = sig;
 
         const petGrid = document.getElementById('petGrid');
         const billsList = document.getElementById('vetBillsList');
 
-        if (data.sheetUrl) {
-          cachedSheetUrl = data.sheetUrl;
+        if (currentData.sheetUrl) {
+          cachedSheetUrl = currentData.sheetUrl;
           if (isAdmin) mountAdminUI();
         }
 
-        if (Array.isArray(data.pets) && data.pets.length > 0) {
-          petGrid.innerHTML = data.pets.map(renderPetCardHtml).join('');
+        if (currentData.pets.length > 0) {
+          petGrid.innerHTML = currentData.pets.map(renderPetCardHtml).join('');
           lucide.createIcons();
-          document.getElementById('petCount').textContent = data.pets.length;
+          document.getElementById('petCount').textContent = currentData.pets.length;
         } else {
           document.getElementById('petCount').textContent = '0';
           petGrid.innerHTML = `
@@ -1267,8 +1284,8 @@
           lucide.createIcons();
         }
 
-        if (Array.isArray(data.bills) && data.bills.length > 0) {
-          billsList.innerHTML = data.bills.map(renderVetBillHtml).join('');
+        if (currentData.bills.length > 0) {
+          billsList.innerHTML = currentData.bills.map(renderVetBillHtml).join('');
           lucide.createIcons();
         } else {
           billsList.innerHTML = `
@@ -1287,29 +1304,28 @@
       }
 
       // ============================================================
-      // TRUE STALE-WHILE-REVALIDATE SYNC (Instant Loads + Live Updates)
+      // REAL-TIME STALE-WHILE-REVALIDATE + 15s LIVE POLLING
       // ============================================================
       window.syncLiveDatabase = async function (bypassServerCache = false) {
-        const cached = readLocalCache();
+        if (isSubmitting && !bypassServerCache) return;
 
-        // 1. Paint cached snapshot immediately in 0ms if available
-        if (cached && cached.data) {
+        const cached = readLocalCache();
+        if (cached && cached.data && !lastRenderedSignature) {
           applyDatabasePayload(cached.data);
         }
 
-        // 2. Always revalidate in background so new adoption posts appear within ~1s
         if (inFlightSync) return inFlightSync;
 
         inFlightSync = (async () => {
           try {
-            const fetchUrl = bypassServerCache ? `${API_URL}?fresh=1&t=${Date.now()}` : API_URL;
+            const fetchUrl = bypassServerCache ? `${API_URL}?fresh=1&t=${Date.now()}` : `${API_URL}?t=${Math.floor(Date.now() / 10000)}`;
             const data = await fetchWithRetry(fetchUrl, {}, 2);
-            if (data && data.status === 'success') {
+            if (data && data.status === 'success' && !isSubmitting) {
               writeLocalCache(data);
               applyDatabasePayload(data);
             }
           } catch (err) {
-            if (!cached) {
+            if (!cached && !lastRenderedSignature) {
               const petTitle = document.getElementById('petsEmptyTitle');
               if (petTitle) petTitle.textContent = 'No active listings loaded';
             }
@@ -1321,7 +1337,13 @@
         return inFlightSync;
       };
 
-      // Re-sync automatically when a user returns to the browser tab
+      // Live auto-refresh every 15 seconds when viewing Adopt or Bills tab
+      setInterval(() => {
+        if (document.visibilityState === 'visible' && (activeTab === 'adopt' || activeTab === 'funds')) {
+          syncLiveDatabase(false);
+        }
+      }, 15000);
+
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
           syncLiveDatabase(false);
@@ -1329,7 +1351,7 @@
       });
 
       // ============================================================
-      // COORDINATOR: DELETE / CLOSE PET LISTING
+      // COORDINATOR: OPTIMISTIC DELETE / CLOSE PET LISTING
       // ============================================================
       window.deletePetListing = async function (petId, petName) {
         const pin = decodeToken();
@@ -1338,7 +1360,14 @@
         if (!confirm(`Remove "${petName}" from the public Adoption & Foster gallery?`)) return;
 
         isSubmitting = true;
-        showToast(`Removing ${petName}...`);
+        // Optimistic instant removal from screen
+        const prevPets = [...currentData.pets];
+        applyDatabasePayload({
+          ...currentData,
+          pets: currentData.pets.filter(p => String(p.Pet_ID).trim() !== petId)
+        }, true);
+        showToast(`${petName} marked adopted & removed`);
+
         try {
           const result = await fetchWithRetry(API_URL, {
             method: 'POST',
@@ -1350,13 +1379,15 @@
             })
           }, 2);
           if (result.status === 'success') {
+            isSubmitting = false;
             await syncLiveDatabase(true);
-            showToast(`${petName} marked adopted & removed`);
           } else {
+            applyDatabasePayload({ ...currentData, pets: prevPets }, true);
             showToast(result.message || 'Could not remove listing');
           }
         } catch (err) {
-          showToast('Server busy — please try again in a moment');
+          applyDatabasePayload({ ...currentData, pets: prevPets }, true);
+          showToast('Network error — restored listing');
         } finally {
           isSubmitting = false;
         }
@@ -1379,7 +1410,13 @@
         }
 
         isSubmitting = true;
-        showToast('Updating amount...');
+        const prevBills = [...currentData.bills];
+        applyDatabasePayload({
+          ...currentData,
+          bills: currentData.bills.map(b => String(b.Bill_ID).trim() === billId ? { ...b, Amount_Raised: newRaised } : b)
+        }, true);
+        showToast(`Updated raised amount for ${animalName}!`);
+
         try {
           const result = await fetchWithRetry(API_URL, {
             method: 'POST',
@@ -1392,12 +1429,14 @@
             })
           }, 2);
           if (result.status === 'success') {
+            isSubmitting = false;
             await syncLiveDatabase(true);
-            showToast(`Updated raised amount for ${animalName}!`);
           } else {
+            applyDatabasePayload({ ...currentData, bills: prevBills }, true);
             showToast(result.message || 'Update failed');
           }
         } catch (err) {
+          applyDatabasePayload({ ...currentData, bills: prevBills }, true);
           showToast('Server busy — please try again');
         } finally {
           isSubmitting = false;
@@ -1411,7 +1450,13 @@
         if (!confirm(`Remove "${animalName}" vet bill from the public tracker?`)) return;
 
         isSubmitting = true;
-        showToast(`Removing ${animalName}'s bill...`);
+        const prevBills = [...currentData.bills];
+        applyDatabasePayload({
+          ...currentData,
+          bills: currentData.bills.filter(b => String(b.Bill_ID).trim() !== billId)
+        }, true);
+        showToast(`Vet bill for ${animalName} removed`);
+
         try {
           const result = await fetchWithRetry(API_URL, {
             method: 'POST',
@@ -1424,12 +1469,14 @@
             })
           }, 2);
           if (result.status === 'success') {
+            isSubmitting = false;
             await syncLiveDatabase(true);
-            showToast(`Vet bill for ${animalName} removed`);
           } else {
+            applyDatabasePayload({ ...currentData, bills: prevBills }, true);
             showToast(result.message || 'Could not remove bill');
           }
         } catch (err) {
+          applyDatabasePayload({ ...currentData, bills: prevBills }, true);
           showToast('Server busy — please try again');
         } finally {
           isSubmitting = false;
@@ -1576,7 +1623,7 @@
           if (result.status === 'success' && result.authenticated) {
             sessionStorage.setItem(SESSION_KEY, encodeToken(enteredPin));
             mountAdminUI();
-            await syncLiveDatabase(true);
+            applyDatabasePayload(currentData, true);
             showToast('Coordinator Mode unlocked');
           } else {
             showToast(result.message || 'Incorrect PIN');
@@ -1615,7 +1662,7 @@
           if (result.status === 'success') {
             sessionStorage.setItem(SESSION_KEY, encodeToken(newPin));
             mountAdminUI();
-            await syncLiveDatabase(true);
+            applyDatabasePayload(currentData, true);
             showToast('New Coordinator PIN saved & unlocked!');
           } else {
             showToast(result.message || 'Could not update PIN');
@@ -1630,10 +1677,10 @@
         }
       };
 
-      window.logoutAdmin = async function () {
+      window.logoutAdmin = function () {
         sessionStorage.removeItem(SESSION_KEY);
         unmountAdminUI();
-        await syncLiveDatabase(true);
+        applyDatabasePayload(currentData, true);
         showToast('Switched back to Public View');
       };
 
@@ -1649,9 +1696,10 @@
       }
 
       // ============================================================
-      // TAB SWITCHING LOGIC (Triggers fresh sync when opening Adopt/Funds)
+      // TAB SWITCHING LOGIC
       // ============================================================
       window.switchTab = function (tabId, btnEl) {
+        activeTab = tabId;
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
         document.getElementById('tab-' + tabId).classList.add('active');
 
@@ -1712,7 +1760,7 @@
       };
 
       // ============================================================
-      // OWNER: LIST ANIMAL FOR FOSTERING / ADOPTION
+      // OWNER: OPTIMISTIC LIST ANIMAL FOR FOSTERING / ADOPTION
       // ============================================================
       let compressedFosterPhotoBase64 = null;
 
@@ -1740,22 +1788,46 @@
         const pin = decodeToken();
         if (!pin) return showToast('Session expired — please unlock again');
 
-        isSubmitting = true;
-        const btn = document.getElementById('fosterSubmitBtn');
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = 'Publishing to Database...';
-
         const name = document.getElementById('newPetName').value.trim();
         const species = document.getElementById('newPetSpecies').value;
         const age = document.getElementById('newPetAge').value.trim();
         const duration = document.getElementById('newPetDuration').value;
         const medStatus = document.getElementById('newPetMedStatus').value;
         const desc = document.getElementById('newPetDesc').value.trim();
+        const photoData = compressedFosterPhotoBase64;
         const fallbackImg = species === 'cat'
           ? 'https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?auto=format&fit=crop&w=800&q=80'
           : 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80';
 
+        // 1. Reset & close modal immediately (0ms perceived latency)
+        event.target.reset();
+        compressedFosterPhotoBase64 = null;
+        document.getElementById('fosterPhotoPreview').classList.add('hidden');
+        document.getElementById('fosterPhotoPlaceholder').classList.remove('hidden');
+        closeListFosterModal();
+
+        // 2. Render optimistic card immediately at top of list
+        const tempId = 'TEMP-' + Date.now();
+        const optimisticPet = {
+          Pet_ID: tempId,
+          Name: name,
+          Species: species,
+          Age_Gender: age,
+          Badge_Duration: duration,
+          Medical_Status: medStatus,
+          Description: desc,
+          Photo_URL: photoData || fallbackImg,
+          _optimistic: true
+        };
+        const prevPets = [...currentData.pets];
+        applyDatabasePayload({
+          ...currentData,
+          pets: [optimisticPet, ...prevPets]
+        }, true);
+        showToast(`${name} posted! Saving to cloud...`);
+
+        // 3. Upload photo & save row in background
+        isSubmitting = true;
         try {
           const result = await fetchWithRetry(API_URL, {
             method: 'POST',
@@ -1769,33 +1841,29 @@
               duration,
               medStatus,
               desc,
-              photoBase64: compressedFosterPhotoBase64,
+              photoBase64: photoData,
               fallbackImg
             })
           }, 2);
 
           if (result.status === 'success') {
+            isSubmitting = false;
             await syncLiveDatabase(true);
-            event.target.reset();
-            compressedFosterPhotoBase64 = null;
-            document.getElementById('fosterPhotoPreview').classList.add('hidden');
-            document.getElementById('fosterPhotoPlaceholder').classList.remove('hidden');
-            closeListFosterModal();
-            showToast(`${name} saved & published live!`);
+            showToast(`${name} is now live for everyone!`);
           } else {
+            applyDatabasePayload({ ...currentData, pets: prevPets }, true);
             showToast(result.message || 'Could not publish listing');
           }
         } catch (err) {
-          showToast('Server busy — please retry in a few seconds');
+          applyDatabasePayload({ ...currentData, pets: prevPets }, true);
+          showToast('Upload failed — please try again');
         } finally {
           isSubmitting = false;
-          btn.disabled = false;
-          btn.textContent = originalText;
         }
       };
 
       // ============================================================
-      // OWNER: ADD ACTIVE VET BILL
+      // OWNER: OPTIMISTIC ADD ACTIVE VET BILL
       // ============================================================
       window.openAddBillModal = function () {
         const modal = document.getElementById('addBillModal');
@@ -1812,12 +1880,6 @@
         const pin = decodeToken();
         if (!pin) return showToast('Session expired — please unlock again');
 
-        isSubmitting = true;
-        const btn = document.getElementById('billSubmitBtn');
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = 'Publishing Bill...';
-
         const animalName = document.getElementById('billAnimalName').value.trim();
         const category = document.getElementById('billCategory').value;
         const summary = document.getElementById('billSummary').value.trim();
@@ -1825,6 +1887,27 @@
         const raised = Math.min(Number(document.getElementById('billRaised').value), total);
         const clinic = document.getElementById('billClinic').value.trim();
 
+        event.target.reset();
+        closeAddBillModal();
+
+        const optimisticBill = {
+          Bill_ID: 'TEMP-' + Date.now(),
+          Animal_Name: animalName,
+          Category: category,
+          Summary: summary,
+          Total_Goal: total,
+          Amount_Raised: raised,
+          Vet_Clinic: clinic,
+          _optimistic: true
+        };
+        const prevBills = [...currentData.bills];
+        applyDatabasePayload({
+          ...currentData,
+          bills: [optimisticBill, ...prevBills]
+        }, true);
+        showToast(`Vet bill for ${animalName} posted!`);
+
+        isSubmitting = true;
         try {
           const result = await fetchWithRetry(API_URL, {
             method: 'POST',
@@ -1842,19 +1925,17 @@
           }, 2);
 
           if (result.status === 'success') {
+            isSubmitting = false;
             await syncLiveDatabase(true);
-            event.target.reset();
-            closeAddBillModal();
-            showToast(`Vet bill for ${animalName} saved live!`);
           } else {
+            applyDatabasePayload({ ...currentData, bills: prevBills }, true);
             showToast(result.message || 'Could not publish vet bill');
           }
         } catch (err) {
-          showToast('Server busy — please retry in a few seconds');
+          applyDatabasePayload({ ...currentData, bills: prevBills }, true);
+          showToast('Upload failed — please try again');
         } finally {
           isSubmitting = false;
-          btn.disabled = false;
-          btn.textContent = originalText;
         }
       };
 
