@@ -783,9 +783,9 @@
       const API_URL = 'https://script.google.com/macros/s/AKfycbym_oZwkq6T5yb0a-PngboQ7fs066WfzJ2bRFPleK1ZbI4J-aBhUaEruMQiymi_ogCR/exec';
 
       // ============================================================
-      // OPTIMISTIC STATE & REAL-TIME AUTO-POLLING ENGINE
+      // OPTIMISTIC STATE & 4-SECOND LIVE POLLING ENGINE
       // ============================================================
-      const CACHE_KEY = '_pfp_live_cache_v3';
+      const CACHE_KEY = '_pfp_live_cache_v4';
       let currentData = { pets: [], bills: [], sheetUrl: '' };
       let lastRenderedSignature = '';
       let inFlightSync = null;
@@ -820,8 +820,8 @@
             return await res.json();
           } catch (err) {
             if (attempt === retries) throw err;
-            const baseDelay = 600 * Math.pow(2, attempt);
-            const jitter = Math.floor(Math.random() * 350);
+            const baseDelay = 550 * Math.pow(2, attempt);
+            const jitter = Math.floor(Math.random() * 300);
             await new Promise(r => setTimeout(r, baseDelay + jitter));
           }
         }
@@ -905,7 +905,7 @@
       }
 
       // ============================================================
-      // FAST IMAGE COMPRESSION HELPER (640px @ 0.68 = ~40% faster upload)
+      // FAST IMAGE COMPRESSION HELPER
       // ============================================================
       function compressImageFile(file, maxWidth = 640, quality = 0.68) {
         return new Promise((resolve) => {
@@ -1304,7 +1304,7 @@
       }
 
       // ============================================================
-      // REAL-TIME STALE-WHILE-REVALIDATE + 15s LIVE POLLING
+      // REAL-TIME STALE-WHILE-REVALIDATE + 4s LIVE POLLING (NO-STORE)
       // ============================================================
       window.syncLiveDatabase = async function (bypassServerCache = false) {
         if (isSubmitting && !bypassServerCache) return;
@@ -1318,8 +1318,10 @@
 
         inFlightSync = (async () => {
           try {
-            const fetchUrl = bypassServerCache ? `${API_URL}?fresh=1&t=${Date.now()}` : `${API_URL}?t=${Math.floor(Date.now() / 10000)}`;
-            const data = await fetchWithRetry(fetchUrl, {}, 2);
+            const fetchUrl = bypassServerCache
+              ? `${API_URL}?fresh=1&t=${Date.now()}`
+              : `${API_URL}?t=${Date.now()}`;
+            const data = await fetchWithRetry(fetchUrl, { cache: 'no-store' }, 2);
             if (data && data.status === 'success' && !isSubmitting) {
               writeLocalCache(data);
               applyDatabasePayload(data);
@@ -1337,12 +1339,12 @@
         return inFlightSync;
       };
 
-      // Live auto-refresh every 15 seconds when viewing Adopt or Bills tab
+      // Live auto-refresh every 4 seconds when viewing Adopt or Bills tab
       setInterval(() => {
         if (document.visibilityState === 'visible' && (activeTab === 'adopt' || activeTab === 'funds')) {
           syncLiveDatabase(false);
         }
-      }, 15000);
+      }, 4000);
 
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
@@ -1360,12 +1362,12 @@
         if (!confirm(`Remove "${petName}" from the public Adoption & Foster gallery?`)) return;
 
         isSubmitting = true;
-        // Optimistic instant removal from screen
         const prevPets = [...currentData.pets];
-        applyDatabasePayload({
-          ...currentData,
-          pets: currentData.pets.filter(p => String(p.Pet_ID).trim() !== petId)
-        }, true);
+        const nextPets = currentData.pets.filter(p => String(p.Pet_ID).trim() !== petId);
+        const optimisticData = { ...currentData, pets: nextPets };
+
+        writeLocalCache(optimisticData);
+        applyDatabasePayload(optimisticData, true);
         showToast(`${petName} marked adopted & removed`);
 
         try {
@@ -1411,10 +1413,12 @@
 
         isSubmitting = true;
         const prevBills = [...currentData.bills];
-        applyDatabasePayload({
+        const optimisticData = {
           ...currentData,
           bills: currentData.bills.map(b => String(b.Bill_ID).trim() === billId ? { ...b, Amount_Raised: newRaised } : b)
-        }, true);
+        };
+        writeLocalCache(optimisticData);
+        applyDatabasePayload(optimisticData, true);
         showToast(`Updated raised amount for ${animalName}!`);
 
         try {
@@ -1451,10 +1455,12 @@
 
         isSubmitting = true;
         const prevBills = [...currentData.bills];
-        applyDatabasePayload({
+        const optimisticData = {
           ...currentData,
           bills: currentData.bills.filter(b => String(b.Bill_ID).trim() !== billId)
-        }, true);
+        };
+        writeLocalCache(optimisticData);
+        applyDatabasePayload(optimisticData, true);
         showToast(`Vet bill for ${animalName} removed`);
 
         try {
@@ -1799,14 +1805,12 @@
           ? 'https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?auto=format&fit=crop&w=800&q=80'
           : 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80';
 
-        // 1. Reset & close modal immediately (0ms perceived latency)
         event.target.reset();
         compressedFosterPhotoBase64 = null;
         document.getElementById('fosterPhotoPreview').classList.add('hidden');
         document.getElementById('fosterPhotoPlaceholder').classList.remove('hidden');
         closeListFosterModal();
 
-        // 2. Render optimistic card immediately at top of list
         const tempId = 'TEMP-' + Date.now();
         const optimisticPet = {
           Pet_ID: tempId,
@@ -1826,7 +1830,6 @@
         }, true);
         showToast(`${name} posted! Saving to cloud...`);
 
-        // 3. Upload photo & save row in background
         isSubmitting = true;
         try {
           const result = await fetchWithRetry(API_URL, {
