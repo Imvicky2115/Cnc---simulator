@@ -255,7 +255,7 @@
         </div>
       </div>
 
-      <!-- Dynamic Coordinator Banner Mount Point (Empty in DOM until unlocked) -->
+      <!-- Dynamic Coordinator Banner Mount Point -->
       <div id="adminBannerMount"></div>
 
     </header>
@@ -566,7 +566,7 @@
       </div>
     </nav>
 
-    <!-- Dynamic Coordinator Modals Mount Point (Empty until unlocked) -->
+    <!-- Dynamic Coordinator Modals Mount Point -->
     <div id="adminModalsMount"></div>
 
     <!-- ========================================== -->
@@ -783,7 +783,52 @@
       const API_URL = 'https://script.google.com/macros/s/AKfycbz3gszGvaErJ9zQDXp6k3bqUD2VaJ-cjB83CwcEPIWQOWrbSEVxktEglCP2nGAVs5UxqQ/exec';
 
       // ============================================================
-      // ANTI-INSPECT & TAMPER DETERRENTS (No backend changes)
+      // HIGH-CONCURRENCY CACHE & RETRY ENGINE (No backend changes)
+      // ============================================================
+      const CACHE_KEY = '_pfp_live_cache_v1';
+      const CACHE_TTL_MS = 3 * 60 * 1000; // 3-minute local read cache to absorb traffic spikes
+      let inFlightSync = null;
+      let isSubmitting = false;
+
+      function readLocalCache() {
+        try {
+          const raw = localStorage.getItem(CACHE_KEY);
+          if (!raw) return null;
+          const parsed = JSON.parse(raw);
+          if (!parsed || !parsed.data) return null;
+          return parsed;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function writeLocalCache(data) {
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify({
+            ts: Date.now(),
+            data: data
+          }));
+        } catch (e) {}
+      }
+
+      async function fetchWithRetry(url, options = {}, retries = 3) {
+        for (let attempt = 0; attempt <= retries; attempt++) {
+          try {
+            const res = await fetch(url, options);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return await res.json();
+          } catch (err) {
+            if (attempt === retries) throw err;
+            // Exponential backoff with random jitter to prevent thundering herd
+            const baseDelay = 750 * Math.pow(2, attempt);
+            const jitter = Math.floor(Math.random() * 450);
+            await new Promise(r => setTimeout(r, baseDelay + jitter));
+          }
+        }
+      }
+
+      // ============================================================
+      // ANTI-INSPECT & TAMPER DETERRENTS
       // ============================================================
       document.addEventListener('contextmenu', function (e) {
         if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
@@ -833,7 +878,6 @@
             sessionStorage.removeItem(SESSION_KEY);
             return null;
           }
-          // Refresh rolling expiry on active usage
           sessionStorage.setItem(SESSION_KEY, encodeToken(obj.p));
           return String(obj.p).trim();
         } catch (e) {
@@ -861,9 +905,9 @@
       }
 
       // ============================================================
-      // IMAGE COMPRESSION HELPER
+      // FAST IMAGE COMPRESSION HELPER (Smaller payload = faster queue)
       // ============================================================
-      function compressImageFile(file, maxWidth = 900, quality = 0.78) {
+      function compressImageFile(file, maxWidth = 800, quality = 0.72) {
         return new Promise((resolve) => {
           if (!file) return resolve(null);
           const reader = new FileReader();
@@ -893,7 +937,6 @@
       // DYNAMICALLY INJECT / REMOVE COORDINATOR DOM ELEMENTS
       // ============================================================
       function mountAdminUI() {
-        // 1. Inject Top Coordinator Banner
         const bannerMount = document.getElementById('adminBannerMount');
         bannerMount.innerHTML = `
           <div class="bg-pinkbrand-700 text-white px-5 py-2 text-[11px] font-medium flex items-center justify-between gap-2">
@@ -909,7 +952,6 @@
           </div>
         `;
 
-        // 2. Inject "+ List Animal" & "+ Add Vet Bill" CTAs
         document.getElementById('adoptAdminCtaMount').innerHTML = `
           <button type="button" onclick="openListFosterModal()" class="btn-press inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-xs shadow-md shadow-pinkbrand-600/20 shrink-0">
             <i data-lucide="plus-circle" class="w-4 h-4"></i>
@@ -924,9 +966,7 @@
           </button>
         `;
 
-        // 3. Inject Listing & Vet Bill Modals into DOM only when authenticated
         document.getElementById('adminModalsMount').innerHTML = `
-          <!-- MODAL: LIST ANIMAL FOR FOSTERING / ADOPTION -->
           <div id="listFosterModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeListFosterModal()">
             <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
               <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
@@ -1005,7 +1045,6 @@
             </div>
           </div>
 
-          <!-- MODAL: ADD ACTIVE VET BILL -->
           <div id="addBillModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeAddBillModal()">
             <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
               <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
@@ -1075,7 +1114,7 @@
       }
 
       // ============================================================
-      // RENDER PET CARD HTML (Balanced, Full-Width Mark Adopted Bar)
+      // RENDER PET CARD HTML
       // ============================================================
       function renderPetCardHtml(pet) {
         const petId = String(pet.Pet_ID || '').trim();
@@ -1098,7 +1137,7 @@
         return `
           <article id="card-${petId}" data-category="${categoryAttr}" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
             <div class="relative h-52 bg-pinkbrand-50">
-              <img src="${photo}" alt="${name}" class="w-full h-full object-cover" />
+              <img src="${photo}" alt="${name}" loading="lazy" class="w-full h-full object-cover" />
               <div class="absolute top-3 left-3 flex gap-1.5">
                 <span class="px-3 py-1 rounded-full ${isFoster ? 'bg-amber-500/95' : 'bg-pinkbrand-600/95'} backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
                   ${badgeLabel}
@@ -1110,7 +1149,7 @@
                 </div>
               ` : ''}
             </div>
-            <div class="p-4.5 p-5 space-y-4">
+            <div class="p-5 space-y-4">
               <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
                   <h3 class="font-display font-bold text-base text-stone-900 leading-snug">${name}</h3>
@@ -1159,7 +1198,7 @@
         const isAdmin = isCoordinatorActive();
 
         return `
-          <div id="bill-${billId}" class="bg-white p-4.5 p-5 rounded-2xl border border-pinkbrand-100 shadow-sm space-y-3.5">
+          <div id="bill-${billId}" class="bg-white p-5 rounded-2xl border border-pinkbrand-100 shadow-sm space-y-3.5">
             <div class="flex items-start justify-between gap-2">
               <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2 py-0.5 rounded-md">${category}</span>
@@ -1194,63 +1233,96 @@
       }
 
       // ============================================================
-      // FETCH LIVE PETS & VET BILLS FROM GOOGLE SHEETS
+      // RENDER LIVE DATA PAYLOAD INTO UI
       // ============================================================
-      window.syncLiveDatabase = async function () {
+      function applyDatabasePayload(data) {
         const petGrid = document.getElementById('petGrid');
         const billsList = document.getElementById('vetBillsList');
 
-        try {
-          const res = await fetch(API_URL);
-          const data = await res.json();
-          if (data.status !== 'success') throw new Error('Sync failed');
-
-          if (data.sheetUrl) {
-            cachedSheetUrl = data.sheetUrl;
-            if (isCoordinatorActive()) mountAdminUI();
-          }
-
-          if (Array.isArray(data.pets) && data.pets.length > 0) {
-            petGrid.innerHTML = data.pets.map(renderPetCardHtml).join('');
-            lucide.createIcons();
-            document.getElementById('petCount').textContent = data.pets.length;
-          } else {
-            document.getElementById('petCount').textContent = '0';
-            petGrid.innerHTML = `
-              <div id="petsEmptyState" class="bg-white rounded-3xl border border-pinkbrand-100 p-8 text-center space-y-2.5">
-                <div class="w-12 h-12 rounded-2xl bg-pinkbrand-50 text-pinkbrand-600 flex items-center justify-center mx-auto">
-                  <i data-lucide="paw-print" class="w-6 h-6"></i>
-                </div>
-                <h3 class="font-display font-bold text-sm text-stone-800">No active foster or adoption listings right now</h3>
-                <p class="text-xs text-stone-500 max-w-xs mx-auto leading-relaxed">
-                  Check back soon! New rescued cats and dogs will appear here as soon as they are cleared by our vets.
-                </p>
-              </div>
-            `;
-            lucide.createIcons();
-          }
-
-          if (Array.isArray(data.bills) && data.bills.length > 0) {
-            billsList.innerHTML = data.bills.map(renderVetBillHtml).join('');
-            lucide.createIcons();
-          } else {
-            billsList.innerHTML = `
-              <div id="billsEmptyState" class="bg-white rounded-2xl border border-pinkbrand-100 p-6 text-center space-y-2">
-                <div class="w-10 h-10 rounded-xl bg-pinkbrand-50 text-pinkbrand-600 flex items-center justify-center mx-auto">
-                  <i data-lucide="file-heart" class="w-5 h-5"></i>
-                </div>
-                <h4 class="font-display font-bold text-xs text-stone-800">No pending vet bills listed right now</h4>
-                <p class="text-[11px] text-stone-500 leading-relaxed">
-                  You can still support daily shelter feeding and emergency medicines via the UPI QR code above.
-                </p>
-              </div>
-            `;
-            lucide.createIcons();
-          }
-        } catch (err) {
-          const petTitle = document.getElementById('petsEmptyTitle');
-          if (petTitle) petTitle.textContent = 'No active listings loaded';
+        if (data.sheetUrl) {
+          cachedSheetUrl = data.sheetUrl;
+          if (isCoordinatorActive()) mountAdminUI();
         }
+
+        if (Array.isArray(data.pets) && data.pets.length > 0) {
+          petGrid.innerHTML = data.pets.map(renderPetCardHtml).join('');
+          lucide.createIcons();
+          document.getElementById('petCount').textContent = data.pets.length;
+        } else {
+          document.getElementById('petCount').textContent = '0';
+          petGrid.innerHTML = `
+            <div id="petsEmptyState" class="bg-white rounded-3xl border border-pinkbrand-100 p-8 text-center space-y-2.5">
+              <div class="w-12 h-12 rounded-2xl bg-pinkbrand-50 text-pinkbrand-600 flex items-center justify-center mx-auto">
+                <i data-lucide="paw-print" class="w-6 h-6"></i>
+              </div>
+              <h3 class="font-display font-bold text-sm text-stone-800">No active foster or adoption listings right now</h3>
+              <p class="text-xs text-stone-500 max-w-xs mx-auto leading-relaxed">
+                Check back soon! New rescued cats and dogs will appear here as soon as they are cleared by our vets.
+              </p>
+            </div>
+          `;
+          lucide.createIcons();
+        }
+
+        if (Array.isArray(data.bills) && data.bills.length > 0) {
+          billsList.innerHTML = data.bills.map(renderVetBillHtml).join('');
+          lucide.createIcons();
+        } else {
+          billsList.innerHTML = `
+            <div id="billsEmptyState" class="bg-white rounded-2xl border border-pinkbrand-100 p-6 text-center space-y-2">
+              <div class="w-10 h-10 rounded-xl bg-pinkbrand-50 text-pinkbrand-600 flex items-center justify-center mx-auto">
+                <i data-lucide="file-heart" class="w-5 h-5"></i>
+              </div>
+              <h4 class="font-display font-bold text-xs text-stone-800">No pending vet bills listed right now</h4>
+              <p class="text-[11px] text-stone-500 leading-relaxed">
+                You can still support daily shelter feeding and emergency medicines via the UPI QR code above.
+              </p>
+            </div>
+          `;
+          lucide.createIcons();
+        }
+      }
+
+      // ============================================================
+      // STALE-WHILE-REVALIDATE SYNC (Protects Apps Script under heavy traffic)
+      // ============================================================
+      window.syncLiveDatabase = async function (forceFresh = false) {
+        const cached = readLocalCache();
+        const isCacheFresh = cached && (Date.now() - cached.ts < CACHE_TTL_MS);
+
+        // Render cached snapshot immediately for zero-latency UX
+        if (cached && cached.data) {
+          applyDatabasePayload(cached.data);
+          if (isCacheFresh && !forceFresh && !isCoordinatorActive()) {
+            return; // Skip network call when fresh cache exists
+          }
+        }
+
+        // Deduplicate overlapping sync calls in same tab
+        if (inFlightSync) return inFlightSync;
+
+        inFlightSync = (async () => {
+          try {
+            // Stagger uncached public reads by 0–1200ms to prevent burst spikes
+            if (!forceFresh && !isCoordinatorActive()) {
+              await new Promise(r => setTimeout(r, Math.floor(Math.random() * 1200)));
+            }
+            const data = await fetchWithRetry(API_URL, {}, 2);
+            if (data && data.status === 'success') {
+              writeLocalCache(data);
+              applyDatabasePayload(data);
+            }
+          } catch (err) {
+            if (!cached) {
+              const petTitle = document.getElementById('petsEmptyTitle');
+              if (petTitle) petTitle.textContent = 'No active listings loaded';
+            }
+          } finally {
+            inFlightSync = null;
+          }
+        })();
+
+        return inFlightSync;
       };
 
       // ============================================================
@@ -1259,11 +1331,13 @@
       window.deletePetListing = async function (petId, petName) {
         const pin = decodeToken();
         if (!pin) return showToast('Session expired — please unlock again');
+        if (isSubmitting) return;
         if (!confirm(`Remove "${petName}" from the public Adoption & Foster gallery?`)) return;
 
+        isSubmitting = true;
         showToast(`Removing ${petName}...`);
         try {
-          const res = await fetch(API_URL, {
+          const result = await fetchWithRetry(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
@@ -1271,16 +1345,17 @@
               pin: pin,
               petId: petId
             })
-          });
-          const result = await res.json();
+          }, 2);
           if (result.status === 'success') {
-            await syncLiveDatabase();
+            await syncLiveDatabase(true);
             showToast(`${petName} marked adopted & removed`);
           } else {
             showToast(result.message || 'Could not remove listing');
           }
         } catch (err) {
-          showToast('Network error removing listing');
+          showToast('Server busy — please try again in a moment');
+        } finally {
+          isSubmitting = false;
         }
       };
 
@@ -1290,6 +1365,7 @@
       window.updateVetBillRaised = async function (billId, animalName, currentRaised, totalGoal) {
         const pin = decodeToken();
         if (!pin) return showToast('Session expired — please unlock again');
+        if (isSubmitting) return;
 
         const input = prompt(`Enter total amount raised so far for ${animalName} (Goal: ₹${totalGoal}):`, currentRaised);
         if (input === null) return;
@@ -1299,9 +1375,10 @@
           return;
         }
 
+        isSubmitting = true;
         showToast('Updating amount...');
         try {
-          const res = await fetch(API_URL, {
+          const result = await fetchWithRetry(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
@@ -1310,27 +1387,30 @@
               billId: billId,
               raised: newRaised
             })
-          });
-          const result = await res.json();
+          }, 2);
           if (result.status === 'success') {
-            await syncLiveDatabase();
+            await syncLiveDatabase(true);
             showToast(`Updated raised amount for ${animalName}!`);
           } else {
             showToast(result.message || 'Update failed');
           }
         } catch (err) {
-          showToast('Network error updating vet bill');
+          showToast('Server busy — please try again');
+        } finally {
+          isSubmitting = false;
         }
       };
 
       window.deleteVetBill = async function (billId, animalName) {
         const pin = decodeToken();
         if (!pin) return showToast('Session expired — please unlock again');
+        if (isSubmitting) return;
         if (!confirm(`Remove "${animalName}" vet bill from the public tracker?`)) return;
 
+        isSubmitting = true;
         showToast(`Removing ${animalName}'s bill...`);
         try {
-          const res = await fetch(API_URL, {
+          const result = await fetchWithRetry(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
@@ -1339,16 +1419,17 @@
               billId: billId,
               newStatus: 'Hidden'
             })
-          });
-          const result = await res.json();
+          }, 2);
           if (result.status === 'success') {
-            await syncLiveDatabase();
+            await syncLiveDatabase(true);
             showToast(`Vet bill for ${animalName} removed`);
           } else {
             showToast(result.message || 'Could not remove bill');
           }
         } catch (err) {
-          showToast('Network error removing bill');
+          showToast('Server busy — please try again');
+        } finally {
+          isSubmitting = false;
         }
       };
 
@@ -1483,17 +1564,16 @@
         btn.textContent = 'Verifying...';
 
         try {
-          const res = await fetch(API_URL, {
+          const result = await fetchWithRetry(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'VERIFY_PIN', pin: enteredPin })
-          });
-          const result = await res.json();
+          }, 2);
 
           if (result.status === 'success' && result.authenticated) {
             sessionStorage.setItem(SESSION_KEY, encodeToken(enteredPin));
             mountAdminUI();
-            await syncLiveDatabase();
+            await syncLiveDatabase(true);
             showToast('Coordinator Mode unlocked');
           } else {
             showToast(result.message || 'Incorrect PIN');
@@ -1518,7 +1598,7 @@
         btn.textContent = 'Saving PIN...';
 
         try {
-          const res = await fetch(API_URL, {
+          const result = await fetchWithRetry(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
@@ -1527,13 +1607,12 @@
               newPin: newPin,
               pin: newPin
             })
-          });
-          const result = await res.json();
+          }, 2);
 
           if (result.status === 'success') {
             sessionStorage.setItem(SESSION_KEY, encodeToken(newPin));
             mountAdminUI();
-            await syncLiveDatabase();
+            await syncLiveDatabase(true);
             showToast('New Coordinator PIN saved & unlocked!');
           } else {
             showToast(result.message || 'Could not update PIN');
@@ -1551,7 +1630,7 @@
       window.logoutAdmin = async function () {
         sessionStorage.removeItem(SESSION_KEY);
         unmountAdminUI();
-        await syncLiveDatabase();
+        await syncLiveDatabase(true);
         showToast('Switched back to Public View');
       };
 
@@ -1650,9 +1729,11 @@
 
       window.handleAddFosterListing = async function (event) {
         event.preventDefault();
+        if (isSubmitting) return;
         const pin = decodeToken();
         if (!pin) return showToast('Session expired — please unlock again');
 
+        isSubmitting = true;
         const btn = document.getElementById('fosterSubmitBtn');
         const originalText = btn.textContent;
         btn.disabled = true;
@@ -1669,7 +1750,7 @@
           : 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80';
 
         try {
-          const res = await fetch(API_URL, {
+          const result = await fetchWithRetry(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
@@ -1684,11 +1765,10 @@
               photoBase64: compressedFosterPhotoBase64,
               fallbackImg
             })
-          });
-          const result = await res.json();
+          }, 2);
 
           if (result.status === 'success') {
-            await syncLiveDatabase();
+            await syncLiveDatabase(true);
             event.target.reset();
             compressedFosterPhotoBase64 = null;
             document.getElementById('fosterPhotoPreview').classList.add('hidden');
@@ -1699,8 +1779,9 @@
             showToast(result.message || 'Could not publish listing');
           }
         } catch (err) {
-          showToast('Network error saving listing');
+          showToast('Server busy — please retry in a few seconds');
         } finally {
+          isSubmitting = false;
           btn.disabled = false;
           btn.textContent = originalText;
         }
@@ -1720,9 +1801,11 @@
 
       window.handleAddVetBill = async function (event) {
         event.preventDefault();
+        if (isSubmitting) return;
         const pin = decodeToken();
         if (!pin) return showToast('Session expired — please unlock again');
 
+        isSubmitting = true;
         const btn = document.getElementById('billSubmitBtn');
         const originalText = btn.textContent;
         btn.disabled = true;
@@ -1736,7 +1819,7 @@
         const clinic = document.getElementById('billClinic').value.trim();
 
         try {
-          const res = await fetch(API_URL, {
+          const result = await fetchWithRetry(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
@@ -1749,11 +1832,10 @@
               raised,
               clinic
             })
-          });
-          const result = await res.json();
+          }, 2);
 
           if (result.status === 'success') {
-            await syncLiveDatabase();
+            await syncLiveDatabase(true);
             event.target.reset();
             closeAddBillModal();
             showToast(`Vet bill for ${animalName} saved live!`);
@@ -1761,15 +1843,16 @@
             showToast(result.message || 'Could not publish vet bill');
           }
         } catch (err) {
-          showToast('Network error saving vet bill');
+          showToast('Server busy — please retry in a few seconds');
         } finally {
+          isSubmitting = false;
           btn.disabled = false;
           btn.textContent = originalText;
         }
       };
 
       // ============================================================
-      // PUBLIC: SOS RESCUE ALERT SUBMISSION
+      // PUBLIC: SOS RESCUE ALERT SUBMISSION (With Auto-Retry Queue)
       // ============================================================
       let compressedSosPhotoBase64 = null;
       let capturedCoords = null;
@@ -1847,6 +1930,9 @@
 
       window.handleSosSubmit = async function (event) {
         event.preventDefault();
+        if (isSubmitting) return;
+        isSubmitting = true;
+
         const submitBtn = document.getElementById('sosSubmitBtn');
         const originalHtml = submitBtn.innerHTML;
 
@@ -1855,7 +1941,7 @@
         lucide.createIcons();
 
         try {
-          const res = await fetch(API_URL, {
+          const result = await fetchWithRetry(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
@@ -1869,9 +1955,8 @@
               stayingAtSpot: document.getElementById('stayAtSpot').checked,
               photoBase64: compressedSosPhotoBase64
             })
-          });
+          }, 3);
 
-          const result = await res.json();
           if (result.status === 'success') {
             document.getElementById('sosForm').reset();
             capturedCoords = null;
@@ -1886,8 +1971,9 @@
             showToast(result.message || 'Could not send alert');
           }
         } catch (err) {
-          showToast('Network error sending SOS alert');
+          showToast('High traffic — please tap Dispatch again');
         } finally {
+          isSubmitting = false;
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalHtml;
           lucide.createIcons();
@@ -1932,6 +2018,9 @@
 
       window.handleAdoptSubmit = async function (event) {
         event.preventDefault();
+        if (isSubmitting) return;
+        isSubmitting = true;
+
         const btn = document.getElementById('adoptSubmitBtn');
         const originalText = btn.textContent;
         btn.disabled = true;
@@ -1959,7 +2048,7 @@
         ].join(' | ');
 
         try {
-          const res = await fetch(API_URL, {
+          const result = await fetchWithRetry(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
@@ -1972,8 +2061,7 @@
               homeType: fullHousingDetails,
               existingPets: fullPetCareNotes
             })
-          });
-          const result = await res.json();
+          }, 3);
 
           if (result.status === 'success') {
             closeAdoptModal();
@@ -1983,8 +2071,9 @@
             showToast(result.message || 'Submission failed');
           }
         } catch (err) {
-          showToast('Network error submitting application');
+          showToast('High traffic — please tap Submit again');
         } finally {
+          isSubmitting = false;
           btn.disabled = false;
           btn.textContent = originalText;
         }
