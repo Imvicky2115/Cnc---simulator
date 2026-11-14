@@ -61,6 +61,13 @@
       background-color: #F5EBEE;
       color: #1F1619;
       overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    input, textarea, select {
+      user-select: text;
+      -webkit-user-select: text;
     }
 
     .no-scrollbar::-webkit-scrollbar {
@@ -155,20 +162,6 @@
     .modal-backdrop.open .modal-sheet {
       transform: translateY(0);
     }
-
-    /* Admin/Owner-Only Controls (Completely invisible for Public Users) */
-    .admin-only {
-      display: none !important;
-    }
-    body.admin-authenticated .admin-only {
-      display: inline-flex !important;
-    }
-    .admin-only-block {
-      display: none !important;
-    }
-    body.admin-authenticated .admin-only-block {
-      display: flex !important;
-    }
   </style>
 </head>
 <body class="antialiased selection:bg-pinkbrand-100 selection:text-pinkbrand-700">
@@ -177,14 +170,14 @@
   <div class="max-w-md mx-auto min-h-screen bg-[#FFF9FA] shadow-2xl relative flex flex-col border-x border-pinkbrand-100">
 
     <!-- CLEAN, SPACIOUS STICKY HEADER -->
-    <header class="sticky top-0 z-30 bg-[#FFF9FA]/95 backdrop-blur-md border-b border-pinkbrand-100">
+    <header id="appHeader" class="sticky top-0 z-30 bg-[#FFF9FA]/95 backdrop-blur-md border-b border-pinkbrand-100">
       
       <!-- Top Bar: Full Brand Name + Clean Public Hamburger Menu -->
       <div class="px-5 py-3.5 flex items-center justify-between gap-3 relative">
         
-        <!-- Brand Identity (Secret 5-tap trigger on Paw Icon for Owner Access) -->
+        <!-- Brand Identity -->
         <div class="flex items-center gap-3 min-w-0 select-none">
-          <div id="secretBrandTrigger" onclick="handleSecretTap()" class="w-10 h-10 rounded-2xl bg-gradient-to-br from-pinkbrand-500 to-pinkbrand-700 flex items-center justify-center text-white shadow-md shadow-pinkbrand-600/20 shrink-0 cursor-pointer active:scale-95 transition-transform">
+          <div id="brandLogoTrigger" class="w-10 h-10 rounded-2xl bg-gradient-to-br from-pinkbrand-500 to-pinkbrand-700 flex items-center justify-center text-white shadow-md shadow-pinkbrand-600/20 shrink-0 cursor-pointer active:scale-95 transition-transform">
             <i data-lucide="paw-print" class="w-5 h-5 animate-float"></i>
           </div>
           <div>
@@ -201,9 +194,9 @@
           </div>
         </div>
 
-        <!-- Right: Clean Hamburger Menu Button (100% Public Items Only) -->
+        <!-- Right: Clean Hamburger Menu Button -->
         <div class="relative shrink-0">
-          <button type="button" id="hamburgerBtn" onclick="toggleMenu(event)" aria-label="Open Menu" class="btn-press w-10 h-10 rounded-2xl bg-white hover:bg-pinkbrand-50 text-stone-700 hover:text-pinkbrand-600 border border-pinkbrand-200/70 shadow-2xs flex items-center justify-center">
+          <button type="button" id="hamburgerBtn" aria-label="Open Menu" class="btn-press w-10 h-10 rounded-2xl bg-white hover:bg-pinkbrand-50 text-stone-700 hover:text-pinkbrand-600 border border-pinkbrand-200/70 shadow-2xs flex items-center justify-center">
             <i data-lucide="menu" id="hamburgerIcon" class="w-5 h-5"></i>
           </button>
 
@@ -262,18 +255,8 @@
         </div>
       </div>
 
-      <!-- Owner Mode Active Banner (Visible ONLY after owner unlocks via ?team=1 or 5-tap) -->
-      <div id="adminBanner" class="hidden bg-pinkbrand-700 text-white px-5 py-1.5 text-[11px] font-medium flex items-center justify-between gap-2">
-        <span class="flex items-center gap-1.5 truncate">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-pinkbrand-200 shrink-0"></i>
-          <span>Coordinator Mode</span>
-        </span>
-        <div class="flex items-center gap-3 shrink-0">
-          <a id="openDbSheetLink" href="#" target="_blank" rel="noopener" class="hidden underline text-pinkbrand-100 hover:text-white font-semibold">Open Sheet</a>
-          <button onclick="openChangePinModal()" class="underline text-pinkbrand-100 hover:text-white font-semibold">PIN</button>
-          <button onclick="logoutAdmin()" class="underline text-pinkbrand-100 hover:text-white font-semibold">Exit</button>
-        </div>
-      </div>
+      <!-- Dynamic Coordinator Banner Mount Point (Empty in DOM until unlocked) -->
+      <div id="adminBannerMount"></div>
 
     </header>
 
@@ -430,18 +413,14 @@
       <!-- ========================================== -->
       <section id="tab-adopt" class="tab-pane space-y-5">
         
-        <!-- Header + Owner-Only List for Fostering CTA -->
+        <!-- Header + Dynamic Coordinator CTA Mount -->
         <div class="space-y-3.5">
           <div class="flex items-center justify-between gap-2">
             <div>
               <h2 class="font-display font-bold text-lg text-stone-900">Adopt & Foster</h2>
               <p class="text-xs text-stone-500">Give a rescued street soul a loving home</p>
             </div>
-            <!-- OWNER-ONLY BUTTON: LIST ANIMAL FOR FOSTERING -->
-            <button type="button" onclick="openListFosterModal()" class="admin-only btn-press items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-xs shadow-md shadow-pinkbrand-600/20 shrink-0">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i>
-              <span>List Animal</span>
-            </button>
+            <div id="adoptAdminCtaMount"></div>
           </div>
 
           <!-- Horizontal Scrollable Filter Chips -->
@@ -538,18 +517,14 @@
           </div>
         </div>
 
-        <!-- Active Medical Cases + Owner-Only Add Vet Bill Button -->
+        <!-- Active Medical Cases + Dynamic Coordinator CTA Mount -->
         <div class="space-y-3.5">
           <div class="flex items-center justify-between gap-2">
             <div>
               <h3 class="font-display font-bold text-base text-stone-900">Active Vet Bills</h3>
               <span class="text-[11px] text-stone-500">Transparent treatment tracker</span>
             </div>
-            <!-- OWNER-ONLY BUTTON: LIST ACTIVE VET BILL -->
-            <button type="button" onclick="openAddBillModal()" class="admin-only btn-press items-center gap-1.5 px-3 py-2 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-xs shadow-sm shrink-0">
-              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-              <span>Add Vet Bill</span>
-            </button>
+            <div id="billsAdminCtaMount"></div>
           </div>
 
           <div id="vetBillsList" class="space-y-3.5">
@@ -591,58 +566,8 @@
       </div>
     </nav>
 
-    <!-- ========================================== -->
-    <!-- MODAL 0: HIDDEN COORDINATOR PIN & SETUP    -->
-    <!-- ========================================== -->
-    <div id="pinModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closePinModal()">
-      <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl">
-        <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
-          <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Team Access</span>
-            <h3 class="font-display font-bold text-lg text-stone-900 mt-1">Coordinator Portal</h3>
-          </div>
-          <button onclick="closePinModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 flex items-center justify-center">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
-        </div>
-
-        <!-- Mode Toggle: Unlock vs Set/Update PIN -->
-        <div class="grid grid-cols-2 gap-2 p-1 bg-blush-50 rounded-2xl border border-pinkbrand-100">
-          <button type="button" id="tabUnlockPinBtn" onclick="switchPinMode('unlock')" class="py-2 rounded-xl bg-pinkbrand-600 text-white text-xs font-bold transition">
-            Unlock Tools
-          </button>
-          <button type="button" id="tabSetPinBtn" onclick="switchPinMode('set')" class="py-2 rounded-xl text-stone-600 text-xs font-semibold transition">
-            Set / Update PIN
-          </button>
-        </div>
-
-        <!-- Form A: Unlock with PIN -->
-        <form id="unlockPinForm" onsubmit="verifyAdminPin(event)" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Enter Your Coordinator PIN (4–6 digits)</label>
-            <input type="password" id="adminPinInput" inputmode="numeric" minlength="4" maxlength="6" required placeholder="••••••" class="w-full px-4 py-3.5 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-lg font-bold tracking-[0.5em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-          </div>
-          <button type="submit" id="pinSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm">
-            Unlock Listing Tools
-          </button>
-        </form>
-
-        <!-- Form B: Set or Change Owner PIN -->
-        <form id="setPinForm" onsubmit="handleSetOwnerPin(event)" class="hidden space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Current PIN (Leave blank if setting first time)</label>
-            <input type="password" id="currentOwnerPinInput" inputmode="numeric" maxlength="6" placeholder="••••••" class="w-full px-4 py-3 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-base font-bold tracking-[0.4em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">New Coordinator PIN (4–6 digits) *</label>
-            <input type="password" id="newOwnerPinInput" inputmode="numeric" pattern="[0-9]{4,6}" minlength="4" maxlength="6" required placeholder="••••••" class="w-full px-4 py-3 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-base font-bold tracking-[0.4em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-          </div>
-          <button type="submit" id="setPinSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-display font-bold text-sm">
-            Save PIN & Unlock
-          </button>
-        </form>
-      </div>
-    </div>
+    <!-- Dynamic Coordinator Modals Mount Point (Empty until unlocked) -->
+    <div id="adminModalsMount"></div>
 
     <!-- ========================================== -->
     <!-- MODAL 1: QUICK SCAN QR DONATION MODAL      -->
@@ -681,148 +606,6 @@
             <span>Pay via App</span>
           </a>
         </div>
-      </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- MODAL 2: OWNER — LIST ANIMAL FOR FOSTERING -->
-    <!-- ========================================== -->
-    <div id="listFosterModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeListFosterModal()">
-      <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
-          <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Coordinator Tool</span>
-            <h3 class="font-display font-bold text-lg text-stone-900 mt-1">List Animal for Foster / Adoption</h3>
-          </div>
-          <button onclick="closeListFosterModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 flex items-center justify-center">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
-        </div>
-
-        <form id="listFosterForm" onsubmit="handleAddFosterListing(event)" class="space-y-4">
-          
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Animal Photo *</label>
-            <label for="fosterPhotoInput" class="flex items-center justify-center w-full h-28 rounded-2xl border-2 border-dashed border-pinkbrand-200 hover:border-pinkbrand-500 bg-blush-50 cursor-pointer overflow-hidden relative">
-              <div id="fosterPhotoPlaceholder" class="flex flex-col items-center text-center p-2">
-                <i data-lucide="image-plus" class="w-5 h-5 text-pinkbrand-600 mb-1"></i>
-                <span class="text-xs font-medium text-stone-600">Upload clear photo</span>
-              </div>
-              <img id="fosterPhotoPreview" class="hidden w-full h-full object-cover" alt="Foster Preview" />
-              <input id="fosterPhotoInput" type="file" accept="image/*" required class="hidden" onchange="previewFosterPhoto(event)" />
-            </label>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Name / Temp ID *</label>
-              <input type="text" id="newPetName" required placeholder="e.g., Coco" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Species *</label>
-              <select id="newPetSpecies" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm text-stone-700 focus:outline-none focus:border-pinkbrand-600">
-                <option value="cat">Cat / Kitten</option>
-                <option value="dog">Dog / Pup</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Age & Gender *</label>
-              <input type="text" id="newPetAge" required placeholder="e.g., 2 Months • Male" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Listing Type / Duration *</label>
-              <select id="newPetDuration" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
-                <option value="Ready for Adoption">Ready for Adoption</option>
-                <option value="Urgent Foster (15 Days)">Urgent Foster (15 Days)</option>
-                <option value="Urgent Foster (30 Days)">Urgent Foster (30 Days)</option>
-                <option value="Post-Op Foster Needed">Post-Op Foster Needed</option>
-                <option value="Foster-to-Adopt">Foster-to-Adopt</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Health / Vaccination Badge *</label>
-            <select id="newPetMedStatus" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
-              <option value="Vaccinated">Vaccinated</option>
-              <option value="Dewormed">Dewormed</option>
-              <option value="Spayed / Neutered">Spayed / Neutered</option>
-              <option value="Under Recovery">Under Recovery</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Temperament & Care Notes *</label>
-            <input type="text" id="newPetDesc" required placeholder="e.g., Litter trained, playful, gentle with other cats" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-          </div>
-
-          <button type="submit" id="fosterSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm shadow-lg shadow-pinkbrand-600/25">
-            Publish Live Listing
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- MODAL 3: OWNER — ADD ACTIVE VET BILL       -->
-    <!-- ========================================== -->
-    <div id="addBillModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeAddBillModal()">
-      <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
-          <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Coordinator Tool</span>
-            <h3 class="font-display font-bold text-lg text-stone-900 mt-1">Post Active Vet Bill</h3>
-          </div>
-          <button onclick="closeAddBillModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 flex items-center justify-center">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
-        </div>
-
-        <form id="addBillForm" onsubmit="handleAddVetBill(event)" class="space-y-4">
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Animal Name *</label>
-              <input type="text" id="billAnimalName" required placeholder="e.g., Rocky" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Treatment Category *</label>
-              <select id="billCategory" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
-                <option value="Emergency Surgery">Emergency Surgery</option>
-                <option value="Parvo / Viral Care">Parvo / Viral Care</option>
-                <option value="Spay & Vaccination">Spay & Vaccination</option>
-                <option value="Boarding & Meds">Boarding & Meds</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Procedure / Case Summary *</label>
-            <input type="text" id="billSummary" required placeholder="e.g., Paw wound dressing & 5-day antibiotics" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Total Bill Goal (₹) *</label>
-              <input type="number" id="billTotal" required min="100" placeholder="e.g., 6500" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-stone-600 mb-1.5">Already Raised (₹) *</label>
-              <input type="number" id="billRaised" required min="0" value="0" placeholder="e.g., 1500" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Vet Clinic / Hospital Name *</label>
-            <input type="text" id="billClinic" required placeholder="e.g., Pet Care Clinic, Banjara Hills" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
-          </div>
-
-          <button type="submit" id="billSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm shadow-lg shadow-pinkbrand-600/20">
-            Publish Vet Bill
-          </button>
-        </form>
       </div>
     </div>
 
@@ -991,928 +774,1256 @@
   </div>
 
   <script>
-    // ============================================================
-    // LIVE GOOGLE APPS SCRIPT DATABASE ENDPOINT
-    // ============================================================
-    const API_URL = 'https://script.google.com/macros/s/AKfycbz3gszGvaErJ9zQDXp6k3bqUD2VaJ-cjB83CwcEPIWQOWrbSEVxktEglCP2nGAVs5UxqQ/exec';
+    (function () {
+      'use strict';
 
-    lucide.createIcons();
+      // ============================================================
+      // LIVE GOOGLE APPS SCRIPT DATABASE ENDPOINT
+      // ============================================================
+      const API_URL = 'https://script.google.com/macros/s/AKfycbz3gszGvaErJ9zQDXp6k3bqUD2VaJ-cjB83CwcEPIWQOWrbSEVxktEglCP2nGAVs5UxqQ/exec';
 
-    // ============================================================
-    // HELPER: FORMAT DURATION BADGE CLEARLY (Never shows bare "31")
-    // ============================================================
-    function formatListingBadge(raw) {
-      const val = String(raw || '').trim();
-      if (!val) return 'Ready for Adoption';
-      if (/^\d+$/.test(val)) {
-        return `Foster: ${val} Days`;
-      }
-      return val;
-    }
-
-    // ============================================================
-    // IMAGE COMPRESSION HELPER
-    // ============================================================
-    function compressImageFile(file, maxWidth = 900, quality = 0.78) {
-      return new Promise((resolve) => {
-        if (!file) return resolve(null);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let width = img.width;
-            let height = img.height;
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL('image/jpeg', quality));
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+      // ============================================================
+      // ANTI-INSPECT & TAMPER DETERRENTS (No backend changes)
+      // ============================================================
+      document.addEventListener('contextmenu', function (e) {
+        if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+          e.preventDefault();
+        }
       });
-    }
 
-    // ============================================================
-    // RENDER PET CARD HTML (Includes Coordinator Remove Button)
-    // ============================================================
-    function renderPetCardHtml(pet) {
-      const petId = String(pet.Pet_ID || '').trim();
-      const name = String(pet.Name || 'Rescue').trim();
-      const species = String(pet.Species || 'cat').toLowerCase();
-      const badgeLabel = formatListingBadge(pet.Badge_Duration);
-      const isFoster = badgeLabel.toLowerCase().includes('foster') || badgeLabel.toLowerCase().includes('day');
-      const categoryAttr = isFoster ? `${species} foster` : species;
-      const medStatus = String(pet.Medical_Status || 'Vaccinated').trim();
-      const ageGender = String(pet.Age_Gender || '').trim();
-      const desc = String(pet.Description || '').trim();
+      document.addEventListener('keydown', function (e) {
+        if (
+          e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'i', 'j', 'c'].includes(e.key)) ||
+          (e.ctrlKey && ['U', 'S', 'u', 's'].includes(e.key)) ||
+          (e.metaKey && e.altKey && ['I', 'J', 'C', 'U', 'i', 'j', 'c', 'u'].includes(e.key))
+        ) {
+          e.preventDefault();
+        }
+      });
 
-      const fallbackImg = species === 'cat'
-        ? 'https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?auto=format&fit=crop&w=800&q=80'
-        : 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80';
-      const photo = (pet.Photo_URL && String(pet.Photo_URL).startsWith('http')) ? pet.Photo_URL : fallbackImg;
-      const safeName = name.replace(/'/g, "\\'");
+      // ============================================================
+      // OBFUSCATED SESSION TOKEN WITH 30-MINUTE AUTO-EXPIRY
+      // ============================================================
+      const SESSION_KEY = '_pfp_tk_v2';
+      const SESSION_TTL_MS = 30 * 60 * 1000;
+      const XOR_SALT = 'PFP_HYD_99';
+      let cachedSheetUrl = '';
 
-      return `
-        <article id="card-${petId}" data-category="${categoryAttr}" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
-          <div class="relative h-52 bg-pinkbrand-50">
-            <img src="${photo}" alt="${name}" class="w-full h-full object-cover" />
-            <div class="absolute top-3 left-3 flex gap-1.5">
-              <span class="px-3 py-1 rounded-full ${isFoster ? 'bg-amber-500/95' : 'bg-pinkbrand-600/95'} backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
-                ${badgeLabel}
-              </span>
+      function encodeToken(pin) {
+        const payload = JSON.stringify({ p: String(pin).trim(), exp: Date.now() + SESSION_TTL_MS });
+        let out = '';
+        for (let i = 0; i < payload.length; i++) {
+          out += String.fromCharCode(payload.charCodeAt(i) ^ XOR_SALT.charCodeAt(i % XOR_SALT.length));
+        }
+        return btoa(out);
+      }
+
+      function decodeToken() {
+        try {
+          const raw = sessionStorage.getItem(SESSION_KEY);
+          if (!raw) return null;
+          const decoded = atob(raw);
+          let jsonStr = '';
+          for (let i = 0; i < decoded.length; i++) {
+            jsonStr += String.fromCharCode(decoded.charCodeAt(i) ^ XOR_SALT.charCodeAt(i % XOR_SALT.length));
+          }
+          const obj = JSON.parse(jsonStr);
+          if (!obj || !obj.p || Date.now() > obj.exp) {
+            sessionStorage.removeItem(SESSION_KEY);
+            return null;
+          }
+          // Refresh rolling expiry on active usage
+          sessionStorage.setItem(SESSION_KEY, encodeToken(obj.p));
+          return String(obj.p).trim();
+        } catch (e) {
+          sessionStorage.removeItem(SESSION_KEY);
+          return null;
+        }
+      }
+
+      function isCoordinatorActive() {
+        return Boolean(decodeToken());
+      }
+
+      lucide.createIcons();
+
+      // ============================================================
+      // HELPER: FORMAT DURATION BADGE CLEARLY
+      // ============================================================
+      function formatListingBadge(raw) {
+        const val = String(raw || '').trim();
+        if (!val) return 'Ready for Adoption';
+        if (/^\d+$/.test(val)) {
+          return `Foster: ${val} Days`;
+        }
+        return val;
+      }
+
+      // ============================================================
+      // IMAGE COMPRESSION HELPER
+      // ============================================================
+      function compressImageFile(file, maxWidth = 900, quality = 0.78) {
+        return new Promise((resolve) => {
+          if (!file) return resolve(null);
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              let width = img.width;
+              let height = img.height;
+              if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+              }
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // ============================================================
+      // DYNAMICALLY INJECT / REMOVE COORDINATOR DOM ELEMENTS
+      // ============================================================
+      function mountAdminUI() {
+        // 1. Inject Top Coordinator Banner
+        const bannerMount = document.getElementById('adminBannerMount');
+        bannerMount.innerHTML = `
+          <div class="bg-pinkbrand-700 text-white px-5 py-2 text-[11px] font-medium flex items-center justify-between gap-2">
+            <span class="flex items-center gap-1.5 truncate">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-pinkbrand-200 shrink-0"></i>
+              <span>Coordinator Mode</span>
+            </span>
+            <div class="flex items-center gap-3.5 shrink-0">
+              ${cachedSheetUrl ? `<a href="${cachedSheetUrl}" target="_blank" rel="noopener" class="underline text-pinkbrand-100 hover:text-white font-semibold">Open Sheet</a>` : ''}
+              <button type="button" onclick="openChangePinModal()" class="underline text-pinkbrand-100 hover:text-white font-semibold">PIN</button>
+              <button type="button" onclick="logoutAdmin()" class="underline text-pinkbrand-100 hover:text-white font-semibold">Exit</button>
             </div>
-            ${ageGender ? `
-              <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-stone-900/75 backdrop-blur-md text-white text-[11px] font-medium">
-                ${ageGender}
+          </div>
+        `;
+
+        // 2. Inject "+ List Animal" & "+ Add Vet Bill" CTAs
+        document.getElementById('adoptAdminCtaMount').innerHTML = `
+          <button type="button" onclick="openListFosterModal()" class="btn-press inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-xs shadow-md shadow-pinkbrand-600/20 shrink-0">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>List Animal</span>
+          </button>
+        `;
+
+        document.getElementById('billsAdminCtaMount').innerHTML = `
+          <button type="button" onclick="openAddBillModal()" class="btn-press inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-xs shadow-sm shrink-0">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Add Vet Bill</span>
+          </button>
+        `;
+
+        // 3. Inject Listing & Vet Bill Modals into DOM only when authenticated
+        document.getElementById('adminModalsMount').innerHTML = `
+          <!-- MODAL: LIST ANIMAL FOR FOSTERING / ADOPTION -->
+          <div id="listFosterModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeListFosterModal()">
+            <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+              <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
+                <div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Coordinator Tool</span>
+                  <h3 class="font-display font-bold text-lg text-stone-900 mt-1">List Animal for Foster / Adoption</h3>
+                </div>
+                <button type="button" onclick="closeListFosterModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 flex items-center justify-center">
+                  <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+              </div>
+
+              <form id="listFosterForm" onsubmit="handleAddFosterListing(event)" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-stone-600 mb-1.5">Animal Photo *</label>
+                  <label for="fosterPhotoInput" class="flex items-center justify-center w-full h-28 rounded-2xl border-2 border-dashed border-pinkbrand-200 hover:border-pinkbrand-500 bg-blush-50 cursor-pointer overflow-hidden relative">
+                    <div id="fosterPhotoPlaceholder" class="flex flex-col items-center text-center p-2">
+                      <i data-lucide="image-plus" class="w-5 h-5 text-pinkbrand-600 mb-1"></i>
+                      <span class="text-xs font-medium text-stone-600">Upload clear photo</span>
+                    </div>
+                    <img id="fosterPhotoPreview" class="hidden w-full h-full object-cover" alt="Foster Preview" />
+                    <input id="fosterPhotoInput" type="file" accept="image/*" required class="hidden" onchange="previewFosterPhoto(event)" />
+                  </label>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold text-stone-600 mb-1.5">Name / Temp ID *</label>
+                    <input type="text" id="newPetName" required placeholder="e.g., Coco" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-stone-600 mb-1.5">Species *</label>
+                    <select id="newPetSpecies" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm text-stone-700 focus:outline-none focus:border-pinkbrand-600">
+                      <option value="cat">Cat / Kitten</option>
+                      <option value="dog">Dog / Pup</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold text-stone-600 mb-1.5">Age & Gender *</label>
+                    <input type="text" id="newPetAge" required placeholder="e.g., 2 Months • Male" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-stone-600 mb-1.5">Listing Type / Duration *</label>
+                    <select id="newPetDuration" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
+                      <option value="Ready for Adoption">Ready for Adoption</option>
+                      <option value="Urgent Foster (15 Days)">Urgent Foster (15 Days)</option>
+                      <option value="Urgent Foster (30 Days)">Urgent Foster (30 Days)</option>
+                      <option value="Post-Op Foster Needed">Post-Op Foster Needed</option>
+                      <option value="Foster-to-Adopt">Foster-to-Adopt</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-stone-600 mb-1.5">Health / Vaccination Badge *</label>
+                  <select id="newPetMedStatus" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
+                    <option value="Vaccinated">Vaccinated</option>
+                    <option value="Dewormed">Dewormed</option>
+                    <option value="Spayed / Neutered">Spayed / Neutered</option>
+                    <option value="Under Recovery">Under Recovery</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-stone-600 mb-1.5">Temperament & Care Notes *</label>
+                  <input type="text" id="newPetDesc" required placeholder="e.g., Litter trained, playful, gentle with other cats" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+                </div>
+
+                <button type="submit" id="fosterSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm shadow-lg shadow-pinkbrand-600/25">
+                  Publish Live Listing
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- MODAL: ADD ACTIVE VET BILL -->
+          <div id="addBillModal" class="modal-backdrop fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closeAddBillModal()">
+            <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+              <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
+                <div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Coordinator Tool</span>
+                  <h3 class="font-display font-bold text-lg text-stone-900 mt-1">Post Active Vet Bill</h3>
+                </div>
+                <button type="button" onclick="closeAddBillModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 flex items-center justify-center">
+                  <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+              </div>
+
+              <form id="addBillForm" onsubmit="handleAddVetBill(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold text-stone-600 mb-1.5">Animal Name *</label>
+                    <input type="text" id="billAnimalName" required placeholder="e.g., Rocky" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-stone-600 mb-1.5">Treatment Category *</label>
+                    <select id="billCategory" required class="w-full px-3 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-xs font-medium text-stone-700 focus:outline-none focus:border-pinkbrand-600">
+                      <option value="Emergency Surgery">Emergency Surgery</option>
+                      <option value="Parvo / Viral Care">Parvo / Viral Care</option>
+                      <option value="Spay & Vaccination">Spay & Vaccination</option>
+                      <option value="Boarding & Meds">Boarding & Meds</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-stone-600 mb-1.5">Procedure / Case Summary *</label>
+                  <input type="text" id="billSummary" required placeholder="e.g., Paw wound dressing & 5-day antibiotics" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold text-stone-600 mb-1.5">Total Bill Goal (₹) *</label>
+                    <input type="number" id="billTotal" required min="100" placeholder="e.g., 6500" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-stone-600 mb-1.5">Already Raised (₹) *</label>
+                    <input type="number" id="billRaised" required min="0" value="0" placeholder="e.g., 1500" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-stone-600 mb-1.5">Vet Clinic / Hospital Name *</label>
+                  <input type="text" id="billClinic" required placeholder="e.g., Pet Care Clinic, Banjara Hills" class="w-full px-3.5 py-2.5 rounded-xl bg-blush-50 border border-pinkbrand-100 text-sm focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+                </div>
+
+                <button type="submit" id="billSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm shadow-lg shadow-pinkbrand-600/20">
+                  Publish Vet Bill
+                </button>
+              </form>
+            </div>
+          </div>
+        `;
+
+        lucide.createIcons();
+      }
+
+      function unmountAdminUI() {
+        document.getElementById('adminBannerMount').innerHTML = '';
+        document.getElementById('adoptAdminCtaMount').innerHTML = '';
+        document.getElementById('billsAdminCtaMount').innerHTML = '';
+        document.getElementById('adminModalsMount').innerHTML = '';
+      }
+
+      // ============================================================
+      // RENDER PET CARD HTML (Balanced, Full-Width Mark Adopted Bar)
+      // ============================================================
+      function renderPetCardHtml(pet) {
+        const petId = String(pet.Pet_ID || '').trim();
+        const name = String(pet.Name || 'Rescue').trim();
+        const species = String(pet.Species || 'cat').toLowerCase();
+        const badgeLabel = formatListingBadge(pet.Badge_Duration);
+        const isFoster = badgeLabel.toLowerCase().includes('foster') || badgeLabel.toLowerCase().includes('day');
+        const categoryAttr = isFoster ? `${species} foster` : species;
+        const medStatus = String(pet.Medical_Status || 'Vaccinated').trim();
+        const ageGender = String(pet.Age_Gender || '').trim();
+        const desc = String(pet.Description || '').trim();
+        const isAdmin = isCoordinatorActive();
+
+        const fallbackImg = species === 'cat'
+          ? 'https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?auto=format&fit=crop&w=800&q=80'
+          : 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80';
+        const photo = (pet.Photo_URL && String(pet.Photo_URL).startsWith('http')) ? pet.Photo_URL : fallbackImg;
+        const safeName = name.replace(/'/g, "\\'");
+
+        return `
+          <article id="card-${petId}" data-category="${categoryAttr}" class="pet-card bg-white rounded-3xl border border-pinkbrand-100 overflow-hidden shadow-sm transition-all">
+            <div class="relative h-52 bg-pinkbrand-50">
+              <img src="${photo}" alt="${name}" class="w-full h-full object-cover" />
+              <div class="absolute top-3 left-3 flex gap-1.5">
+                <span class="px-3 py-1 rounded-full ${isFoster ? 'bg-amber-500/95' : 'bg-pinkbrand-600/95'} backdrop-blur-sm text-white text-[11px] font-bold tracking-wide shadow-sm">
+                  ${badgeLabel}
+                </span>
+              </div>
+              ${ageGender ? `
+                <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-stone-900/75 backdrop-blur-md text-white text-[11px] font-medium">
+                  ${ageGender}
+                </div>
+              ` : ''}
+            </div>
+            <div class="p-4.5 p-5 space-y-4">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <h3 class="font-display font-bold text-base text-stone-900 leading-snug">${name}</h3>
+                  <p class="text-xs text-stone-500 mt-1 leading-relaxed">${desc}</p>
+                </div>
+                <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/70 px-3 py-1 rounded-full shrink-0">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i>
+                  <span>${medStatus}</span>
+                </span>
+              </div>
+
+              <div class="space-y-2.5 pt-0.5">
+                <button type="button" onclick="openAdoptModal('${safeName}', '${isFoster ? 'Foster' : 'Adoption'}')" class="btn-press w-full py-3.5 px-4 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-sm shadow-pinkbrand-600/15">
+                  <i data-lucide="heart" class="w-4 h-4 shrink-0"></i>
+                  <span>${isFoster ? 'Apply to Foster ' + name : 'Apply to Adopt ' + name}</span>
+                </button>
+
+                ${isAdmin ? `
+                  <div class="pt-2.5 border-t border-pinkbrand-100/70">
+                    <button type="button" onclick="deletePetListing('${petId}', '${safeName}')" class="btn-press w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100/90 border border-rose-200/60 text-rose-700 text-xs font-semibold flex items-center justify-center gap-2">
+                      <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0"></i>
+                      <span>Mark Adopted / Remove Listing</span>
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </article>
+        `;
+      }
+
+      // ============================================================
+      // RENDER VET BILL CARD HTML
+      // ============================================================
+      function renderVetBillHtml(bill) {
+        const billId = String(bill.Bill_ID || '').trim();
+        const animalName = String(bill.Animal_Name || '').trim();
+        const category = String(bill.Category || 'Medical Care').trim();
+        const summary = String(bill.Summary || '').trim();
+        const clinic = String(bill.Vet_Clinic || 'Hyderabad Vet').trim();
+        const total = Number(bill.Total_Goal) || 1;
+        const raised = Math.min(Number(bill.Amount_Raised) || 0, total);
+        const pct = Math.round((raised / total) * 100);
+        const remaining = Math.max(total - raised, 0);
+        const safeAnimal = animalName.replace(/'/g, "\\'");
+        const isAdmin = isCoordinatorActive();
+
+        return `
+          <div id="bill-${billId}" class="bg-white p-4.5 p-5 rounded-2xl border border-pinkbrand-100 shadow-sm space-y-3.5">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2 py-0.5 rounded-md">${category}</span>
+                <h4 class="font-display font-bold text-sm text-stone-900 mt-1.5">${animalName} — ${summary}</h4>
+              </div>
+              <span class="text-xs font-bold text-stone-700 shrink-0">₹${raised.toLocaleString('en-IN')} / ₹${total.toLocaleString('en-IN')}</span>
+            </div>
+            
+            <div class="w-full h-2.5 bg-pinkbrand-50 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-pinkbrand-500 to-pinkbrand-600 rounded-full" style="width: ${pct}%"></div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-stone-500">
+              <span>${pct}% funded • ${clinic}</span>
+              <span class="font-semibold text-pinkbrand-600">${remaining > 0 ? '₹' + remaining.toLocaleString('en-IN') + ' needed' : 'Bill Settled'}</span>
+            </div>
+
+            ${isAdmin ? `
+              <div class="pt-3 border-t border-pinkbrand-100/70 grid grid-cols-2 gap-2.5">
+                <button type="button" onclick="updateVetBillRaised('${billId}', '${safeAnimal}', ${raised}, ${total})" class="btn-press py-2.5 px-3 rounded-xl bg-pinkbrand-50 hover:bg-pinkbrand-100 border border-pinkbrand-200/60 text-pinkbrand-700 text-xs font-semibold flex items-center justify-center gap-1.5">
+                  <i data-lucide="indian-rupee" class="w-3.5 h-3.5 shrink-0"></i>
+                  <span>Update Raised</span>
+                </button>
+                <button type="button" onclick="deleteVetBill('${billId}', '${safeAnimal}')" class="btn-press py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200/60 text-rose-700 text-xs font-semibold flex items-center justify-center gap-1.5">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5 shrink-0"></i>
+                  <span>Remove</span>
+                </button>
               </div>
             ` : ''}
           </div>
-          <div class="p-4 space-y-3.5">
-            <div class="flex items-start justify-between gap-2">
-              <div>
-                <h3 class="font-display font-bold text-base text-stone-900">${name}</h3>
-                <p class="text-xs text-stone-500 mt-0.5">${desc}</p>
-              </div>
-              <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-1 rounded-lg shrink-0">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> ${medStatus}
-              </span>
-            </div>
-
-            <button onclick="openAdoptModal('${safeName}', '${isFoster ? 'Foster' : 'Adoption'}')" class="btn-press w-full py-3 rounded-xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-semibold text-xs flex items-center justify-center gap-2">
-              <i data-lucide="heart" class="w-4 h-4"></i>
-              <span>${isFoster ? 'Apply to Foster ' + name : 'Apply to Adopt ' + name}</span>
-            </button>
-
-            <!-- COORDINATOR-ONLY DELETE / CLOSE LISTING BUTTON -->
-            <div class="admin-only-block pt-1 border-t border-pinkbrand-50 justify-end">
-              <button type="button" onclick="deletePetListing('${petId}', '${safeName}')" class="btn-press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-semibold">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                <span>Mark Adopted / Remove Listing</span>
-              </button>
-            </div>
-          </div>
-        </article>
-      `;
-    }
-
-    // ============================================================
-    // RENDER VET BILL CARD HTML (Includes Coordinator Controls)
-    // ============================================================
-    function renderVetBillHtml(bill) {
-      const billId = String(bill.Bill_ID || '').trim();
-      const animalName = String(bill.Animal_Name || '').trim();
-      const category = String(bill.Category || 'Medical Care').trim();
-      const summary = String(bill.Summary || '').trim();
-      const clinic = String(bill.Vet_Clinic || 'Hyderabad Vet').trim();
-      const total = Number(bill.Total_Goal) || 1;
-      const raised = Math.min(Number(bill.Amount_Raised) || 0, total);
-      const pct = Math.round((raised / total) * 100);
-      const remaining = Math.max(total - raised, 0);
-      const safeAnimal = animalName.replace(/'/g, "\\'");
-
-      return `
-        <div id="bill-${billId}" class="bg-white p-4 rounded-2xl border border-pinkbrand-100 shadow-sm space-y-3">
-          <div class="flex items-start justify-between gap-2">
-            <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2 py-0.5 rounded-md">${category}</span>
-              <h4 class="font-display font-bold text-sm text-stone-900 mt-1">${animalName} — ${summary}</h4>
-            </div>
-            <span class="text-xs font-bold text-stone-700 shrink-0">₹${raised.toLocaleString('en-IN')} / ₹${total.toLocaleString('en-IN')}</span>
-          </div>
-          
-          <div class="w-full h-2.5 bg-pinkbrand-50 rounded-full overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-pinkbrand-500 to-pinkbrand-600 rounded-full" style="width: ${pct}%"></div>
-          </div>
-
-          <div class="flex items-center justify-between text-[11px] text-stone-500">
-            <span>${pct}% funded • ${clinic}</span>
-            <span class="font-semibold text-pinkbrand-600">${remaining > 0 ? '₹' + remaining.toLocaleString('en-IN') + ' needed' : 'Bill Settled'}</span>
-          </div>
-
-          <!-- COORDINATOR-ONLY VET BILL CONTROLS -->
-          <div class="admin-only-block pt-2 border-t border-pinkbrand-50 items-center justify-end gap-2">
-            <button type="button" onclick="updateVetBillRaised('${billId}', '${safeAnimal}', ${raised}, ${total})" class="btn-press inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-pinkbrand-50 hover:bg-pinkbrand-100 text-pinkbrand-700 text-[11px] font-semibold">
-              <i data-lucide="indian-rupee" class="w-3 h-3"></i>
-              <span>Update Raised ₹</span>
-            </button>
-            <button type="button" onclick="deleteVetBill('${billId}', '${safeAnimal}')" class="btn-press inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-semibold">
-              <i data-lucide="trash-2" class="w-3 h-3"></i>
-              <span>Remove</span>
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    // ============================================================
-    // FETCH LIVE PETS & VET BILLS FROM GOOGLE SHEETS
-    // ============================================================
-    async function syncLiveDatabase() {
-      const petGrid = document.getElementById('petGrid');
-      const billsList = document.getElementById('vetBillsList');
-
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        if (data.status !== 'success') throw new Error('Sync failed');
-
-        if (data.sheetUrl) {
-          const sheetLink = document.getElementById('openDbSheetLink');
-          sheetLink.href = data.sheetUrl;
-          sheetLink.classList.remove('hidden');
-        }
-
-        if (Array.isArray(data.pets) && data.pets.length > 0) {
-          petGrid.innerHTML = data.pets.map(renderPetCardHtml).join('');
-          lucide.createIcons();
-          document.getElementById('petCount').textContent = data.pets.length;
-        } else {
-          document.getElementById('petCount').textContent = '0';
-          document.getElementById('petsEmptyTitle').textContent = 'No active foster or adoption listings right now';
-          document.getElementById('petsEmptyDesc').textContent = 'Check back soon! New rescued cats and dogs will appear here as soon as they are cleared by our vets.';
-        }
-
-        if (Array.isArray(data.bills) && data.bills.length > 0) {
-          billsList.innerHTML = data.bills.map(renderVetBillHtml).join('');
-          lucide.createIcons();
-        } else {
-          document.getElementById('billsEmptyTitle').textContent = 'No pending vet bills listed right now';
-          document.getElementById('billsEmptyDesc').textContent = 'You can still support daily shelter feeding and emergency medicines via the UPI QR code above.';
-        }
-      } catch (err) {
-        document.getElementById('petsEmptyTitle').textContent = 'No active listings loaded';
-        document.getElementById('petsEmptyDesc').textContent = 'Please check your internet connection and refresh.';
-        document.getElementById('billsEmptyTitle').textContent = 'No active vet bills loaded';
+        `;
       }
-    }
 
-    // ============================================================
-    // COORDINATOR: DELETE / CLOSE PET LISTING
-    // ============================================================
-    async function deletePetListing(petId, petName) {
-      if (!confirm(`Remove "${petName}" from the public Adoption & Foster gallery?`)) return;
+      // ============================================================
+      // FETCH LIVE PETS & VET BILLS FROM GOOGLE SHEETS
+      // ============================================================
+      window.syncLiveDatabase = async function () {
+        const petGrid = document.getElementById('petGrid');
+        const billsList = document.getElementById('vetBillsList');
 
-      showToast(`Removing ${petName}...`);
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'CLOSE_PET',
-            pin: String(sessionStorage.getItem('pfp_owner_pin') || '').trim(),
-            petId: petId
-          })
-        });
-        const result = await res.json();
-        if (result.status === 'success') {
-          const card = document.getElementById('card-' + petId);
-          if (card) card.remove();
-          const remaining = document.querySelectorAll('.pet-card').length;
-          document.getElementById('petCount').textContent = remaining;
-          if (remaining === 0) {
-            document.getElementById('petGrid').innerHTML = `
+        try {
+          const res = await fetch(API_URL);
+          const data = await res.json();
+          if (data.status !== 'success') throw new Error('Sync failed');
+
+          if (data.sheetUrl) {
+            cachedSheetUrl = data.sheetUrl;
+            if (isCoordinatorActive()) mountAdminUI();
+          }
+
+          if (Array.isArray(data.pets) && data.pets.length > 0) {
+            petGrid.innerHTML = data.pets.map(renderPetCardHtml).join('');
+            lucide.createIcons();
+            document.getElementById('petCount').textContent = data.pets.length;
+          } else {
+            document.getElementById('petCount').textContent = '0';
+            petGrid.innerHTML = `
               <div id="petsEmptyState" class="bg-white rounded-3xl border border-pinkbrand-100 p-8 text-center space-y-2.5">
+                <div class="w-12 h-12 rounded-2xl bg-pinkbrand-50 text-pinkbrand-600 flex items-center justify-center mx-auto">
+                  <i data-lucide="paw-print" class="w-6 h-6"></i>
+                </div>
                 <h3 class="font-display font-bold text-sm text-stone-800">No active foster or adoption listings right now</h3>
-                <p class="text-xs text-stone-500 max-w-xs mx-auto leading-relaxed">Tap "+ List Animal" above whenever a new rescue is ready.</p>
+                <p class="text-xs text-stone-500 max-w-xs mx-auto leading-relaxed">
+                  Check back soon! New rescued cats and dogs will appear here as soon as they are cleared by our vets.
+                </p>
               </div>
             `;
+            lucide.createIcons();
           }
-          showToast(`${petName} removed from public view`);
-        } else {
-          showToast(result.message || 'Could not remove listing');
+
+          if (Array.isArray(data.bills) && data.bills.length > 0) {
+            billsList.innerHTML = data.bills.map(renderVetBillHtml).join('');
+            lucide.createIcons();
+          } else {
+            billsList.innerHTML = `
+              <div id="billsEmptyState" class="bg-white rounded-2xl border border-pinkbrand-100 p-6 text-center space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-pinkbrand-50 text-pinkbrand-600 flex items-center justify-center mx-auto">
+                  <i data-lucide="file-heart" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-display font-bold text-xs text-stone-800">No pending vet bills listed right now</h4>
+                <p class="text-[11px] text-stone-500 leading-relaxed">
+                  You can still support daily shelter feeding and emergency medicines via the UPI QR code above.
+                </p>
+              </div>
+            `;
+            lucide.createIcons();
+          }
+        } catch (err) {
+          const petTitle = document.getElementById('petsEmptyTitle');
+          if (petTitle) petTitle.textContent = 'No active listings loaded';
         }
-      } catch (err) {
-        showToast('Network error removing listing');
-      }
-    }
+      };
 
-    // ============================================================
-    // COORDINATOR: UPDATE OR DELETE VET BILL
-    // ============================================================
-    async function updateVetBillRaised(billId, animalName, currentRaised, totalGoal) {
-      const input = prompt(`Enter total amount raised so far for ${animalName} (Goal: ₹${totalGoal}):`, currentRaised);
-      if (input === null) return;
-      const newRaised = Number(input);
-      if (isNaN(newRaised) || newRaised < 0) {
-        showToast('Please enter a valid number');
-        return;
-      }
+      // ============================================================
+      // COORDINATOR: DELETE / CLOSE PET LISTING
+      // ============================================================
+      window.deletePetListing = async function (petId, petName) {
+        const pin = decodeToken();
+        if (!pin) return showToast('Session expired — please unlock again');
+        if (!confirm(`Remove "${petName}" from the public Adoption & Foster gallery?`)) return;
 
-      showToast('Updating amount...');
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'UPDATE_VET_BILL',
-            pin: String(sessionStorage.getItem('pfp_owner_pin') || '').trim(),
-            billId: billId,
-            raised: newRaised
-          })
-        });
-        const result = await res.json();
-        if (result.status === 'success') {
-          await syncLiveDatabase();
-          showToast(`Updated raised amount for ${animalName}!`);
-        } else {
-          showToast(result.message || 'Update failed');
+        showToast(`Removing ${petName}...`);
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'CLOSE_PET',
+              pin: pin,
+              petId: petId
+            })
+          });
+          const result = await res.json();
+          if (result.status === 'success') {
+            await syncLiveDatabase();
+            showToast(`${petName} marked adopted & removed`);
+          } else {
+            showToast(result.message || 'Could not remove listing');
+          }
+        } catch (err) {
+          showToast('Network error removing listing');
         }
-      } catch (err) {
-        showToast('Network error updating vet bill');
-      }
-    }
+      };
 
-    async function deleteVetBill(billId, animalName) {
-      if (!confirm(`Remove "${animalName}" vet bill from the public tracker?`)) return;
+      // ============================================================
+      // COORDINATOR: UPDATE OR DELETE VET BILL
+      // ============================================================
+      window.updateVetBillRaised = async function (billId, animalName, currentRaised, totalGoal) {
+        const pin = decodeToken();
+        if (!pin) return showToast('Session expired — please unlock again');
 
-      showToast(`Removing ${animalName}'s bill...`);
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'UPDATE_VET_BILL',
-            pin: String(sessionStorage.getItem('pfp_owner_pin') || '').trim(),
-            billId: billId,
-            newStatus: 'Hidden'
-          })
-        });
-        const result = await res.json();
-        if (result.status === 'success') {
-          const el = document.getElementById('bill-' + billId);
-          if (el) el.remove();
-          showToast(`Vet bill for ${animalName} removed`);
-        } else {
-          showToast(result.message || 'Could not remove bill');
+        const input = prompt(`Enter total amount raised so far for ${animalName} (Goal: ₹${totalGoal}):`, currentRaised);
+        if (input === null) return;
+        const newRaised = Number(input);
+        if (isNaN(newRaised) || newRaised < 0) {
+          showToast('Please enter a valid number');
+          return;
         }
-      } catch (err) {
-        showToast('Network error removing bill');
-      }
-    }
 
-    // ============================================================
-    // HAMBURGER DROPDOWN MENU LOGIC (PUBLIC ONLY)
-    // ============================================================
-    function toggleMenu(event) {
-      event.stopPropagation();
-      document.getElementById('navDropdown').classList.toggle('open');
-    }
+        showToast('Updating amount...');
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'UPDATE_VET_BILL',
+              pin: pin,
+              billId: billId,
+              raised: newRaised
+            })
+          });
+          const result = await res.json();
+          if (result.status === 'success') {
+            await syncLiveDatabase();
+            showToast(`Updated raised amount for ${animalName}!`);
+          } else {
+            showToast(result.message || 'Update failed');
+          }
+        } catch (err) {
+          showToast('Network error updating vet bill');
+        }
+      };
 
-    function closeMenu() {
-      document.getElementById('navDropdown').classList.remove('open');
-    }
+      window.deleteVetBill = async function (billId, animalName) {
+        const pin = decodeToken();
+        if (!pin) return showToast('Session expired — please unlock again');
+        if (!confirm(`Remove "${animalName}" vet bill from the public tracker?`)) return;
 
-    document.addEventListener('click', (e) => {
-      const dropdown = document.getElementById('navDropdown');
-      const btn = document.getElementById('hamburgerBtn');
-      if (dropdown.classList.contains('open') && !dropdown.contains(e.target) && !btn.contains(e.target)) {
-        closeMenu();
-      }
-    });
+        showToast(`Removing ${animalName}'s bill...`);
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'UPDATE_VET_BILL',
+              pin: pin,
+              billId: billId,
+              newStatus: 'Hidden'
+            })
+          });
+          const result = await res.json();
+          if (result.status === 'success') {
+            await syncLiveDatabase();
+            showToast(`Vet bill for ${animalName} removed`);
+          } else {
+            showToast(result.message || 'Could not remove bill');
+          }
+        } catch (err) {
+          showToast('Network error removing bill');
+        }
+      };
 
-    // ============================================================
-    // INVISIBLE OWNER ACCESS (?team=1 OR 5-TAP PAW LOGO) + SET PIN
-    // ============================================================
-    let secretTapCount = 0;
-    let secretTapTimer = null;
+      // ============================================================
+      // HAMBURGER DROPDOWN MENU LOGIC
+      // ============================================================
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      hamburgerBtn.addEventListener('click', function (event) {
+        event.stopPropagation();
+        document.getElementById('navDropdown').classList.toggle('open');
+      });
 
-    function handleSecretTap() {
-      secretTapCount++;
-      clearTimeout(secretTapTimer);
-      if (secretTapCount >= 5) {
-        secretTapCount = 0;
-        openPinPrompt();
-      } else {
-        secretTapTimer = setTimeout(() => {
+      window.closeMenu = function () {
+        document.getElementById('navDropdown').classList.remove('open');
+      };
+
+      document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('navDropdown');
+        if (dropdown.classList.contains('open') && !dropdown.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+          closeMenu();
+        }
+      });
+
+      // ============================================================
+      // INVISIBLE OWNER ACCESS (?team=1 OR 5-TAP PAW LOGO)
+      // ============================================================
+      let secretTapCount = 0;
+      let secretTapTimer = null;
+
+      document.getElementById('brandLogoTrigger').addEventListener('click', function () {
+        secretTapCount++;
+        clearTimeout(secretTapTimer);
+        if (secretTapCount >= 5) {
           secretTapCount = 0;
-        }, 1500);
-      }
-    }
-
-    function switchPinMode(mode) {
-      const unlockForm = document.getElementById('unlockPinForm');
-      const setForm = document.getElementById('setPinForm');
-      const unlockTab = document.getElementById('tabUnlockPinBtn');
-      const setTab = document.getElementById('tabSetPinBtn');
-
-      if (mode === 'unlock') {
-        unlockForm.classList.remove('hidden');
-        setForm.classList.add('hidden');
-        unlockTab.className = 'py-2 rounded-xl bg-pinkbrand-600 text-white text-xs font-bold transition';
-        setTab.className = 'py-2 rounded-xl text-stone-600 text-xs font-semibold transition';
-      } else {
-        unlockForm.classList.add('hidden');
-        setForm.classList.remove('hidden');
-        setTab.className = 'py-2 rounded-xl bg-pinkbrand-600 text-white text-xs font-bold transition';
-        unlockTab.className = 'py-2 rounded-xl text-stone-600 text-xs font-semibold transition';
-      }
-    }
-
-    function openPinPrompt() {
-      switchPinMode('unlock');
-      document.getElementById('pinModal').classList.add('open');
-      setTimeout(() => document.getElementById('adminPinInput').focus(), 150);
-    }
-
-    function openChangePinModal() {
-      switchPinMode('set');
-      document.getElementById('pinModal').classList.add('open');
-      setTimeout(() => document.getElementById('currentOwnerPinInput').focus(), 150);
-    }
-
-    function checkOwnerAccessOnLoad() {
-      if (sessionStorage.getItem('pfp_owner_pin')) {
-        enableAdminUI();
-        return;
-      }
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('team') === '1') {
-        openPinPrompt();
-      }
-    }
-
-    function closePinModal() {
-      document.getElementById('pinModal').classList.remove('open');
-      document.getElementById('adminPinInput').value = '';
-      document.getElementById('currentOwnerPinInput').value = '';
-      document.getElementById('newOwnerPinInput').value = '';
-    }
-
-    async function verifyAdminPin(event) {
-      event.preventDefault();
-      const enteredPin = String(document.getElementById('adminPinInput').value || '').trim();
-      const btn = document.getElementById('pinSubmitBtn');
-      btn.disabled = true;
-      btn.textContent = 'Verifying...';
-
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'VERIFY_PIN', pin: enteredPin })
-        });
-        const result = await res.json();
-
-        if (result.status === 'success' && result.authenticated) {
-          sessionStorage.setItem('pfp_owner_pin', enteredPin);
-          enableAdminUI();
-          closePinModal();
-          showToast('Coordinator Mode unlocked');
+          openPinPrompt('unlock');
         } else {
-          showToast(result.message || 'Incorrect PIN');
-          document.getElementById('adminPinInput').value = '';
+          secretTapTimer = setTimeout(() => {
+            secretTapCount = 0;
+          }, 1500);
         }
-      } catch (err) {
-        showToast('Network error verifying PIN');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Unlock Listing Tools';
-      }
-    }
-
-    async function handleSetOwnerPin(event) {
-      event.preventDefault();
-      const currentPin = String(document.getElementById('currentOwnerPinInput').value || '').trim();
-      const newPin = String(document.getElementById('newOwnerPinInput').value || '').trim();
-      const btn = document.getElementById('setPinSubmitBtn');
-      btn.disabled = true;
-      btn.textContent = 'Saving PIN...';
-
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'SET_PIN',
-            currentPin: currentPin,
-            newPin: newPin,
-            pin: newPin
-          })
-        });
-        const result = await res.json();
-
-        if (result.status === 'success') {
-          sessionStorage.setItem('pfp_owner_pin', newPin);
-          enableAdminUI();
-          closePinModal();
-          showToast('New Coordinator PIN saved & unlocked!');
-        } else {
-          showToast(result.message || 'Could not update PIN');
-        }
-      } catch (err) {
-        showToast('Network error saving PIN');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Save PIN & Unlock';
-      }
-    }
-
-    function enableAdminUI() {
-      document.body.classList.add('admin-authenticated');
-      document.getElementById('adminBanner').classList.remove('hidden');
-    }
-
-    function logoutAdmin() {
-      sessionStorage.removeItem('pfp_owner_pin');
-      document.body.classList.remove('admin-authenticated');
-      document.getElementById('adminBanner').classList.add('hidden');
-      showToast('Switched back to Public View');
-    }
-
-    // ============================================================
-    // TAB SWITCHING LOGIC
-    // ============================================================
-    function switchTab(tabId, btnEl) {
-      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-      document.getElementById('tab-' + tabId).classList.add('active');
-
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('active', 'text-pinkbrand-600', 'bg-pinkbrand-50');
-        btn.classList.add('text-stone-500');
-        btn.querySelector('span').classList.replace('font-bold', 'font-semibold');
       });
 
-      btnEl.classList.add('active', 'text-pinkbrand-600', 'bg-pinkbrand-50');
-      btnEl.classList.remove('text-stone-500');
-      btnEl.querySelector('span').classList.replace('font-semibold', 'font-bold');
+      window.openPinPrompt = function (defaultMode = 'unlock') {
+        const mount = document.getElementById('adminModalsMount');
+        mount.innerHTML = `
+          <div id="pinModal" class="modal-backdrop open fixed inset-0 z-50 bg-stone-900/65 backdrop-blur-xs flex items-end justify-center" onclick="if(event.target===this) closePinModal()">
+            <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 space-y-5 shadow-2xl">
+              <div class="flex items-center justify-between border-b border-pinkbrand-100 pb-3.5">
+                <div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-pinkbrand-700 bg-pinkbrand-50 px-2.5 py-0.5 rounded-full">Team Access</span>
+                  <h3 class="font-display font-bold text-lg text-stone-900 mt-1">Coordinator Portal</h3>
+                </div>
+                <button type="button" onclick="closePinModal()" class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 flex items-center justify-center">
+                  <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+              </div>
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+              <div class="grid grid-cols-2 gap-2 p-1 bg-blush-50 rounded-2xl border border-pinkbrand-100">
+                <button type="button" id="tabUnlockPinBtn" onclick="switchPinMode('unlock')" class="py-2 rounded-xl ${defaultMode === 'unlock' ? 'bg-pinkbrand-600 text-white font-bold' : 'text-stone-600 font-semibold'} text-xs transition">
+                  Unlock Tools
+                </button>
+                <button type="button" id="tabSetPinBtn" onclick="switchPinMode('set')" class="py-2 rounded-xl ${defaultMode === 'set' ? 'bg-pinkbrand-600 text-white font-bold' : 'text-stone-600 font-semibold'} text-xs transition">
+                  Set / Update PIN
+                </button>
+              </div>
 
-    // ============================================================
-    // SERVICE MENU INFO DRAWER
-    // ============================================================
-    const serviceDetails = {
-      rehab: {
-        title: 'Rehabilitation & Trauma Care',
-        body: 'We rescue critically injured, accident-hit, and abandoned street animals across Hyderabad, providing emergency hospitalization, orthopedic surgeries, and safe post-operative recovery until they can walk and thrive again.'
-      },
-      feeding: {
-        title: 'Daily Street Feeding Drives',
-        body: 'Our volunteers conduct daily feeding runs across Hyderabad colonies and shelter zones. You can sponsor dry kibble (like Whiskas for rescued kittens/cats) or volunteer for a feeding route in your neighborhood.'
-      },
-      spay: {
-        title: 'Spay, Neuter & Vaccination (ABC)',
-        body: 'Sterilization and anti-rabies / 7-in-1 / Tricat vaccinations are the most humane way to prevent street suffering. Report unsterilized community animals or sponsor a vaccination kit today.'
-      }
-    };
+              <form id="unlockPinForm" onsubmit="verifyAdminPin(event)" class="${defaultMode === 'unlock' ? '' : 'hidden'} space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-stone-600 mb-1.5">Enter Coordinator PIN (4–6 digits)</label>
+                  <input type="password" id="adminPinInput" inputmode="numeric" minlength="4" maxlength="6" required placeholder="••••••" class="w-full px-4 py-3.5 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-lg font-bold tracking-[0.5em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+                </div>
+                <button type="submit" id="pinSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-pinkbrand-600 hover:bg-pinkbrand-700 text-white font-display font-bold text-sm">
+                  Unlock Listing Tools
+                </button>
+              </form>
 
-    function openServiceInfo(key) {
-      const data = serviceDetails[key];
-      if (!data) return;
-      document.getElementById('serviceTitle').textContent = data.title;
-      document.getElementById('serviceBody').textContent = data.body;
-      document.getElementById('serviceModal').classList.add('open');
-    }
-    function closeServiceModal() {
-      document.getElementById('serviceModal').classList.remove('open');
-    }
-
-    // ============================================================
-    // QR MODAL CONTROLS
-    // ============================================================
-    function openQrModal() {
-      document.getElementById('qrModal').classList.add('open');
-    }
-    function closeQrModal() {
-      document.getElementById('qrModal').classList.remove('open');
-    }
-
-    // ============================================================
-    // OWNER: LIST ANIMAL FOR FOSTERING / ADOPTION
-    // ============================================================
-    let compressedFosterPhotoBase64 = null;
-
-    function openListFosterModal() {
-      document.getElementById('listFosterModal').classList.add('open');
-    }
-    function closeListFosterModal() {
-      document.getElementById('listFosterModal').classList.remove('open');
-    }
-
-    async function previewFosterPhoto(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      compressedFosterPhotoBase64 = await compressImageFile(file);
-      document.getElementById('fosterPhotoPreview').src = compressedFosterPhotoBase64;
-      document.getElementById('fosterPhotoPreview').classList.remove('hidden');
-      document.getElementById('fosterPhotoPlaceholder').classList.add('hidden');
-    }
-
-    async function handleAddFosterListing(event) {
-      event.preventDefault();
-      const btn = document.getElementById('fosterSubmitBtn');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Publishing to Database...';
-
-      const name = document.getElementById('newPetName').value.trim();
-      const species = document.getElementById('newPetSpecies').value;
-      const age = document.getElementById('newPetAge').value.trim();
-      const duration = document.getElementById('newPetDuration').value;
-      const medStatus = document.getElementById('newPetMedStatus').value;
-      const desc = document.getElementById('newPetDesc').value.trim();
-      const fallbackImg = species === 'cat'
-        ? 'https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?auto=format&fit=crop&w=800&q=80'
-        : 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80';
-
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'ADD_PET',
-            pin: String(sessionStorage.getItem('pfp_owner_pin') || '').trim(),
-            name,
-            species,
-            age,
-            duration,
-            medStatus,
-            desc,
-            photoBase64: compressedFosterPhotoBase64,
-            fallbackImg
-          })
-        });
-        const result = await res.json();
-
-        if (result.status === 'success') {
-          await syncLiveDatabase();
-          event.target.reset();
-          compressedFosterPhotoBase64 = null;
-          document.getElementById('fosterPhotoPreview').classList.add('hidden');
-          document.getElementById('fosterPhotoPlaceholder').classList.remove('hidden');
-          closeListFosterModal();
-          showToast(`${name} saved & published live!`);
-        } else {
-          showToast(result.message || 'Could not publish listing');
-        }
-      } catch (err) {
-        showToast('Network error saving listing');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
-    }
-
-    // ============================================================
-    // OWNER: ADD ACTIVE VET BILL
-    // ============================================================
-    function openAddBillModal() {
-      document.getElementById('addBillModal').classList.add('open');
-    }
-    function closeAddBillModal() {
-      document.getElementById('addBillModal').classList.remove('open');
-    }
-
-    async function handleAddVetBill(event) {
-      event.preventDefault();
-      const btn = document.getElementById('billSubmitBtn');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Publishing Bill...';
-
-      const animalName = document.getElementById('billAnimalName').value.trim();
-      const category = document.getElementById('billCategory').value;
-      const summary = document.getElementById('billSummary').value.trim();
-      const total = Number(document.getElementById('billTotal').value);
-      const raised = Math.min(Number(document.getElementById('billRaised').value), total);
-      const clinic = document.getElementById('billClinic').value.trim();
-
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'ADD_VET_BILL',
-            pin: String(sessionStorage.getItem('pfp_owner_pin') || '').trim(),
-            animalName,
-            category,
-            summary,
-            total,
-            raised,
-            clinic
-          })
-        });
-        const result = await res.json();
-
-        if (result.status === 'success') {
-          await syncLiveDatabase();
-          event.target.reset();
-          closeAddBillModal();
-          showToast(`Vet bill for ${animalName} saved live!`);
-        } else {
-          showToast(result.message || 'Could not publish vet bill');
-        }
-      } catch (err) {
-        showToast('Network error saving vet bill');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
-    }
-
-    // ============================================================
-    // PUBLIC: SOS RESCUE ALERT SUBMISSION
-    // ============================================================
-    let compressedSosPhotoBase64 = null;
-    let capturedCoords = null;
-
-    function selectChip(group, value, btnEl) {
-      if (group === 'species') {
-        document.getElementById('speciesInput').value = value;
-        document.querySelectorAll('.species-chip').forEach(chip => {
-          chip.className = 'species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border border-pinkbrand-100 bg-white text-stone-600 hover:border-pinkbrand-300 font-medium text-xs gap-1.5';
-        });
-        btnEl.className = 'species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border-2 border-pinkbrand-600 bg-pinkbrand-50 text-pinkbrand-700 font-semibold text-xs gap-1.5';
-      } else if (group === 'urgency') {
-        document.getElementById('urgencyInput').value = value;
-        document.querySelectorAll('.urgency-chip').forEach(chip => {
-          chip.className = 'urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-pinkbrand-100 bg-white text-stone-600 font-medium text-xs text-center';
-        });
-        btnEl.className = 'urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border-2 border-pinkbrand-600 bg-pinkbrand-50 text-pinkbrand-700 font-semibold text-xs text-center';
-      }
-    }
-
-    function detectLocation() {
-      const btnText = document.getElementById('gpsBtnText');
-      const gpsIcon = document.getElementById('gpsIcon');
-      const statusBox = document.getElementById('gpsStatusBox');
-      const coordsText = document.getElementById('gpsCoordsText');
-
-      if (!navigator.geolocation) {
-        showToast('GPS not supported on this browser');
-        return;
-      }
-
-      btnText.textContent = 'Locating...';
-      gpsIcon.classList.add('animate-spin');
-
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const lat = pos.coords.latitude.toFixed(5);
-          const lng = pos.coords.longitude.toFixed(5);
-          capturedCoords = `${lat},${lng}`;
-          
-          gpsIcon.classList.remove('animate-spin');
-          btnText.textContent = 'Pinned';
-          coordsText.textContent = `${lat}° N, ${lng}° E`;
-          statusBox.classList.remove('hidden');
-          showToast('GPS location locked!');
-        },
-        () => {
-          gpsIcon.classList.remove('animate-spin');
-          btnText.textContent = 'Retry GPS';
-          showToast('Enable location permission or type landmark');
-        },
-        { enableHighAccuracy: true, timeout: 8000 }
-      );
-    }
-
-    async function previewPhoto(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      compressedSosPhotoBase64 = await compressImageFile(file);
-      document.getElementById('photoPreview').src = compressedSosPhotoBase64;
-      document.getElementById('photoPreview').classList.remove('hidden');
-      document.getElementById('uploadPlaceholder').classList.add('hidden');
-      document.getElementById('clearPhotoBtn').classList.remove('hidden');
-    }
-
-    function clearPhoto(event) {
-      event.preventDefault();
-      event.stopPropagation();
-      compressedSosPhotoBase64 = null;
-      document.getElementById('photoUpload').value = '';
-      document.getElementById('photoPreview').classList.add('hidden');
-      document.getElementById('uploadPlaceholder').classList.remove('hidden');
-      document.getElementById('clearPhotoBtn').classList.add('hidden');
-    }
-
-    async function handleSosSubmit(event) {
-      event.preventDefault();
-      const submitBtn = document.getElementById('sosSubmitBtn');
-      const originalHtml = submitBtn.innerHTML;
-
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Dispatching SOS Alert...</span>`;
-      lucide.createIcons();
-
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'NEW_SOS',
-            species: document.getElementById('speciesInput').value,
-            urgency: document.getElementById('urgencyInput').value,
-            gps: capturedCoords || 'Not shared',
-            landmark: document.getElementById('landmarkInput').value.trim(),
-            reporterName: document.getElementById('reporterName').value.trim(),
-            reporterPhone: document.getElementById('reporterPhone').value.trim(),
-            stayingAtSpot: document.getElementById('stayAtSpot').checked,
-            photoBase64: compressedSosPhotoBase64
-          })
-        });
-
-        const result = await res.json();
-        if (result.status === 'success') {
-          document.getElementById('sosForm').reset();
-          capturedCoords = null;
-          compressedSosPhotoBase64 = null;
-          document.getElementById('photoPreview').classList.add('hidden');
-          document.getElementById('uploadPlaceholder').classList.remove('hidden');
-          document.getElementById('clearPhotoBtn').classList.add('hidden');
-          document.getElementById('gpsStatusBox').classList.add('hidden');
-          document.getElementById('gpsBtnText').textContent = 'Auto-Pin GPS';
-          showToast(`SOS Ticket #${result.ticketId} sent! Team notified.`);
-        } else {
-          showToast(result.message || 'Could not send alert');
-        }
-      } catch (err) {
-        showToast('Network error sending SOS alert');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalHtml;
+              <form id="setPinForm" onsubmit="handleSetOwnerPin(event)" class="${defaultMode === 'set' ? '' : 'hidden'} space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-stone-600 mb-1.5">Current PIN (Leave blank if setting first time)</label>
+                  <input type="password" id="currentOwnerPinInput" inputmode="numeric" maxlength="6" placeholder="••••••" class="w-full px-4 py-3 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-base font-bold tracking-[0.4em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-stone-600 mb-1.5">New Coordinator PIN (4–6 digits) *</label>
+                  <input type="password" id="newOwnerPinInput" inputmode="numeric" pattern="[0-9]{4,6}" minlength="4" maxlength="6" required placeholder="••••••" class="w-full px-4 py-3 rounded-xl bg-blush-50 border border-pinkbrand-200 text-center text-base font-bold tracking-[0.4em] focus:outline-none focus:bg-white focus:border-pinkbrand-600" />
+                </div>
+                <button type="submit" id="setPinSubmitBtn" class="btn-press w-full py-3.5 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-display font-bold text-sm">
+                  Save PIN & Unlock
+                </button>
+              </form>
+            </div>
+          </div>
+        `;
         lucide.createIcons();
+      };
+
+      window.openChangePinModal = function () {
+        openPinPrompt('set');
+      };
+
+      window.switchPinMode = function (mode) {
+        const unlockForm = document.getElementById('unlockPinForm');
+        const setForm = document.getElementById('setPinForm');
+        const unlockTab = document.getElementById('tabUnlockPinBtn');
+        const setTab = document.getElementById('tabSetPinBtn');
+
+        if (mode === 'unlock') {
+          unlockForm.classList.remove('hidden');
+          setForm.classList.add('hidden');
+          unlockTab.className = 'py-2 rounded-xl bg-pinkbrand-600 text-white text-xs font-bold transition';
+          setTab.className = 'py-2 rounded-xl text-stone-600 text-xs font-semibold transition';
+        } else {
+          unlockForm.classList.add('hidden');
+          setForm.classList.remove('hidden');
+          setTab.className = 'py-2 rounded-xl bg-pinkbrand-600 text-white text-xs font-bold transition';
+          unlockTab.className = 'py-2 rounded-xl text-stone-600 text-xs font-semibold transition';
+        }
+      };
+
+      window.closePinModal = function () {
+        if (isCoordinatorActive()) {
+          mountAdminUI();
+        } else {
+          unmountAdminUI();
+        }
+      };
+
+      window.verifyAdminPin = async function (event) {
+        event.preventDefault();
+        const enteredPin = String(document.getElementById('adminPinInput').value || '').trim();
+        const btn = document.getElementById('pinSubmitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Verifying...';
+
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'VERIFY_PIN', pin: enteredPin })
+          });
+          const result = await res.json();
+
+          if (result.status === 'success' && result.authenticated) {
+            sessionStorage.setItem(SESSION_KEY, encodeToken(enteredPin));
+            mountAdminUI();
+            await syncLiveDatabase();
+            showToast('Coordinator Mode unlocked');
+          } else {
+            showToast(result.message || 'Incorrect PIN');
+            document.getElementById('adminPinInput').value = '';
+          }
+        } catch (err) {
+          showToast('Network error verifying PIN');
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Unlock Listing Tools';
+          }
+        }
+      };
+
+      window.handleSetOwnerPin = async function (event) {
+        event.preventDefault();
+        const currentPin = String(document.getElementById('currentOwnerPinInput').value || '').trim();
+        const newPin = String(document.getElementById('newOwnerPinInput').value || '').trim();
+        const btn = document.getElementById('setPinSubmitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Saving PIN...';
+
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'SET_PIN',
+              currentPin: currentPin,
+              newPin: newPin,
+              pin: newPin
+            })
+          });
+          const result = await res.json();
+
+          if (result.status === 'success') {
+            sessionStorage.setItem(SESSION_KEY, encodeToken(newPin));
+            mountAdminUI();
+            await syncLiveDatabase();
+            showToast('New Coordinator PIN saved & unlocked!');
+          } else {
+            showToast(result.message || 'Could not update PIN');
+          }
+        } catch (err) {
+          showToast('Network error saving PIN');
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Save PIN & Unlock';
+          }
+        }
+      };
+
+      window.logoutAdmin = async function () {
+        sessionStorage.removeItem(SESSION_KEY);
+        unmountAdminUI();
+        await syncLiveDatabase();
+        showToast('Switched back to Public View');
+      };
+
+      function checkOwnerAccessOnLoad() {
+        if (isCoordinatorActive()) {
+          mountAdminUI();
+          return;
+        }
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('team') === '1') {
+          openPinPrompt('unlock');
+        }
       }
-    }
 
-    // ============================================================
-    // PUBLIC: PET FILTERS & MANDATORY ADOPTION / FOSTER APPLICATION
-    // ============================================================
-    function filterPets(category, btnEl) {
-      document.querySelectorAll('.filter-pill').forEach(pill => {
-        if (pill.textContent.includes('Urgent')) {
-          pill.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-pinkbrand-50 border border-pinkbrand-200 text-pinkbrand-700 text-xs font-semibold shrink-0 flex items-center gap-1.5';
-        } else {
-          pill.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-white border border-pinkbrand-100 text-stone-600 text-xs font-medium shrink-0';
-        }
-      });
+      // ============================================================
+      // TAB SWITCHING LOGIC
+      // ============================================================
+      window.switchTab = function (tabId, btnEl) {
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
 
-      btnEl.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-pinkbrand-600 text-white text-xs font-semibold shrink-0 flex items-center gap-1.5';
-
-      document.querySelectorAll('.pet-card').forEach(card => {
-        const categories = card.getAttribute('data-category');
-        if (category === 'all' || categories.includes(category)) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    }
-
-    function openAdoptModal(petName, type) {
-      document.getElementById('adoptPetName').value = petName;
-      document.getElementById('adoptInquiryType').value = type;
-      document.getElementById('modalTitle').textContent = `Apply for ${petName}`;
-      document.getElementById('modalBadge').textContent = `Mandatory ${type} Vetting`;
-      document.getElementById('adoptModal').classList.add('open');
-    }
-
-    function closeAdoptModal() {
-      document.getElementById('adoptModal').classList.remove('open');
-    }
-
-    async function handleAdoptSubmit(event) {
-      event.preventDefault();
-      const btn = document.getElementById('adoptSubmitBtn');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Submitting Application...';
-
-      const petName = document.getElementById('adoptPetName').value;
-      const inquiryType = document.getElementById('adoptInquiryType').value;
-
-      const fullApplicantProfile = [
-        `Age: ${document.getElementById('appAgeInput').value}`,
-        `Job: ${document.getElementById('appOccupationInput').value.trim()}`,
-        `Address: ${document.getElementById('appLocalityInput').value.trim()}`
-      ].join(' | ');
-
-      const fullHousingDetails = [
-        document.getElementById('appHomeInput').value,
-        document.getElementById('appOwnershipInput').value,
-        `Alone: ${document.getElementById('appAloneHoursInput').value}`
-      ].join(' • ');
-
-      const fullPetCareNotes = [
-        document.getElementById('appPetsInput').value,
-        `Care Plan: ${document.getElementById('appReasonInput').value.trim()}`,
-        'Agreed to Indoor/Vaccination/Follow-ups: Yes'
-      ].join(' | ');
-
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'NEW_APPLICATION',
-            petName,
-            inquiryType,
-            applicantName: `${document.getElementById('appNameInput').value.trim()} (${document.getElementById('appAgeInput').value} yrs, ${document.getElementById('appOccupationInput').value.trim()})`,
-            applicantPhone: document.getElementById('appPhoneInput').value.trim(),
-            locality: fullApplicantProfile,
-            homeType: fullHousingDetails,
-            existingPets: fullPetCareNotes
-          })
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+          btn.classList.remove('active', 'text-pinkbrand-600', 'bg-pinkbrand-50');
+          btn.classList.add('text-stone-500');
+          btn.querySelector('span').classList.replace('font-bold', 'font-semibold');
         });
-        const result = await res.json();
 
-        if (result.status === 'success') {
-          closeAdoptModal();
-          event.target.reset();
-          showToast(`Application #${result.appId} for ${petName} submitted!`);
-        } else {
-          showToast(result.message || 'Submission failed');
+        btnEl.classList.add('active', 'text-pinkbrand-600', 'bg-pinkbrand-50');
+        btnEl.classList.remove('text-stone-500');
+        btnEl.querySelector('span').classList.replace('font-semibold', 'font-bold');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      // ============================================================
+      // SERVICE MENU INFO DRAWER
+      // ============================================================
+      const serviceDetails = {
+        rehab: {
+          title: 'Rehabilitation & Trauma Care',
+          body: 'We rescue critically injured, accident-hit, and abandoned street animals across Hyderabad, providing emergency hospitalization, orthopedic surgeries, and safe post-operative recovery until they can walk and thrive again.'
+        },
+        feeding: {
+          title: 'Daily Street Feeding Drives',
+          body: 'Our volunteers conduct daily feeding runs across Hyderabad colonies and shelter zones. You can sponsor dry kibble (like Whiskas for rescued kittens/cats) or volunteer for a feeding route in your neighborhood.'
+        },
+        spay: {
+          title: 'Spay, Neuter & Vaccination (ABC)',
+          body: 'Sterilization and anti-rabies / 7-in-1 / Tricat vaccinations are the most humane way to prevent street suffering. Report unsterilized community animals or sponsor a vaccination kit today.'
         }
-      } catch (err) {
-        showToast('Network error submitting application');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
-    }
+      };
 
-    // ============================================================
-    // COPY UPI & TOAST
-    // ============================================================
-    function copyUpi() {
-      const upi = document.getElementById('upiIdText').textContent;
-      navigator.clipboard.writeText(upi);
-      
-      const copyText = document.getElementById('copyText');
-      if (copyText) copyText.textContent = 'Copied!';
-      showToast('Copied: barshasarkar45@okaxis');
+      window.openServiceInfo = function (key) {
+        const data = serviceDetails[key];
+        if (!data) return;
+        document.getElementById('serviceTitle').textContent = data.title;
+        document.getElementById('serviceBody').textContent = data.body;
+        document.getElementById('serviceModal').classList.add('open');
+      };
+      window.closeServiceModal = function () {
+        document.getElementById('serviceModal').classList.remove('open');
+      };
 
-      setTimeout(() => {
-        if (copyText) copyText.textContent = 'Copy';
-      }, 2000);
-    }
+      // ============================================================
+      // QR MODAL CONTROLS
+      // ============================================================
+      window.openQrModal = function () {
+        document.getElementById('qrModal').classList.add('open');
+      };
+      window.closeQrModal = function () {
+        document.getElementById('qrModal').classList.remove('open');
+      };
 
-    let toastTimeout;
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toastMessage').textContent = message;
-      toast.classList.remove('opacity-0', '-translate-y-2');
-      toast.classList.add('opacity-100', 'translate-y-0');
+      // ============================================================
+      // OWNER: LIST ANIMAL FOR FOSTERING / ADOPTION
+      // ============================================================
+      let compressedFosterPhotoBase64 = null;
 
-      clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        toast.classList.remove('opacity-100', 'translate-y-0');
-        toast.classList.add('opacity-0', '-translate-y-2');
-      }, 3000);
-    }
+      window.openListFosterModal = function () {
+        const modal = document.getElementById('listFosterModal');
+        if (modal) modal.classList.add('open');
+      };
+      window.closeListFosterModal = function () {
+        const modal = document.getElementById('listFosterModal');
+        if (modal) modal.classList.remove('open');
+      };
 
-    // Boot
-    checkOwnerAccessOnLoad();
-    syncLiveDatabase();
+      window.previewFosterPhoto = async function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        compressedFosterPhotoBase64 = await compressImageFile(file);
+        document.getElementById('fosterPhotoPreview').src = compressedFosterPhotoBase64;
+        document.getElementById('fosterPhotoPreview').classList.remove('hidden');
+        document.getElementById('fosterPhotoPlaceholder').classList.add('hidden');
+      };
+
+      window.handleAddFosterListing = async function (event) {
+        event.preventDefault();
+        const pin = decodeToken();
+        if (!pin) return showToast('Session expired — please unlock again');
+
+        const btn = document.getElementById('fosterSubmitBtn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Publishing to Database...';
+
+        const name = document.getElementById('newPetName').value.trim();
+        const species = document.getElementById('newPetSpecies').value;
+        const age = document.getElementById('newPetAge').value.trim();
+        const duration = document.getElementById('newPetDuration').value;
+        const medStatus = document.getElementById('newPetMedStatus').value;
+        const desc = document.getElementById('newPetDesc').value.trim();
+        const fallbackImg = species === 'cat'
+          ? 'https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?auto=format&fit=crop&w=800&q=80'
+          : 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80';
+
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'ADD_PET',
+              pin: pin,
+              name,
+              species,
+              age,
+              duration,
+              medStatus,
+              desc,
+              photoBase64: compressedFosterPhotoBase64,
+              fallbackImg
+            })
+          });
+          const result = await res.json();
+
+          if (result.status === 'success') {
+            await syncLiveDatabase();
+            event.target.reset();
+            compressedFosterPhotoBase64 = null;
+            document.getElementById('fosterPhotoPreview').classList.add('hidden');
+            document.getElementById('fosterPhotoPlaceholder').classList.remove('hidden');
+            closeListFosterModal();
+            showToast(`${name} saved & published live!`);
+          } else {
+            showToast(result.message || 'Could not publish listing');
+          }
+        } catch (err) {
+          showToast('Network error saving listing');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = originalText;
+        }
+      };
+
+      // ============================================================
+      // OWNER: ADD ACTIVE VET BILL
+      // ============================================================
+      window.openAddBillModal = function () {
+        const modal = document.getElementById('addBillModal');
+        if (modal) modal.classList.add('open');
+      };
+      window.closeAddBillModal = function () {
+        const modal = document.getElementById('addBillModal');
+        if (modal) modal.classList.remove('open');
+      };
+
+      window.handleAddVetBill = async function (event) {
+        event.preventDefault();
+        const pin = decodeToken();
+        if (!pin) return showToast('Session expired — please unlock again');
+
+        const btn = document.getElementById('billSubmitBtn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Publishing Bill...';
+
+        const animalName = document.getElementById('billAnimalName').value.trim();
+        const category = document.getElementById('billCategory').value;
+        const summary = document.getElementById('billSummary').value.trim();
+        const total = Number(document.getElementById('billTotal').value);
+        const raised = Math.min(Number(document.getElementById('billRaised').value), total);
+        const clinic = document.getElementById('billClinic').value.trim();
+
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'ADD_VET_BILL',
+              pin: pin,
+              animalName,
+              category,
+              summary,
+              total,
+              raised,
+              clinic
+            })
+          });
+          const result = await res.json();
+
+          if (result.status === 'success') {
+            await syncLiveDatabase();
+            event.target.reset();
+            closeAddBillModal();
+            showToast(`Vet bill for ${animalName} saved live!`);
+          } else {
+            showToast(result.message || 'Could not publish vet bill');
+          }
+        } catch (err) {
+          showToast('Network error saving vet bill');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = originalText;
+        }
+      };
+
+      // ============================================================
+      // PUBLIC: SOS RESCUE ALERT SUBMISSION
+      // ============================================================
+      let compressedSosPhotoBase64 = null;
+      let capturedCoords = null;
+
+      window.selectChip = function (group, value, btnEl) {
+        if (group === 'species') {
+          document.getElementById('speciesInput').value = value;
+          document.querySelectorAll('.species-chip').forEach(chip => {
+            chip.className = 'species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border border-pinkbrand-100 bg-white text-stone-600 hover:border-pinkbrand-300 font-medium text-xs gap-1.5';
+          });
+          btnEl.className = 'species-chip btn-press group flex flex-col items-center justify-center py-3 px-2 rounded-2xl border-2 border-pinkbrand-600 bg-pinkbrand-50 text-pinkbrand-700 font-semibold text-xs gap-1.5';
+        } else if (group === 'urgency') {
+          document.getElementById('urgencyInput').value = value;
+          document.querySelectorAll('.urgency-chip').forEach(chip => {
+            chip.className = 'urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-pinkbrand-100 bg-white text-stone-600 font-medium text-xs text-center';
+          });
+          btnEl.className = 'urgency-chip btn-press flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border-2 border-pinkbrand-600 bg-pinkbrand-50 text-pinkbrand-700 font-semibold text-xs text-center';
+        }
+      };
+
+      window.detectLocation = function () {
+        const btnText = document.getElementById('gpsBtnText');
+        const gpsIcon = document.getElementById('gpsIcon');
+        const statusBox = document.getElementById('gpsStatusBox');
+        const coordsText = document.getElementById('gpsCoordsText');
+
+        if (!navigator.geolocation) {
+          showToast('GPS not supported on this browser');
+          return;
+        }
+
+        btnText.textContent = 'Locating...';
+        gpsIcon.classList.add('animate-spin');
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude.toFixed(5);
+            const lng = pos.coords.longitude.toFixed(5);
+            capturedCoords = `${lat},${lng}`;
+            
+            gpsIcon.classList.remove('animate-spin');
+            btnText.textContent = 'Pinned';
+            coordsText.textContent = `${lat}° N, ${lng}° E`;
+            statusBox.classList.remove('hidden');
+            showToast('GPS location locked!');
+          },
+          () => {
+            gpsIcon.classList.remove('animate-spin');
+            btnText.textContent = 'Retry GPS';
+            showToast('Enable location permission or type landmark');
+          },
+          { enableHighAccuracy: true, timeout: 8000 }
+        );
+      };
+
+      window.previewPhoto = async function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        compressedSosPhotoBase64 = await compressImageFile(file);
+        document.getElementById('photoPreview').src = compressedSosPhotoBase64;
+        document.getElementById('photoPreview').classList.remove('hidden');
+        document.getElementById('uploadPlaceholder').classList.add('hidden');
+        document.getElementById('clearPhotoBtn').classList.remove('hidden');
+      };
+
+      window.clearPhoto = function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        compressedSosPhotoBase64 = null;
+        document.getElementById('photoUpload').value = '';
+        document.getElementById('photoPreview').classList.add('hidden');
+        document.getElementById('uploadPlaceholder').classList.remove('hidden');
+        document.getElementById('clearPhotoBtn').classList.add('hidden');
+      };
+
+      window.handleSosSubmit = async function (event) {
+        event.preventDefault();
+        const submitBtn = document.getElementById('sosSubmitBtn');
+        const originalHtml = submitBtn.innerHTML;
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Dispatching SOS Alert...</span>`;
+        lucide.createIcons();
+
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'NEW_SOS',
+              species: document.getElementById('speciesInput').value,
+              urgency: document.getElementById('urgencyInput').value,
+              gps: capturedCoords || 'Not shared',
+              landmark: document.getElementById('landmarkInput').value.trim(),
+              reporterName: document.getElementById('reporterName').value.trim(),
+              reporterPhone: document.getElementById('reporterPhone').value.trim(),
+              stayingAtSpot: document.getElementById('stayAtSpot').checked,
+              photoBase64: compressedSosPhotoBase64
+            })
+          });
+
+          const result = await res.json();
+          if (result.status === 'success') {
+            document.getElementById('sosForm').reset();
+            capturedCoords = null;
+            compressedSosPhotoBase64 = null;
+            document.getElementById('photoPreview').classList.add('hidden');
+            document.getElementById('uploadPlaceholder').classList.remove('hidden');
+            document.getElementById('clearPhotoBtn').classList.add('hidden');
+            document.getElementById('gpsStatusBox').classList.add('hidden');
+            document.getElementById('gpsBtnText').textContent = 'Auto-Pin GPS';
+            showToast(`SOS Ticket #${result.ticketId} sent! Team notified.`);
+          } else {
+            showToast(result.message || 'Could not send alert');
+          }
+        } catch (err) {
+          showToast('Network error sending SOS alert');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalHtml;
+          lucide.createIcons();
+        }
+      };
+
+      // ============================================================
+      // PUBLIC: PET FILTERS & MANDATORY ADOPTION / FOSTER APPLICATION
+      // ============================================================
+      window.filterPets = function (category, btnEl) {
+        document.querySelectorAll('.filter-pill').forEach(pill => {
+          if (pill.textContent.includes('Urgent')) {
+            pill.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-pinkbrand-50 border border-pinkbrand-200 text-pinkbrand-700 text-xs font-semibold shrink-0 flex items-center gap-1.5';
+          } else {
+            pill.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-white border border-pinkbrand-100 text-stone-600 text-xs font-medium shrink-0';
+          }
+        });
+
+        btnEl.className = 'filter-pill btn-press px-4 py-2 rounded-full bg-pinkbrand-600 text-white text-xs font-semibold shrink-0 flex items-center gap-1.5';
+
+        document.querySelectorAll('.pet-card').forEach(card => {
+          const categories = card.getAttribute('data-category');
+          if (category === 'all' || categories.includes(category)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      };
+
+      window.openAdoptModal = function (petName, type) {
+        document.getElementById('adoptPetName').value = petName;
+        document.getElementById('adoptInquiryType').value = type;
+        document.getElementById('modalTitle').textContent = `Apply for ${petName}`;
+        document.getElementById('modalBadge').textContent = `Mandatory ${type} Vetting`;
+        document.getElementById('adoptModal').classList.add('open');
+      };
+
+      window.closeAdoptModal = function () {
+        document.getElementById('adoptModal').classList.remove('open');
+      };
+
+      window.handleAdoptSubmit = async function (event) {
+        event.preventDefault();
+        const btn = document.getElementById('adoptSubmitBtn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Submitting Application...';
+
+        const petName = document.getElementById('adoptPetName').value;
+        const inquiryType = document.getElementById('adoptInquiryType').value;
+
+        const fullApplicantProfile = [
+          `Age: ${document.getElementById('appAgeInput').value}`,
+          `Job: ${document.getElementById('appOccupationInput').value.trim()}`,
+          `Address: ${document.getElementById('appLocalityInput').value.trim()}`
+        ].join(' | ');
+
+        const fullHousingDetails = [
+          document.getElementById('appHomeInput').value,
+          document.getElementById('appOwnershipInput').value,
+          `Alone: ${document.getElementById('appAloneHoursInput').value}`
+        ].join(' • ');
+
+        const fullPetCareNotes = [
+          document.getElementById('appPetsInput').value,
+          `Care Plan: ${document.getElementById('appReasonInput').value.trim()}`,
+          'Agreed to Indoor/Vaccination/Follow-ups: Yes'
+        ].join(' | ');
+
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'NEW_APPLICATION',
+              petName,
+              inquiryType,
+              applicantName: `${document.getElementById('appNameInput').value.trim()} (${document.getElementById('appAgeInput').value} yrs, ${document.getElementById('appOccupationInput').value.trim()})`,
+              applicantPhone: document.getElementById('appPhoneInput').value.trim(),
+              locality: fullApplicantProfile,
+              homeType: fullHousingDetails,
+              existingPets: fullPetCareNotes
+            })
+          });
+          const result = await res.json();
+
+          if (result.status === 'success') {
+            closeAdoptModal();
+            event.target.reset();
+            showToast(`Application #${result.appId} for ${petName} submitted!`);
+          } else {
+            showToast(result.message || 'Submission failed');
+          }
+        } catch (err) {
+          showToast('Network error submitting application');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = originalText;
+        }
+      };
+
+      // ============================================================
+      // COPY UPI & TOAST
+      // ============================================================
+      window.copyUpi = function () {
+        const upi = document.getElementById('upiIdText').textContent;
+        navigator.clipboard.writeText(upi);
+        
+        const copyText = document.getElementById('copyText');
+        if (copyText) copyText.textContent = 'Copied!';
+        showToast('Copied: barshasarkar45@okaxis');
+
+        setTimeout(() => {
+          if (copyText) copyText.textContent = 'Copy';
+        }, 2000);
+      };
+
+      let toastTimeout;
+      window.showToast = function (message) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMessage').textContent = message;
+        toast.classList.remove('opacity-0', '-translate-y-2');
+        toast.classList.add('opacity-100', 'translate-y-0');
+
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toast.classList.remove('opacity-100', 'translate-y-0');
+          toast.classList.add('opacity-0', '-translate-y-2');
+        }, 3000);
+      };
+
+      // Boot
+      checkOwnerAccessOnLoad();
+      syncLiveDatabase();
+    })();
   </script>
 </body>
 </html>
